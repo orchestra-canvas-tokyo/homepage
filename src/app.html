@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		%sveltekit.head%
+	</head>
+
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+
+	<style>
+		/*  自サーバーにホストしているFuturaを読み込む
+			downloaded from https://fontsgeek.com/fonts/Futura-Medium */
+		@font-face {
+			font-family: 'Futura Medium';
+			src: url('/font/Futura\ Medium.otf') format('opentype');
+		}
+
+		:root {
+			--main-color: white;
+			--secondary-color: #938b87;
+			--background-color: #0a0606;
+			--secondary-background-color: #36312e;
+			--tertiary-background-color: #938b87;
+			--header-height: 130px;
+			--window-padding: 30px;
+			--header-padding: 30px;
+			--aside-width: calc(80.61px + 2 * var(--window-padding));
+			--mobile-news-height: 100px;
+			--font-family: '游ゴシック体', YuGothic, '游ゴシック Medium', 'Yu Gothic Medium', '游ゴシック',
+				'Yu Gothic', sans-serif;
+			--english-font-family: 'Futura Medium', var(--font-family);
+			--letter-spacing: 0.1em;
+			--header-letter-spacing: 0.2em;
+		}
+
+		@media (max-width: 950px) {
+			:root {
+				--window-padding: 35px;
+				--header-padding: 20px;
+			}
+		}
+
+		html {
+			font-family: var(--font-family);
+			letter-spacing: var(--letter-spacing);
+		}
+
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6 {
+			line-height: 1.2em;
+			letter-spacing: var(--header-letter-spacing);
+		}
+
+		a {
+			color: var(--main-color);
+			text-decoration: none;
+			border-bottom: 1px solid;
+		}
+
+		.en {
+			text-transform: uppercase;
+			font-family: var(--english-font-family);
+		}
+	</style>
+</html>

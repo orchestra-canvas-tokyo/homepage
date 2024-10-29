@@ -1,0 +1,4 @@
+# *.pages.devへのデプロイがインデックスされないように
+# https://developers.cloudflare.com/pages/configuration/headers/#prevent-your-pagesdev-deployments-showing-in-search-results
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
