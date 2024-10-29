@@ -12,6 +12,7 @@
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
+	import { afterNavigate } from '$app/navigation';
 
 	export let data: LayoutData;
 
@@ -128,6 +129,9 @@
 		if (browser) document.body.style.overflow = isOpen ? 'hidden' : '';
 	});
 	onDestroy(unsubscribe);
+
+	// 画面遷移時はハンバーガーメニューを閉じる
+	afterNavigate(() => (isOpen = false));
 </script>
 
 <header>
