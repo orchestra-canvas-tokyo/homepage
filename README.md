@@ -40,6 +40,9 @@ npm run dev
 
 ### 演奏会の追加
 
+> [!IMPORTANT]
+> Newsの追加も忘れずに！
+
 ```shell
 # インタラクティブに各種パラメータを設定
 $ npm run add:concert
@@ -47,6 +50,8 @@ $ npm run add:concert
 # コマンドライン引数で一括指定も可能
 $ npm run add:concert -- --type regular|chamber --number 999
 ```
+
+その後、`/src/lib/concerts/`内の目的の演奏会ファイルを編集してください。
 
 - SSR時に演奏会開催日でソートされるため、`concerts`への追加順は問いません。
 - `concerts`でエクスポートされた演奏会が、`/concerts/[slug]`で表示されます。
