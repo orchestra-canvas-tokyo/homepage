@@ -25,9 +25,33 @@
 ## 開発環境の構築
 
 ```shell
-npm install
-npm run dev
+npm install # 依存関係をインストール
+npm run dev # 開発環境を立ち上げ
 ```
+
+### Npm Script一覧
+
+npm scriptとは、npmで設定できる開発時向けのエイリアス、スクリプトです。
+`packages.json`内に設定の実態があります。
+
+| コマンド                | 内容                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| `npm install`           | 厳密にはnpm scriptではないですが、依存関係を(再)インストールします。          |
+| **開発環境**            |                                                                               |
+| `npm run dev`           | 開発環境を起動します。                                                        |
+| `npm run build`         | ビルドします。                                                                |
+| `npm run preview`       | ビルドしたものをローカルの環境で提供します。                                  |
+|                         | `dev`、`preview`はコマンドライン引数`-- --open`でブラウザを自動起動できます。 |
+| **コーディング**        |                                                                               |
+| `npm run precommit`     | コミット前のCIに用いられる、`check`と`lint:*`を並列実行します。               |
+| `npm run check`         | Svelteが提供しているチェッカーを実行します。                                  |
+| `npm run check:watch`   | Svelteが提供しているチェッカーを常時実行します。                              |
+| `npm run lint`          | `lint:*`を順次実行します。                                                    |
+| `npm run lint:prettier` | Prettierでのコードチェックを実行します。                                      |
+| `npm run lint:eslint`   | ESLintを実行します。                                                          |
+| `npm run format`        | Prettierでのフォーマットを実行します。                                        |
+| **テンプレート**        |                                                                               |
+| `npm run add:concert`   | 演奏会ページを作成します。（[詳細後述](#演奏会の追加)）                       |
 
 ## 日々のメンテナンス
 
