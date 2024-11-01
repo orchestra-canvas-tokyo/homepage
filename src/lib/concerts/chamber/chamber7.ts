@@ -21,7 +21,7 @@ export const concert: Concert = {
 		{ name: 'モーツァルト/セレナーデ第11番 変ホ長調' },
 		{ name: 'ボウエン/ホルンと弦楽四重奏のための五重奏曲 ほか' }
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: false,
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/23160'

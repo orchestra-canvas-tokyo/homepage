@@ -34,7 +34,7 @@ export const concert: Concert = {
 		{ name: 'ドビュッシー / 弦楽四重奏曲 ト短調 作品10 第1,3楽章' },
 		{ name: 'トマジ / 春' }
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: false,
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/32749'

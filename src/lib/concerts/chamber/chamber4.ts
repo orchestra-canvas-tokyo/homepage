@@ -28,7 +28,7 @@ export const concert: Concert = {
 		{ name: 'ジョージ・ガーシュウィン（デニス・アーミテージ編）／ポートレイト' },
 		{ name: 'ジェフリー・アグレル／ゴスペル・タイム' }
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: false,
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/15848'

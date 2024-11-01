@@ -46,7 +46,7 @@ export const concert: Concert = {
 			url: 'https://www.jao.or.jp/library/'
 		}
 	],
-	showProgramNote: true,
+	showLinkToProgramNote: true,
 	// cspell: disable-next-line
 	youtubePlaylistId: 'PLlsZL5V_BM_FStt8VhzOvFKqOT4W44tuB'
 };

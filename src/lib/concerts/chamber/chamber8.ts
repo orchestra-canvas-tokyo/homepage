@@ -30,7 +30,7 @@ export const concert: Concert = {
 		{ name: 'ラインベルガー / 九重奏曲 作品139' },
 		{ name: 'ブラームス / 弦楽五重奏第2番 1楽章' }
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: false,
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/27240'

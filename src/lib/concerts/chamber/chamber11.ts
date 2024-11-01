@@ -31,7 +31,7 @@ export const concert: Concert = {
 		{ name: 'チャイコフスキー / 弦楽四重奏曲 第1番 ニ長調 作品11 第2,3,4楽章' },
 		{ name: 'ブラームス / 弦楽器五重奏曲 第2番 ト長調 作品111 第1,4楽章' }
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: false,
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/36513'
