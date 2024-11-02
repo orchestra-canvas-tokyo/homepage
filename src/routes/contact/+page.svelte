@@ -66,6 +66,7 @@
 		if (form?.success === undefined) {
 			toastMessage = null;
 		} else {
+			if (form?.success === false) console.log({ form });
 			formResponseStateChanged(form.success);
 		}
 	}
