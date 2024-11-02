@@ -112,13 +112,13 @@
 		<div class="form-container">
 			<label for="name">お名前</label>
 			<input type="text" id="name" name="name" />
-			<label for="mailAddress" class="required-label">メールアドレス</label>
-			<input type="email" id="mailAddress" name="mailAddress" required />
-			<label for="category" class="required-label">種類</label>
-			<select id="category" name="category" required>
+			<label for="email" class="required-label">メールアドレス</label>
+			<input type="email" id="email" name="email" required />
+			<label for="categoryKey" class="required-label">種類</label>
+			<select id="categoryKey" name="categoryKey" required>
 				<option value="" selected hidden></option>
-				{#each categories as category}
-					<option value={category.key}>{category.description}</option>
+				{#each Object.entries(categories) as [key, description]}
+					<option value={key}>{description}</option>
 				{/each}
 			</select>
 			<label for="body" class="required-label">本文</label>
