@@ -2,6 +2,7 @@ import { RECAPTCHA_SECRET } from '$env/static/private';
 import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { validate } from './validator';
 import { log } from './logger';
+import { verifyCaptcha } from './capthaVerfier';
 
 export const load: ServerLoad = async ({ locals }) => {
 	const { session } = locals;
@@ -36,18 +37,8 @@ export const actions = {
 			return { success: false, message: 'Invalid csrf token' };
 
 		// reCAPTCHAトークンを検証
-		const body = new FormData();
-		body.append('secret', RECAPTCHA_SECRET);
-		body.append('response', validatedRequest.reCaptchaToken);
-		const response = await (
-			await fetch('https://www.google.com/recaptcha/api/siteverify', {
-				body: body,
-				method: 'POST'
-			})
-		).json();
-		if (!response?.success) {
-			return { success: false, message: 'Invalid reCaptcha token' };
-		}
+		const captchaResult = await verifyCaptcha(validatedRequest.reCaptchaToken);
+		if (!captchaResult) return { success: false, message: 'Invalid reCAPTCHA token' };
 
 		// データベースにログ
 		const loggingResult = await log(platform?.env.DB, {
