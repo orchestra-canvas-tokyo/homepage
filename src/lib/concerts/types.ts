@@ -55,6 +55,6 @@ export interface Concert {
 		description?: string | string[]; // 複数行にまたがる場合、各行を要素とする配列で指定
 		url?: string;
 	};
-	showProgramNote?: boolean; // blogへのリンクを表示するかどうか
+	showLinkToProgramNote?: boolean; // blogへのリンクを表示するかどうか
 	youtubePlaylistId?: string;
 }

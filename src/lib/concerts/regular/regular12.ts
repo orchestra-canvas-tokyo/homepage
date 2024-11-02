@@ -37,7 +37,7 @@ export const concert: Concert = {
 			encoreType: 'standard'
 		}
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: true,
 	ticket: {
 		description: '全席指定 1,000円',
 		url: 'https://teket.jp/1776/34677'

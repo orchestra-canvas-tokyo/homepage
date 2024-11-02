@@ -31,7 +31,7 @@ export const concert: Concert = {
 		description: '未定'
 		// url: '●'
 	},
-	showProgramNote: false
+	showLinkToProgramNote: false
 	// cspell: disable-next-line
 	// youtubePlaylistId: '●'
 };

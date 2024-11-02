@@ -28,7 +28,7 @@ export const concert: Concert = {
 		{ name: 'ラヴェル / クープランの墓' },
 		{ name: '小林健太郎 / ホルン四重奏曲 第3番「あらたなる旅立ちの時」' }
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: false,
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/33384'

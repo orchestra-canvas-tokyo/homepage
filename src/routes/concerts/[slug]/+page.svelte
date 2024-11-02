@@ -133,7 +133,7 @@
 				</dd>
 			{/if}
 		{/if}
-		{#if data.showProgramNote}
+		{#if data.showLinkToProgramNote}
 			<dt>曲目解説</dt>
 			<dl>
 				<a

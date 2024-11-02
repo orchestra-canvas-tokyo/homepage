@@ -51,7 +51,7 @@ export const concert: Concert = {
 			}
 		}
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: true,
 	ticket: {
 		description: '全席指定 1,000円',
 		url: 'https://teket.jp/1776/24639'

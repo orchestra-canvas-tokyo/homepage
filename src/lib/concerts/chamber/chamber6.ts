@@ -21,7 +21,7 @@ export const concert: Concert = {
 		{ name: 'ドヴォルザーク／弦楽四重奏曲第12番 作品96 『アメリカ』' },
 		{ name: 'ターナー／Farewell to Red Castle 他' }
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: false,
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/21472'

@@ -31,7 +31,7 @@ export const concert: Concert = {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/42303'
 	},
-	showProgramNote: false
+	showLinkToProgramNote: false
 	// cspell: disable-next-line
 	// youtubePlaylistId: '●'
 };
