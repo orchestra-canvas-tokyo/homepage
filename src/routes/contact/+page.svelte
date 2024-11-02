@@ -1,25 +1,11 @@
 <script lang="ts">
 	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
-	import { onMount } from 'svelte';
+	import type { PageServerData } from './$types';
 
 	// CSRF-likeなトークンに用いる2変数
-	let csrfToken = '';
-	let csrfTimestamp = '';
-	onMount(async () => {
-		// CSRF-likeなトークンを取得する。厳密にはセッションを用いていない
-		const response = await fetch('https://api.orch-canvas.tokyo/homepage/get-csrf-token', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
-		if (response.ok) {
-			const data = JSON.parse(await response.text());
-			csrfToken = data.token;
-			csrfTimestamp = data.timestamp;
-		}
-	});
+	export let data: PageServerData;
+	const csrfToken = data.csrfToken;
 
 	const reCaptchaSiteKey = '6LfixUwmAAAAAKr_6ZeTyiPBnYq-Li5KO8_5EVbC';
 	let isSubmitting = false; // 送信中の状態を管理する変数
@@ -133,7 +119,6 @@
 		</div>
 
 		<input type="hidden" name="csrfToken" value={csrfToken} />
-		<input type="hidden" name="csrfTimestamp" value={csrfTimestamp} />
 		<button
 			class="g-recaptcha"
 			data-sitekey="6Leu7JkpAAAAAJtmzgkPuGhRnabureUN_O_yt8IM"

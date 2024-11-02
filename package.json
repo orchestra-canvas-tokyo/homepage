@@ -46,6 +46,8 @@
 		"@splidejs/svelte-splide": "^0.2.9",
 		"@types/grecaptcha": "^3.0.9",
 		"dayjs": "^1.11.13",
+		"svelte-kit-connect-cloudflare-kv": "^0.1.0",
+		"svelte-kit-sessions": "^0.3.2",
 		"zod": "^3.23.8"
 	},
 	"optionalDependencies": {
