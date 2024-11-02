@@ -9,6 +9,7 @@ declare global {
 		interface Platform {
 			env: {
 				KV: KVNamespace;
+				DB: D1Database;
 			};
 		}
 	}
