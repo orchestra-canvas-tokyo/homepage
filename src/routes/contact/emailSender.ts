@@ -10,13 +10,7 @@ const ccsByCategory: Record<string, string[]> = {
 
 export async function sendEmail(content: RequestData, apiKey: string) {
 	const subject = 'お問い合わせを承りました（Orchestra Canvas Tokyo）';
-
-	const body = content.name
-		? `${content.name}さま
-
-` // 名前が送信されている場合、宛名と適当な改行を挿入
-		: '' +
-			`Orchestra Canvas Tokyoです。
+	let body = `Orchestra Canvas Tokyoです。
 ホームページより、お問い合わせを承りました。
 
 必要に応じてメールにてご返答いたします。
@@ -27,6 +21,13 @@ export async function sendEmail(content: RequestData, apiKey: string) {
 分類：${categories[content.categoryKey]}
 本分：
 ${content.body}`;
+
+	// 名前が送信されている場合、宛名と適当な改行を挿入
+	if (content.name)
+		body =
+			`${content.name}さま
+
+` + body;
 
 	const resend = new Resend(apiKey);
 	await resend.emails.send({
