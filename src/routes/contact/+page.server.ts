@@ -1,8 +1,8 @@
-import { RECAPTCHA_SECRET } from '$env/static/private';
 import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { validate } from './validator';
 import { log } from './logger';
 import { verifyCaptcha } from './capthaVerfier';
+import { sendEmail } from './emailSender';
 
 export const load: ServerLoad = async ({ locals }) => {
 	const { session } = locals;
@@ -22,6 +22,9 @@ export const actions = {
 	default: async ({ request, locals, platform }) => {
 		const { session } = locals;
 
+		if (platform?.env.RECAPTCHA_SECRET === undefined || platform?.env.RESEND_API_KEY === undefined)
+			return { success: false, message: 'Invalid system environment' };
+
 		const rawRequest: Record<string, FormDataEntryValue> = {};
 		(await request.formData()).forEach((value, key) => {
 			rawRequest[key] = value;
@@ -37,7 +40,10 @@ export const actions = {
 			return { success: false, message: 'Invalid csrf token' };
 
 		// reCAPTCHAトークンを検証
-		const captchaResult = await verifyCaptcha(validatedRequest.reCaptchaToken);
+		const captchaResult = await verifyCaptcha(
+			validatedRequest.reCaptchaToken,
+			platform?.env.RECAPTCHA_SECRET
+		);
 		if (!captchaResult) return { success: false, message: 'Invalid reCAPTCHA token' };
 
 		// データベースにログ
@@ -45,7 +51,10 @@ export const actions = {
 			sentAt: new Date().toISOString(),
 			...validatedRequest
 		});
-		console.log({ loggingResult });
+		if (!loggingResult.success) return { success: false, message: 'Failed to log' };
+
+		// メール送信
+		sendEmail(validatedRequest, platform.env.RESEND_API_KEY);
 
 		return { success: true };
 	}
