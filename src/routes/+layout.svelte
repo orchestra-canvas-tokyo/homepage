@@ -123,6 +123,9 @@
 	// ハンバーガーメニュー
 	let isOpen: boolean = false;
 	$: transformX = isOpen ? '0' : '300px';
+	$: if (browser) {
+		document.body.style.overflow = isOpen ? 'hidden' : '';
+	}
 
 	// ハンバーガーメニューオープン時はスクロールしないように
 	const unsubscribe = page.subscribe(() => {
@@ -131,7 +134,9 @@
 	onDestroy(unsubscribe);
 
 	// 画面遷移時はハンバーガーメニューを閉じる
-	afterNavigate(() => (isOpen = false));
+	afterNavigate(() => {
+		isOpen = false;
+	});
 </script>
 
 <header>
@@ -142,9 +147,6 @@
 	<nav>
 		<input
 			bind:checked={isOpen}
-			on:change={() => {
-				document.body.style.overflow = isOpen ? 'hidden' : '';
-			}}
 			type="checkbox"
 			id="hamburger-menu-check"
 			aria-label="ハンバーガーメニューを開閉する"
