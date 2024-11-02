@@ -2,10 +2,11 @@
 	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import type { PageServerData } from './$types';
-	import { applyAction, deserialize, enhance } from '$app/forms';
+	import { applyAction, deserialize } from '$app/forms';
 	import type { ActionResult } from '@sveltejs/kit';
 	import { invalidateAll } from '$app/navigation';
 	import type { ActionData } from './$types';
+	import { categories, maxBodyLength } from './validator';
 
 	export let data: PageServerData;
 	export let form: ActionData;
@@ -116,13 +117,12 @@
 			<label for="category" class="required-label">種類</label>
 			<select id="category" name="category" required>
 				<option value="" selected hidden></option>
-				<option value="concert, ticket">演奏会、チケットについて</option>
-				<option value="advertisement">挟み込みについて</option>
-				<option value="hp, sns">ホームページ、SNSについて</option>
-				<option value="others">その他</option>
+				{#each categories as category}
+					<option value={category.key}>{category.description}</option>
+				{/each}
 			</select>
 			<label for="body" class="required-label">本文</label>
-			<textarea id="body" name="body" rows="6" required></textarea>
+			<textarea id="body" name="body" rows="6" maxlength={maxBodyLength} required></textarea>
 		</div>
 
 		<input type="hidden" name="csrfToken" value={csrfToken} />
