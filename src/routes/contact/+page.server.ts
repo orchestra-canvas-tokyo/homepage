@@ -1,6 +1,7 @@
 import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { validate } from './validator';
 import { log } from './logger';
+import { env } from '$env/dynamic/private';
 // import { verifyCaptcha } from './capthaVerfier';
 // import { sendEmail } from './emailSender';
 
@@ -71,7 +72,8 @@ export const actions = {
 			return {
 				success: true,
 				vite: Object.keys(import.meta.env),
-				cf: Object.keys(Object(platform?.env))
+				cf: Object.keys(Object(platform?.env)),
+				svelte: Object.keys(env)
 			};
 		} catch (error) {
 			console.log(error);
