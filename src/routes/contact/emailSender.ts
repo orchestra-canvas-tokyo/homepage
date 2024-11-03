@@ -10,7 +10,23 @@ const ccsByCategory: Record<string, string[]> = {
 
 export async function sendEmail(content: RequestData, apiKey: string) {
 	const subject = 'お問い合わせを承りました（Orchestra Canvas Tokyo）';
-	let body = `Orchestra Canvas Tokyoです。
+	const textBody = generateTextBody(content);
+	const htmlBody = await generateHtmlBody(content);
+
+	const resend = new Resend(apiKey);
+	await resend.emails.send({
+		from: 'お問い合わせフォーム <webadmin@orch-canvas.tokyo>',
+		to: [content.email],
+		cc: ccsByCategory[content.categoryKey],
+		replyTo: ccsByCategory[content.categoryKey],
+		subject: subject,
+		text: textBody,
+		html: htmlBody
+	});
+}
+
+function generateTextBody(content: RequestData): string {
+	let body: string = `Orchestra Canvas Tokyoです。
 ホームページより、お問い合わせを承りました。
 
 必要に応じてメールにてご返答いたします。
@@ -29,13 +45,20 @@ ${content.body}`;
 
 ` + body;
 
-	const resend = new Resend(apiKey);
-	await resend.emails.send({
-		from: 'お問い合わせフォーム <webadmin@orch-canvas.tokyo>',
-		to: [content.email],
-		cc: ccsByCategory[content.categoryKey],
-		replyTo: ccsByCategory[content.categoryKey],
-		subject: subject,
-		text: body
-	});
+	return body;
+}
+
+async function generateHtmlBody(content: RequestData): Promise<string> {
+	const templateHtml: string = (await import('./emailTemplate.html?raw')).default;
+
+	// 各種パラメータを置換
+	let body: string = templateHtml
+		.replace('%name%', content.name)
+		.replace('%categoryDescription%', categories[content.categoryKey])
+		.replace('%body%', content.body);
+
+	// nameが空の場合、関連する部分を削除
+	if (content.name === '') body = body.replace(/<!-- name -->.+<!-- \/name -->/s, '');
+
+	return body;
 }
