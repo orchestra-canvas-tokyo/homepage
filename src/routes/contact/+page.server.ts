@@ -1,6 +1,6 @@
 import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { validate } from './validator';
-// import { log } from './logger';
+import { log } from './logger';
 // import { verifyCaptcha } from './capthaVerfier';
 // import { sendEmail } from './emailSender';
 
@@ -19,8 +19,7 @@ export const load: ServerLoad = async ({ locals }) => {
 };
 
 export const actions = {
-	// default: async ({ request, locals, platform }) => {
-	default: async ({ locals, request }) => {
+	default: async ({ locals, request, platform }) => {
 		try {
 			const { session } = locals;
 
@@ -59,12 +58,12 @@ export const actions = {
 			// const captchaResult = await verifyCaptcha(validatedRequest.reCaptchaToken, RECAPTCHA_SECRET);
 			// if (!captchaResult) return { success: false, message: 'Invalid reCAPTCHA token' };
 
-			// // データベースにログ
-			// const loggingResult = await log(platform?.env.DB, {
-			// 	sentAt: new Date().toISOString(),
-			// 	...validatedRequest
-			// });
-			// if (!loggingResult.success) return { success: false, message: 'Failed to log' };
+			// データベースにログ
+			const loggingResult = await log(platform?.env.DB, {
+				sentAt: new Date().toISOString(),
+				...validatedRequest
+			});
+			if (!loggingResult.success) return { success: false, message: 'Failed to log' };
 
 			// // メール送信
 			// sendEmail(validatedRequest, RESEND_API_KEY);
