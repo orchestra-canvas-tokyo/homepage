@@ -27,7 +27,16 @@ export const actions = {
 
 		if (!RECAPTCHA_SECRET || !RESEND_API_KEY) {
 			console.log({ RECAPTCHA_SECRET, RESEND_API_KEY });
-			return { success: false, message: 'Invalid system environment' };
+			return {
+				success: false,
+				message: 'Invalid system environment',
+				details: {
+					RECAPTCHA_SECRET,
+					RESEND_API_KEY,
+					'import.meta.env': import.meta.env,
+					'platform.env': platform?.env
+				}
+			};
 		}
 
 		const rawRequest: Record<string, FormDataEntryValue> = {};
