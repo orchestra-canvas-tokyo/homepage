@@ -68,7 +68,11 @@ export const actions = {
 			// // メール送信
 			// sendEmail(validatedRequest, RESEND_API_KEY);
 
-			return { success: true, vite: Object.keys(import.meta.env) };
+			return {
+				success: true,
+				vite: Object.keys(import.meta.env),
+				cf: Object.keys(Object(platform?.env))
+			};
 		} catch (error) {
 			console.log(error);
 			return { success: false, error };
