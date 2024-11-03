@@ -3,7 +3,6 @@ import { validate } from './validator';
 import { log } from './logger';
 import { verifyCaptcha } from './capthaVerfier';
 import { sendEmail } from './emailSender';
-import { RECAPTCHA_SECRET, RESEND_API_KEY } from '$env/static/private';
 
 export const load: ServerLoad = async ({ locals }) => {
 	const { session } = locals;
@@ -22,6 +21,9 @@ export const load: ServerLoad = async ({ locals }) => {
 export const actions = {
 	default: async ({ request, locals, platform }) => {
 		const { session } = locals;
+
+		const RECAPTCHA_SECRET = import.meta.env.VITE_RECAPTCHA_SECRET;
+		const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
 
 		if (!RECAPTCHA_SECRET || !RESEND_API_KEY) {
 			console.log({ RECAPTCHA_SECRET, RESEND_API_KEY });
