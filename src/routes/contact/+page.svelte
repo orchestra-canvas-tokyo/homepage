@@ -38,6 +38,7 @@
 			const data = new FormData(event.currentTarget);
 
 			// reCAPTCHAトークンを発行
+			// eslint-disable-next-line no-undef
 			const reCaptchaToken = await grecaptcha.execute(reCaptchaSiteKey, { action: 'submit' });
 			data.append('reCaptchaToken', reCaptchaToken);
 
@@ -54,7 +55,7 @@
 				await invalidateAll();
 			}
 			applyAction(result);
-		} catch (error) {
+		} catch {
 			formResponseStateChanged(false);
 		} finally {
 			isSubmitting = false; // 送信ボタンを再度有効化
