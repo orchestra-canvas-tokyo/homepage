@@ -10,6 +10,10 @@ declare global {
 			env: {
 				KV: KVNamespace;
 				DB: D1Database;
+				VITE_RECAPTCHA_SECRET: string;
+				VITE_RESEND_API_KEY: string;
+				RECAPTCHA_SECRET: string;
+				RESEND_API_KEY: string;
 			};
 		}
 	}
