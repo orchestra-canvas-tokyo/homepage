@@ -59,11 +59,11 @@ export const actions = {
 			if (!captchaResult) return { success: false, message: 'Invalid reCAPTCHA token' };
 
 			// データベースにログ
-			const loggingResult = await log(platform?.env.DB, {
-				sentAt: new Date().toISOString(),
-				...validatedRequest
-			});
-			if (!loggingResult.success) return { success: false, message: 'Failed to log' };
+			// const loggingResult = await log(platform?.env.DB, {
+			// 	sentAt: new Date().toISOString(),
+			// 	...validatedRequest
+			// });
+			// if (!loggingResult.success) return { success: false, message: 'Failed to log' };
 
 			// メール送信
 			sendEmail(validatedRequest, RESEND_API_KEY);
