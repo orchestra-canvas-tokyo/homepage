@@ -20,53 +20,58 @@ export const load: ServerLoad = async ({ locals }) => {
 
 export const actions = {
 	default: async ({ request, locals, platform }) => {
-		const { session } = locals;
+		try {
+			const { session } = locals;
 
-		const RECAPTCHA_SECRET = import.meta.env.VITE_RECAPTCHA_SECRET;
-		const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
+			const RECAPTCHA_SECRET = import.meta.env.VITE_RECAPTCHA_SECRET;
+			const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
 
-		if (!RECAPTCHA_SECRET || !RESEND_API_KEY) {
-			console.log({ RECAPTCHA_SECRET, RESEND_API_KEY });
-			return {
-				success: false,
-				message: 'Invalid system environment',
-				details: {
-					RECAPTCHA_SECRET,
-					RESEND_API_KEY,
-					'import.meta.env': import.meta.env,
-					'platform.env': platform?.env
-				}
-			};
+			if (!RECAPTCHA_SECRET || !RESEND_API_KEY) {
+				console.log({ RECAPTCHA_SECRET, RESEND_API_KEY });
+				return {
+					success: false,
+					message: 'Invalid system environment',
+					details: {
+						RECAPTCHA_SECRET,
+						RESEND_API_KEY,
+						'import.meta.env': import.meta.env,
+						'platform.env': platform?.env
+					}
+				};
+			}
+
+			const rawRequest: Record<string, FormDataEntryValue> = {};
+			(await request.formData()).forEach((value, key) => {
+				rawRequest[key] = value;
+			});
+
+			// バリデーション
+			const validationResult = validate(rawRequest);
+			if (!validationResult.success) return { success: false, message: 'Invalid request body' };
+			const validatedRequest = validationResult.data;
+
+			// csrfトークンを検証
+			if (session.data.csrfToken !== validatedRequest.csrfToken)
+				return { success: false, message: 'Invalid csrf token' };
+
+			// reCAPTCHAトークンを検証
+			const captchaResult = await verifyCaptcha(validatedRequest.reCaptchaToken, RECAPTCHA_SECRET);
+			if (!captchaResult) return { success: false, message: 'Invalid reCAPTCHA token' };
+
+			// データベースにログ
+			const loggingResult = await log(platform?.env.DB, {
+				sentAt: new Date().toISOString(),
+				...validatedRequest
+			});
+			if (!loggingResult.success) return { success: false, message: 'Failed to log' };
+
+			// メール送信
+			sendEmail(validatedRequest, RESEND_API_KEY);
+
+			return { success: true };
+		} catch (error) {
+			console.log(error);
+			return { success: false, error };
 		}
-
-		const rawRequest: Record<string, FormDataEntryValue> = {};
-		(await request.formData()).forEach((value, key) => {
-			rawRequest[key] = value;
-		});
-
-		// バリデーション
-		const validationResult = validate(rawRequest);
-		if (!validationResult.success) return { success: false, message: 'Invalid request body' };
-		const validatedRequest = validationResult.data;
-
-		// csrfトークンを検証
-		if (session.data.csrfToken !== validatedRequest.csrfToken)
-			return { success: false, message: 'Invalid csrf token' };
-
-		// reCAPTCHAトークンを検証
-		const captchaResult = await verifyCaptcha(validatedRequest.reCaptchaToken, RECAPTCHA_SECRET);
-		if (!captchaResult) return { success: false, message: 'Invalid reCAPTCHA token' };
-
-		// データベースにログ
-		const loggingResult = await log(platform?.env.DB, {
-			sentAt: new Date().toISOString(),
-			...validatedRequest
-		});
-		if (!loggingResult.success) return { success: false, message: 'Failed to log' };
-
-		// メール送信
-		sendEmail(validatedRequest, RESEND_API_KEY);
-
-		return { success: true };
 	}
 } satisfies Actions;
