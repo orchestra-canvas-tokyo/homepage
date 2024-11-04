@@ -64,7 +64,7 @@ export const actions = {
 		await sendEmail(validatedRequestBody, RESEND_API_KEY);
 
 		// データベースにログ
-		logData.status = statusScheme.parse('have sent mail');
+		logData.status = statusScheme.parse('have sent email');
 		await log(platform?.env.DB, logData);
 
 		return { success: true };
