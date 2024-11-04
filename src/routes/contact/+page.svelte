@@ -23,6 +23,14 @@
 			: 'フォーム送信に失敗しました。再度お試しください。';
 		isToastShown = true;
 
+		if (success) {
+			// フォームの値を初期化する
+			(document.getElementById('name') as HTMLInputElement).value = '';
+			(document.getElementById('email') as HTMLInputElement).value = '';
+			(document.getElementById('categoryKey') as HTMLSelectElement).selectedIndex = 0;
+			(document.getElementById('body') as HTMLTextAreaElement).value = '';
+		}
+
 		setTimeout(() => {
 			// 5秒後にtoastを非表示にする
 			isToastShown = false;
@@ -113,18 +121,25 @@
 	<form method="POST" on:submit|preventDefault={handleSubmit}>
 		<div class="form-container">
 			<label for="name">お名前</label>
-			<input type="text" id="name" name="name" />
+			<input type="text" id="name" name="name" disabled={isSubmitting} />
 			<label for="email" class="required-label">メールアドレス</label>
-			<input type="email" id="email" name="email" required />
+			<input type="email" id="email" name="email" required disabled={isSubmitting} />
 			<label for="categoryKey" class="required-label">種類</label>
-			<select id="categoryKey" name="categoryKey" required>
+			<select id="categoryKey" name="categoryKey" required disabled={isSubmitting}>
 				<option value="" selected hidden></option>
 				{#each Object.entries(categories) as [key, description]}
 					<option value={key}>{description}</option>
 				{/each}
 			</select>
 			<label for="body" class="required-label">本文</label>
-			<textarea id="body" name="body" rows="6" maxlength={maxBodyLength} required></textarea>
+			<textarea
+				id="body"
+				name="body"
+				rows="6"
+				maxlength={maxBodyLength}
+				required
+				disabled={isSubmitting}
+			></textarea>
 		</div>
 
 		<input type="hidden" name="csrfToken" value={csrfToken} />
