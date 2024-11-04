@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { categories, type CategoryKey, type RequestData } from './validator';
+import { categories, type CategoryKey, type RequestBody } from './validator';
 
 const ccsByCategory: Record<string, string[]> = {
 	'concert, ticket': ['webadmin@orch-canvas.toyo', 'info@orch-canvas.toyo'],
@@ -8,7 +8,7 @@ const ccsByCategory: Record<string, string[]> = {
 	others: ['webadmin@orch-canvas.tokyo', 'contact@orch-canvas.tokyo']
 } as Record<CategoryKey, string[]>;
 
-export async function sendEmail(content: RequestData, apiKey: string) {
+export async function sendEmail(content: RequestBody, apiKey: string) {
 	const subject = 'お問い合わせを承りました（Orchestra Canvas Tokyo）';
 	const textBody = generateTextBody(content);
 	const htmlBody = await generateHtmlBody(content);
@@ -25,7 +25,7 @@ export async function sendEmail(content: RequestData, apiKey: string) {
 	});
 }
 
-function generateTextBody(content: RequestData): string {
+function generateTextBody(content: RequestBody): string {
 	let body: string = `Orchestra Canvas Tokyoです。
 ホームページより、お問い合わせを承りました。
 
@@ -48,7 +48,7 @@ ${content.body}`;
 	return body;
 }
 
-async function generateHtmlBody(content: RequestData): Promise<string> {
+async function generateHtmlBody(content: RequestBody): Promise<string> {
 	const templateHtml: string = (await import('./emailTemplate.html?raw')).default;
 
 	// 各種パラメータを置換

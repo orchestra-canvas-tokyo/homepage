@@ -1,6 +1,6 @@
 import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { RECAPTCHA_SECRET, RESEND_API_KEY } from '$env/static/private';
-import { validate } from './validator';
+import { statusScheme, validate, type Log } from './validator';
 import { log } from './logger';
 import { verifyCaptcha } from './capthaVerfier';
 import { sendEmail } from './emailSender';
@@ -23,41 +23,49 @@ export const actions = {
 	default: async ({ locals, request, platform }) => {
 		const { session } = locals;
 
-		if (!RECAPTCHA_SECRET || !RESEND_API_KEY) {
-			console.log({ RECAPTCHA_SECRET, RESEND_API_KEY });
-			return {
-				success: false,
-				message: 'Invalid system environment'
-			};
-		}
-
-		const rawRequest: Record<string, FormDataEntryValue> = {};
+		// リクエストボディをオブジェクトに
+		const rawRequestBody: Record<string, FormDataEntryValue> = {};
 		(await request.formData()).forEach((value, key) => {
-			rawRequest[key] = value;
+			rawRequestBody[key] = value;
 		});
 
 		// バリデーション
-		const validationResult = validate(rawRequest);
+		const validationResult = validate(rawRequestBody);
 		if (!validationResult.success) return { success: false, message: 'Invalid request body' };
-		const validatedRequest = validationResult.data;
+		const validatedRequestBody = validationResult.data;
+
+		// id採番、送信日時取得
+		const logData: Log = {
+			id: crypto.randomUUID(),
+			status: statusScheme.parse('received'),
+			sentAt: new Date().toISOString(),
+			...validationResult.data
+		};
 
 		// csrfトークンを検証
-		if (session.data.csrfToken !== validatedRequest.csrfToken)
+		if (session.data.csrfToken !== validatedRequestBody.csrfToken) {
+			logData.status = statusScheme.parse('invalid csrf');
+			await log(platform?.env.DB, logData);
 			return { success: false, message: 'Invalid csrf token' };
+		}
 
 		// reCAPTCHAトークンを検証
-		const captchaResult = await verifyCaptcha(validatedRequest.reCaptchaToken, RECAPTCHA_SECRET);
-		if (!captchaResult) return { success: false, message: 'Invalid reCAPTCHA token' };
-
-		// データベースにログ
-		const loggingResult = await log(platform?.env.DB, {
-			sentAt: new Date().toISOString(),
-			...validatedRequest
-		});
-		if (!loggingResult.success) return { success: false, message: 'Failed to log' };
+		const captchaResult = await verifyCaptcha(
+			validatedRequestBody.reCaptchaToken,
+			RECAPTCHA_SECRET
+		);
+		if (!captchaResult) {
+			logData.status = statusScheme.parse('invalid captcha');
+			await log(platform?.env.DB, logData);
+			return { success: false, message: 'Invalid captcha token' };
+		}
 
 		// メール送信
-		await sendEmail(validatedRequest, RESEND_API_KEY);
+		await sendEmail(validatedRequestBody, RESEND_API_KEY);
+
+		// データベースにログ
+		logData.status = statusScheme.parse('have sent mail');
+		await log(platform?.env.DB, logData);
 
 		return { success: true };
 	}
