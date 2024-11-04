@@ -1,4 +1,5 @@
 import type { Actions, ServerLoad } from '@sveltejs/kit';
+import { RECAPTCHA_SECRET, RESEND_API_KEY } from '$env/static/private';
 import { validate } from './validator';
 import { log } from './logger';
 import { verifyCaptcha } from './capthaVerfier';
@@ -21,9 +22,6 @@ export const load: ServerLoad = async ({ locals }) => {
 export const actions = {
 	default: async ({ locals, request, platform }) => {
 		const { session } = locals;
-
-		const RECAPTCHA_SECRET = platform?.env.RECAPTCHA_SECRET;
-		const RESEND_API_KEY = platform?.env.RESEND_API_KEY;
 
 		if (!RECAPTCHA_SECRET || !RESEND_API_KEY) {
 			console.log({ RECAPTCHA_SECRET, RESEND_API_KEY });
@@ -65,7 +63,7 @@ export const actions = {
 		if (!loggingResult.success) return { success: false, message: 'Failed to log' };
 
 		// メール送信
-		sendEmail(validatedRequest, RESEND_API_KEY);
+		await sendEmail(validatedRequest, RESEND_API_KEY);
 
 		return { success: true };
 	}
