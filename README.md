@@ -110,35 +110,11 @@ npm install
 
 ## Contactの仕様
 
-```mermaid
-flowchart LR
-  A["/contact"] <--> B["/homepage/get-csrf-token"]
-  A --> C["/homepage/contact"]
-  C --> C1(reCAPTCHA v3検証)
-  C1 --> D["doPost()"]
-  D --> D1(ログ保存)
-  D --> D2(メール送信)
-
-  subgraph "homepage"
-    A
-  end
-
-  subgraph "api.orch-canvas.tokyo"
-    B
-    C
-    C1
-  end
-
-  subgraph "Google Apps Script"
-    D
-    D1
-    D2
-  end
-```
-
-- [reCAPTCHA v3 Admin Console](https://www.google.com/recaptcha/admin/site/642565602) / [スプレッドシート](https://docs.google.com/spreadsheets/d/1uqnU0wP8CjgFnMpx_ObdDgKR96Ek7dxfY3E_dPL62Lw/edit)
-- セッションを用いていないため、CSRFはトークンとタイムスタンプをセットで取り扱う。
-- メール送信先はGoogle Apps Scriptのコードで管理されている。
+- セッション管理：Cloudflare KV
+- reCAPTCHA v3（[Admin Console](https://www.google.com/recaptcha/admin/site/642565602)）
+- ログ保存：Cloudflare D1
+- メール送信：Resend
+- メール用画像配信：Cloudflare R2
 
 ## FAQ
 
