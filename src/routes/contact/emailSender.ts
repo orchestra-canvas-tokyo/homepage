@@ -55,7 +55,7 @@ async function generateHtmlBody(content: RequestBody): Promise<string> {
 	let body: string = templateHtml
 		.replace('%name%', content.name)
 		.replace('%categoryDescription%', categories[content.categoryKey])
-		.replace('%body%', content.body);
+		.replace('%body%', content.body.replaceAll('\n', '<br />'));
 
 	// nameが空の場合、関連する部分を削除
 	if (content.name === '') body = body.replace(/<!-- name -->.+<!-- \/name -->/s, '');
