@@ -27,13 +27,7 @@ export const actions = {
 			console.log({ RECAPTCHA_SECRET, RESEND_API_KEY });
 			return {
 				success: false,
-				message: 'Invalid system environment',
-				details: {
-					RECAPTCHA_SECRET,
-					RESEND_API_KEY,
-					'import.meta.env': import.meta.env,
-					'platform.env': platform?.env
-				}
+				message: 'Invalid system environment'
 			};
 		}
 
