@@ -44,5 +44,10 @@ jobs:
           node-version-file: './.node-version'
       - name: Prepare dependencies
         run: npm ci
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v2.0
+        env:
+          envkey_RECAPTCHA_SECRET: ${{secrets.RECAPTCHA_SECRET}}
+          envkey_RESEND_API_KEY: ${{secrets.RESEND_API_KEY}}
       - name: Run checkers & linters
         run: npm run precommit
