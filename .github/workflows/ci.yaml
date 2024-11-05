@@ -49,5 +49,7 @@ jobs:
         env:
           envkey_RECAPTCHA_SECRET: ${{secrets.RECAPTCHA_SECRET}}
           envkey_RESEND_API_KEY: ${{secrets.RESEND_API_KEY}}
+      - name: Debug
+        run: cat ./.env
       - name: Run checkers & linters
         run: npm run precommit
