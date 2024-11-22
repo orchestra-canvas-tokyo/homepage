@@ -6,7 +6,14 @@ declare global {
 		// interface Locals {}
 		// interface PageData {}
 		// interface PageState {}
-		// interface Platform {}
+		interface Platform {
+			env: {
+				KV: KVNamespace;
+				DB: D1Database;
+				RECAPTCHA_SECRET: string;
+				RESEND_API_KEY: string;
+			};
+		}
 	}
 }
 

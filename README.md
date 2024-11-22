@@ -29,7 +29,36 @@ npm install # 依存関係をインストール
 npm run dev # 開発環境を立ち上げ
 ```
 
-### Npm Script一覧
+### 環境変数ファイルを作成
+
+`.env.local.example`を参考に、`.env.local`をルートディレクトリに作成してください。
+
+実際の環境変数は @horn553 などに聞いてください！
+
+### ローカル環境のD1を作成する
+
+```shell
+npx wrangler d1 create DB
+npx wrangler d1 migrations apply DB
+```
+
+### スキーマ変更時
+
+マイグレーションファイルを作成する
+
+```shell
+npx drizzle-kit generate
+```
+
+各種DBをマイグレートする
+
+```shell
+npx wrangler d1 migrations apply DB
+npx wrangler d1 migrations apply DB --remote --env preview
+npx wrangler d1 migrations apply DB --remote --env production
+```
+
+### npm Script一覧
 
 npm scriptとは、npmで設定できる開発時向けのエイリアス、スクリプトです。
 `packages.json`内に設定の実体があります。
@@ -110,35 +139,11 @@ npm install
 
 ## Contactの仕様
 
-```mermaid
-flowchart LR
-  A["/contact"] <--> B["/homepage/get-csrf-token"]
-  A --> C["/homepage/contact"]
-  C --> C1(reCAPTCHA v3検証)
-  C1 --> D["doPost()"]
-  D --> D1(ログ保存)
-  D --> D2(メール送信)
-
-  subgraph "homepage"
-    A
-  end
-
-  subgraph "api.orch-canvas.tokyo"
-    B
-    C
-    C1
-  end
-
-  subgraph "Google Apps Script"
-    D
-    D1
-    D2
-  end
-```
-
-- [reCAPTCHA v3 Admin Console](https://www.google.com/recaptcha/admin/site/642565602) / [スプレッドシート](https://docs.google.com/spreadsheets/d/1uqnU0wP8CjgFnMpx_ObdDgKR96Ek7dxfY3E_dPL62Lw/edit)
-- セッションを用いていないため、CSRFはトークンとタイムスタンプをセットで取り扱う。
-- メール送信先はGoogle Apps Scriptのコードで管理されている。
+- セッション管理：Cloudflare KV
+- reCAPTCHA v3（[Admin Console](https://www.google.com/recaptcha/admin/site/642565602)）
+- ログ保存：Cloudflare D1
+- メール送信：Resend
+- メール用画像配信：Cloudflare R2
 
 ## FAQ
 
