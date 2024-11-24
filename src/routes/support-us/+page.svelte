@@ -51,6 +51,7 @@
 			</a>
 			<enhanced:img class="supporter-logo" src={mizuya} alt="MC & Model Agency Hollywood Latte" />
 			<a href="http://spacephoto.c.ooco.jp/">(有)スタジオ・スペースフォト</a>
+			<a href="https://royal-marriage.shop/">西田ジュエリーデザイン</a>
 		</div>
 		<div class="halfwidth-supporters-left">
 			<span>柿沼　威司　様</span>
@@ -62,6 +63,7 @@
 			<span>吉田　裕之　様</span>
 			<span>和田　　愛　様</span>
 			<span>和田　　究　様</span>
+			<span>螺良　修一　様</span>
 		</div>
 		<div class="fullwidth-supporters">（他匿名6名様）</div>
 	</div>
@@ -227,7 +229,7 @@
 							<ul>
 								<li>各種印刷物<sup>※３</sup>に「特別協賛：○○」の掲載。</li>
 								<li>当団HP演奏会ページにロゴ・リンクの埋込（無期限）。</li>
-								<li>プログラムにA5版白黒広告の掲載。</li>
+								<li>プログラムにA5版広告の掲載。</li>
 							</ul>
 						</td>
 					</tr>
