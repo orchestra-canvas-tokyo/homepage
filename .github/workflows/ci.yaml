@@ -47,5 +47,6 @@ jobs:
       - name: Run checkers & linters
         run: npm run precommit
         env:
+          SESSION_SECRET: ${{secrets.SESSION_SECRET}}
           RECAPTCHA_SECRET: ${{secrets.RECAPTCHA_SECRET}}
           RESEND_API_KEY: ${{secrets.RESEND_API_KEY}}
