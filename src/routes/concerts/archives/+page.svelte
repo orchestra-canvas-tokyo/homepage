@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageServerData, Snapshot } from './$types';
-	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import 'dayjs/locale/ja';
 	import dayjs from 'dayjs';
@@ -8,6 +7,7 @@
 	import Concert from './Concert.svelte';
 	import YearAnchors from './YearAnchors.svelte';
 	import type { YearlyFirstConcerts } from './YearAnchors';
+	import Meta from '$lib/components/Meta.svelte';
 
 	export let data: PageServerData;
 
@@ -79,7 +79,8 @@
 	};
 </script>
 
-<MetaTags title="Concert Archives - Orchestra Canvas Tokyo" />
+<Meta title="Concert Archives" canonical="/concerts/archives" />
+
 <Breadcrumb
 	segments={[
 		{

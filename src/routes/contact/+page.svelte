@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import Meta from '$lib/components/Meta.svelte';
 	import { onMount } from 'svelte';
 
 	// CSRF-likeなトークンに用いる2変数
@@ -77,7 +77,7 @@
 	<script src="https://www.google.com/recaptcha/api.js?render={reCaptchaSiteKey}" async></script>
 </svelte:head>
 
-<MetaTags title="Contact - Orchestra Canvas Tokyo" />
+<Meta title="Contact" canonical="/contact" />
 
 <Breadcrumb
 	segments={[

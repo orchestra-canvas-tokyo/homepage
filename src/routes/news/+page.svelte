@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { PageServerData } from './$types';
-	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import dayjs from 'dayjs';
+	import Meta from '$lib/components/Meta.svelte';
 
 	export let data: PageServerData;
 	const sliceNumber = 10; //１ページに表示するnewsの数
@@ -17,7 +17,7 @@
 	let page = 0;
 </script>
 
-<MetaTags title="News - Orchestra Canvas Tokyo" />
+<Meta title="News" canonical="/news" />
 
 <Breadcrumb
 	segments={[
