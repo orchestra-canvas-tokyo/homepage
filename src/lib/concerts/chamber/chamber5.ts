@@ -29,7 +29,7 @@ export const concert: Concert = {
 			name: 'ミヨー／ルネ王の暖炉 Ⅰ.行列 Ⅱ.朝の歌 Ⅲ.軽業師 Ⅳ.ラ・マウザングラード Ⅴ.弓の試合 Ⅵ.ヴァラブルでの狩り Ⅶ.夜のマドリガル'
 		}
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: false,
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/19476'

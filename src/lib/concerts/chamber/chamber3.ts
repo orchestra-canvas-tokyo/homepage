@@ -32,7 +32,7 @@ export const concert: Concert = {
 		{ name: 'ツェムリンスキー／ユーモレスク' },
 		{ name: 'リチャーズ／「高貴なる葡萄酒を讃えて」より Ⅰ、Ⅱ、Ⅲ、Ⅴ' }
 	],
-	showProgramNote: false,
+	showLinkToProgramNote: false,
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/12905'

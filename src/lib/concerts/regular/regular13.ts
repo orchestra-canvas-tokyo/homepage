@@ -1,6 +1,6 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
-import flyer from './images/flyers/regular-13-poster.png?enhanced';
+import flyer from './images/flyers/regular-13.png?enhanced';
 
 const type = 'regular';
 const number = 13;
@@ -32,7 +32,7 @@ export const concert: Concert = {
 		description: '全席指定 1,000円',
 		url: 'https://teket.jp/1776/39057'
 	},
-	showProgramNote: false
+	showLinkToProgramNote: false
 	// cspell: disable-next-line
 	// youtubePlaylistId: '●'
 };

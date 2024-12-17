@@ -12,7 +12,7 @@ export const concert: Concert = {
 	// flyer: flyer,
 	dateTime: { date: '2025-11-24', day: '月祝', time: '昼公演' },
 	place: {
-		name: 'ミューザ川崎 シンフォニーホール',
+		name: 'ミューザ川崎シンフォニーホール',
 		url: 'https://www.kawasaki-sym-hall.jp/visit/access/'
 	},
 	conductor: {
@@ -31,7 +31,7 @@ export const concert: Concert = {
 		description: '未定'
 		// url: '●'
 	},
-	showProgramNote: false
+	showLinkToProgramNote: false
 	// cspell: disable-next-line
 	// youtubePlaylistId: '●'
 };

@@ -40,7 +40,7 @@ export const concert: Concert = {
 	ticket: {
 		url: 'https://ticket.orch-canvas.tokyo/'
 	},
-	showProgramNote: true,
+	showLinkToProgramNote: true,
 	// cspell: disable-next-line
 	youtubePlaylistId: 'PLlsZL5V_BM_HpIZKZVedc851bg-EFW3NR'
 };

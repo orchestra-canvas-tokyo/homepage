@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { PageServerData } from './$types';
-	import { MetaTags } from 'svelte-meta-tags';
 	import { Splide, SplideSlide, SplideTrack } from '@splidejs/svelte-splide';
 	import '@splidejs/svelte-splide/css/core';
 	import dayjs from 'dayjs';
 	import type { MoveEventDetail } from '@splidejs/svelte-splide/types';
+	import Meta from '$lib/components/Meta.svelte';
 
 	export let data: PageServerData;
 
@@ -62,7 +62,7 @@
 	};
 </script>
 
-<MetaTags title="Orchestra Canvas Tokyo" />
+<Meta title="" canonical="/" />
 
 <div class="slideshow">
 	<Splide

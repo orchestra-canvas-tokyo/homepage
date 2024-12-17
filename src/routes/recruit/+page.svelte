@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import Meta from '$lib/components/Meta.svelte';
 </script>
 
-<MetaTags title="Recruit - Orchestra Canvas Tokyo" />
+<Meta title="Recruit" canonical="/recruit" />
 
 <Breadcrumb
 	segments={[

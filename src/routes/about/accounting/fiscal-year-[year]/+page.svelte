@@ -1,12 +1,15 @@
 <script lang="ts">
 	import type { PageServerData } from './$types';
-	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import Meta from '$lib/components/Meta.svelte';
 
 	export let data: PageServerData;
 </script>
 
-<MetaTags title="第{data.fiscalYearNumber}期決算報告書 - Orchestra Canvas Tokyo" />
+<Meta
+	title="第{data.fiscalYearNumber}期決算報告書"
+	canonical="/about/accounting/fiscal-year-{data.fiscalYearNumber}"
+/>
 
 <Breadcrumb
 	segments={[

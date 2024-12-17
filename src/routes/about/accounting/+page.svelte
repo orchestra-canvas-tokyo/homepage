@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageServerData } from './$types';
-	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import Meta from '$lib/components/Meta.svelte';
 
 	export let data: PageServerData;
 
@@ -14,7 +14,7 @@
 	);
 </script>
 
-<MetaTags title="Accounting - Orchestra Canvas Tokyo" />
+<Meta title="Accounting" canonical="/about/accounting" />
 
 <Breadcrumb
 	segments={[
