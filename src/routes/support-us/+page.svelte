@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import Meta from '$lib/components/Meta.svelte';
 	import hollyWoodLatte from './hollywood-latte.png?enhanced';
 	import mizuya from './mizuya.png?enhanced';
 	import pdf from './ご支援のお願い.pdf';
 </script>
 
-<MetaTags title="ご支援のお願い - Orchestra Canvas Tokyo" />
+<Meta title="ご支援のお願い" canonical="/support-us" />
 
 <Breadcrumb
 	segments={[

@@ -1,74 +1,82 @@
 <script lang="ts">
-	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
-	import { onMount } from 'svelte';
+	import Meta from '$lib/components/Meta.svelte';
+	import type { PageServerData } from './$types';
+	import { applyAction, deserialize } from '$app/forms';
+	import type { ActionResult } from '@sveltejs/kit';
+	import { invalidateAll } from '$app/navigation';
+	import type { ActionData } from './$types';
+	import { categories, maxBodyLength } from './validator';
 
-	// CSRF-likeなトークンに用いる2変数
-	let csrfToken = '';
-	let csrfTimestamp = '';
-	onMount(async () => {
-		// CSRF-likeなトークンを取得する。厳密にはセッションを用いていない
-		const response = await fetch('https://api.orch-canvas.tokyo/homepage/get-csrf-token', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
-		if (response.ok) {
-			const data = JSON.parse(await response.text());
-			csrfToken = data.token;
-			csrfTimestamp = data.timestamp;
+	export let data: PageServerData;
+	export let form: ActionData;
+
+	// csrfトークン
+	const csrfToken = data.csrfToken;
+
+	// フォーム送信後のtoast
+	let toastMessage: string | null;
+	let isToastShown: boolean = false; // フェードアウト時に要素の幅が小さくならないように別管理
+	const formResponseStateChanged = (success: boolean) => {
+		toastMessage = success
+			? 'お問い合わせを受け付けました。'
+			: 'フォーム送信に失敗しました。再度お試しください。';
+		isToastShown = true;
+
+		if (success) {
+			// フォームの値を初期化する
+			(document.getElementById('name') as HTMLInputElement).value = '';
+			(document.getElementById('email') as HTMLInputElement).value = '';
+			(document.getElementById('categoryKey') as HTMLSelectElement).selectedIndex = 0;
+			(document.getElementById('body') as HTMLTextAreaElement).value = '';
 		}
-	});
 
-	const reCaptchaSiteKey = '6LfixUwmAAAAAKr_6ZeTyiPBnYq-Li5KO8_5EVbC';
-	let isSubmitting = false; // 送信中の状態を管理する変数
-	let toastMessage = ''; // トーストメッセージを格納する変数
-
-	// トーストメッセージが設定されている間はトーストが表示されるように
-	let isToastShown = false;
-	$: isToastShown = toastMessage !== '';
+		setTimeout(() => {
+			// 5秒後にtoastを非表示にする
+			isToastShown = false;
+		}, 5000);
+	};
 
 	// 送信時に呼び出される関数
-	async function handleSubmit() {
+	let isSubmitting = false; // 送信中の状態を管理する変数
+	const reCaptchaSiteKey = '6LfixUwmAAAAAKr_6ZeTyiPBnYq-Li5KO8_5EVbC';
+	async function handleSubmit(event: { currentTarget: EventTarget & HTMLFormElement }) {
 		isSubmitting = true; // 送信ボタンを無効化
 		try {
-			// 送信情報をまとめる
-			const formElement = document.querySelector('form') as HTMLFormElement;
-			const formData = new FormData(formElement);
-			const body: Record<string, string> = {};
-			formData.forEach((value, key) => {
-				if (typeof value !== 'string') return;
-				body[key] = value;
-			});
+			const data = new FormData(event.currentTarget);
 
-			// reCaptchaを実行する
+			// reCAPTCHAトークンを発行
 			// eslint-disable-next-line no-undef
-			body['reCaptchaToken'] = await grecaptcha.execute(reCaptchaSiteKey, {
-				action: 'submit'
-			});
+			const reCaptchaToken = await grecaptcha.execute(reCaptchaSiteKey, { action: 'submit' });
+			data.append('reCaptchaToken', reCaptchaToken);
 
-			// apiサーバーに送信
-			const response = await fetch('https://api.orch-canvas.tokyo/homepage/contact', {
+			// サーバーサイドに送信
+			const response = await fetch('/contact', {
 				method: 'POST',
-				body: JSON.stringify(body),
-				headers: {
-					'Content-Type': 'application/json'
-				}
+				body: data
 			});
+			const result: ActionResult = deserialize(await response.text());
 
-			// レスポンスのメッセージをトーストメッセージに設定
-			const data = await response.json();
-			toastMessage = data.message;
-
-			setTimeout(() => {
-				// 5秒後にtoastを非表示にする
-				isToastShown = false;
-			}, 5000);
-		} catch (error) {
-			console.error('Form submission error:', error);
+			// リクエストが成功した場合の一連のおまじない
+			if (result.type === 'success') {
+				// rerun all `load` functions, following the successful update
+				await invalidateAll();
+			}
+			applyAction(result);
+		} catch {
+			formResponseStateChanged(false);
 		} finally {
 			isSubmitting = false; // 送信ボタンを再度有効化
+		}
+	}
+
+	// formが更新されたとき(フォーム送信のレスポンス受信後)の処理
+	$: {
+		if (form?.success === undefined) {
+			toastMessage = null;
+		} else {
+			if (form?.success === false) console.log({ form });
+			formResponseStateChanged(form.success);
 		}
 	}
 </script>
@@ -77,7 +85,7 @@
 	<script src="https://www.google.com/recaptcha/api.js?render={reCaptchaSiteKey}" async></script>
 </svelte:head>
 
-<MetaTags title="Contact - Orchestra Canvas Tokyo" />
+<Meta title="Contact" canonical="/contact" />
 
 <Breadcrumb
 	segments={[
@@ -110,39 +118,32 @@
 		詳しくは当フォームよりお問い合わせください。
 	</p>
 
-	<form
-		method="post"
-		action="https://api.orch-canvas.tokyo/homepage/contact"
-		on:submit|preventDefault={handleSubmit}
-	>
+	<form method="POST" on:submit|preventDefault={handleSubmit}>
 		<div class="form-container">
 			<label for="name">お名前</label>
-			<input type="text" id="name" name="name" />
-			<label for="mailAddress" class="required-label">メールアドレス</label>
-			<input type="email" id="mailAddress" name="mailAddress" required />
-			<label for="category" class="required-label">種類</label>
-			<select id="category" name="category" required>
+			<input type="text" id="name" name="name" disabled={isSubmitting} />
+			<label for="email" class="required-label">メールアドレス</label>
+			<input type="email" id="email" name="email" required disabled={isSubmitting} />
+			<label for="categoryKey" class="required-label">種類</label>
+			<select id="categoryKey" name="categoryKey" required disabled={isSubmitting}>
 				<option value="" selected hidden></option>
-				<option value="concert, ticket">演奏会、チケットについて</option>
-				<option value="advertisement">挟み込みについて</option>
-				<option value="hp, sns">ホームページ、SNSについて</option>
-				<option value="others">その他</option>
+				{#each Object.entries(categories) as [key, description]}
+					<option value={key}>{description}</option>
+				{/each}
 			</select>
 			<label for="body" class="required-label">本文</label>
-			<textarea id="body" name="body" rows="6" required></textarea>
+			<textarea
+				id="body"
+				name="body"
+				rows="6"
+				maxlength={maxBodyLength}
+				required
+				disabled={isSubmitting}
+			></textarea>
 		</div>
 
 		<input type="hidden" name="csrfToken" value={csrfToken} />
-		<input type="hidden" name="csrfTimestamp" value={csrfTimestamp} />
-		<button
-			class="g-recaptcha"
-			data-sitekey="6Leu7JkpAAAAAJtmzgkPuGhRnabureUN_O_yt8IM"
-			data-callback="onSubmit"
-			data-action="submit"
-			disabled={isSubmitting}
-		>
-			送信
-		</button>
+		<button type="submit" disabled={isSubmitting}>送信</button>
 
 		<!-- ref: https://developers.google.com/recaptcha/docs/faq?hl=ja#id-like-to-hide-the-recaptcha-badge.-what-is-allowed https://developers.google.com/recaptcha/docs/faq?hl=ja#id-like-to-hide-the-recaptcha-badge.-what-is-allowed-->
 		<p class="recaptcha-description">
@@ -244,13 +245,13 @@
 	.toast {
 		position: fixed;
 		bottom: 20px;
-		left: calc(20px + var(--aside-width));
+		right: calc(20px);
 		background-color: var(--background-color);
 		padding: 8px;
 		border: 1px solid;
 		border-radius: 4px;
 		transition-duration: 0.3s;
-		transform: translateX(-30px);
+		transform: translateX(30px);
 		opacity: 0;
 	}
 	.toast.shown {

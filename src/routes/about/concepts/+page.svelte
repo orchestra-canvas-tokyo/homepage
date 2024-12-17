@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { MetaTags } from 'svelte-meta-tags';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import Meta from '$lib/components/Meta.svelte';
 	import organizationChart from './organization-chart.png?enhanced';
 </script>
 
-<MetaTags title="Concepts - Orchestra Canvas Tokyo" />
+<Meta title="Concepts" canonical="/about/concepts" />
 
 <Breadcrumb
 	segments={[
