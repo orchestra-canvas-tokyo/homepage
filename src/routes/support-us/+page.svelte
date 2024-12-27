@@ -52,6 +52,7 @@
 			<enhanced:img class="supporter-logo" src={mizuya} alt="MC & Model Agency Hollywood Latte" />
 			<a href="http://spacephoto.c.ooco.jp/">(有)スタジオ・スペースフォト</a>
 			<a href="https://royal-marriage.shop/">西田ジュエリーデザイン</a>
+			<span>あらいクリニック</span>
 		</div>
 		<div class="halfwidth-supporters-left">
 			<span>柿沼　威司　様</span>
