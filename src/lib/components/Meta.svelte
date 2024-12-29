@@ -17,7 +17,7 @@
 		site: '@Orch_canvas',
 		cardType: 'summary',
 		title: fullTitle,
-		image: 'https://blog.orch-canvas.tokyo/web-app-manifest-512x512.png',
+		image: 'https://www.orch-canvas.tokyo/web-app-manifest-512x512.png',
 		imageAlt: 'Orchestra Canvas Tokyoのロゴ'
 	}}
 />
