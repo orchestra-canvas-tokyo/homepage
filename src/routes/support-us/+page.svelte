@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
-	import hollyWoodLatte from './hollywood-latte.png?enhanced';
-	import mizuya from './mizuya.png?enhanced';
+	import hollyWoodLatte from './hollywood-latte.png';
+	import mizuya from './mizuya.png';
 	import pdf from './ご支援のお願い.pdf';
 </script>
 
@@ -43,13 +43,9 @@
 	<div class="supporter-container">
 		<div class="fullwidth-supporters">
 			<a href="https://hollywoodlatte.com/">
-				<enhanced:img
-					class="supporter-logo"
-					src={hollyWoodLatte}
-					alt="MC & Model Agency Hollywood Latte"
-				/>
+				<img class="supporter-logo" src={hollyWoodLatte} alt="MC & Model Agency Hollywood Latte" />
 			</a>
-			<enhanced:img class="supporter-logo" src={mizuya} alt="MC & Model Agency Hollywood Latte" />
+			<img class="supporter-logo" src={mizuya} alt="MC & Model Agency Hollywood Latte" />
 			<a href="http://spacephoto.c.ooco.jp/">(有)スタジオ・スペースフォト</a>
 			<span>あらいクリニック</span>
 			<a href="https://royal-marriage.shop/">西田ジュエリーデザイン</a>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
-	import organizationChart from './organization-chart.png?enhanced';
+	import organizationChart from './organization-chart.png';
 </script>
 
 <Meta title="Concepts" canonical="/about/concepts" />
@@ -42,7 +42,7 @@
 		これらの環境を最大限活かし、人的・知的交流が支える音楽的挑戦を通じて、皆様に新たな音楽的価値をお届けして参ります。
 	</p>
 
-	<enhanced:img src={organizationChart} alt="組織図" class="img" />
+	<img src={organizationChart} alt="組織図" class="img" />
 </article>
 
 <style>

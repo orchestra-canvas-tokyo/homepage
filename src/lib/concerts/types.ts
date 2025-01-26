@@ -15,7 +15,7 @@ export interface Soloist extends People {
 }
 
 /** アンコール種別の定義 */
-export type EncorType = 'standard' | 'soloist';
+export type EncoreType = 'standard' | 'soloist';
 
 /** いち演奏会に関する情報をまとめたインターフェース */
 export interface Concert {
@@ -39,7 +39,7 @@ export interface Concert {
 		composer?: string;
 		arranger?: string;
 		name: string;
-		encoreType?: EncorType; // アンコールの場合のみ指定
+		encoreType?: EncoreType; // アンコールの場合のみ指定
 	}[];
 	// 協賛
 	credits?: {
@@ -47,7 +47,7 @@ export interface Concert {
 		name: string;
 		url: string;
 		image?: {
-			src: Picture;
+			src: string;
 			maxHeight: string; // 単位つきで指定
 		};
 	}[];

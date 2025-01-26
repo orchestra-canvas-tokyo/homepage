@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import type { Concert, ConcertType, EncorType } from './types';
+import type { Concert, ConcertType, EncoreType } from './types';
 
 /**
  * 画面表示に適した形式の演奏会開催日文字列を生成する
@@ -38,7 +38,7 @@ export function getConcertShortName(type: ConcertType) {
  * @param type アンコール種別
  * @returns アンコール種別名
  */
-export function getEncorName(type: EncorType) {
+export function getEncoreName(type: EncoreType) {
 	return {
 		standard: 'アンコール',
 		soloist: 'ソリストアンコール'

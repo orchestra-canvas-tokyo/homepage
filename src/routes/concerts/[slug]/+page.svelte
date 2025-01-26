@@ -3,7 +3,7 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import dayjs from 'dayjs';
 	import 'dayjs/locale/ja';
-	import { getConcertShortName, getEncorName } from '$lib/concerts/generateContentsToDisplay';
+	import { getConcertShortName, getEncoreName } from '$lib/concerts/generateContentsToDisplay';
 	import Meta from '$lib/components/Meta.svelte';
 
 	export let data: PageServerData;
@@ -89,7 +89,7 @@
 						<dd>
 							<p>{program.name}</p>
 							{#if program.encoreType}
-								<p>（{getEncorName(program.encoreType)}）</p>
+								<p>（{getEncoreName(program.encoreType)}）</p>
 							{/if}
 						</dd>
 					{/each}
@@ -109,7 +109,7 @@
 					{#if credit.image}
 						<a href={credit.url} class="credit-image-link">
 							<span>{credit.name}</span>
-							<enhanced:img
+							<img
 								class="inline-icon"
 								style="max-height: {credit.image.maxHeight};"
 								src={credit.image.src}

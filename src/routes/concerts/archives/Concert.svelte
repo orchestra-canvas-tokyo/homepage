@@ -1,11 +1,11 @@
 <script lang="ts">
 	import {
 		getConcertDateDayToDisplay,
-		getEncorName
+		getEncoreName
 	} from '$lib/concerts/generateContentsToDisplay';
 	import type { Concert } from '$lib/concerts/types';
 	import type { YearlyFirstConcerts } from './YearAnchors';
-	import youtubeLogo from './yt_logo_mono_dark.png?enhanced';
+	import youtubeLogo from './yt_logo_mono_dark.png';
 
 	/** このコンポーネントが表示する演奏会 */
 	export let concert: Concert;
@@ -42,7 +42,7 @@
 					class="show-on-mobile"
 					href="https://youtube.com/playlist?list={concert.youtubePlaylistId}"
 				>
-					<enhanced:img src={youtubeLogo} alt="YouTube" class="youtube-logo" />
+					<img src={youtubeLogo} alt="YouTube" class="youtube-logo" />
 				</a>
 			{/if}
 		</div>
@@ -58,7 +58,7 @@
 					{/if}
 					{program.name}
 					{#if program.encoreType}
-						（{getEncorName(program.encoreType)}）
+						（{getEncoreName(program.encoreType)}）
 					{/if}
 				</p>
 				<p class="show-on-mobile">
@@ -71,7 +71,7 @@
 					{/if}
 					{program.name}
 					{#if program.encoreType}
-						（{getEncorName(program.encoreType)}）
+						（{getEncoreName(program.encoreType)}）
 					{/if}
 				</p>
 			{/each}
@@ -80,16 +80,16 @@
 					class="hide-on-mobile"
 					href="https://youtube.com/playlist?list={concert.youtubePlaylistId}"
 				>
-					<enhanced:img src={youtubeLogo} alt="YouTube" class="youtube-logo" />
+					<img src={youtubeLogo} alt="YouTube" class="youtube-logo" />
 				</a>
 			{/if}
 		</div>
 	</div>
 
 	{#if concert.flyer}
-		<a href="/concerts/{concert.slug}"
-			><enhanced:img class="flyer" src={concert.flyer} alt="{concert.title}のフライヤー" /></a
-		>
+		<a href="/concerts/{concert.slug}">
+			<enhanced:img class="flyer" src={concert.flyer} alt="{concert.title}のフライヤー" />
+		</a>
 	{/if}
 </div>
 

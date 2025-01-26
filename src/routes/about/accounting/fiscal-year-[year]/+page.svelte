@@ -38,7 +38,7 @@
 	<h1>第{data.fiscalYearNumber}期決算報告書</h1>
 	<p>第{data.fiscalYearNumber}期（{data.duration}）につき、次のとおり報告いたします。</p>
 	<p><a href={data.pdf}>PDFファイル</a></p>
-	<enhanced:img src={data.image} alt="決算報告書の表紙" class="img" />
+	<img src={data.image} alt="決算報告書の表紙" class="img" />
 </article>
 
 <style>
