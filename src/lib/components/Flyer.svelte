@@ -19,7 +19,7 @@
 		const optionsString = options.map(([key, value]) => `${key}=${value}`).join(',');
 
 		// '/' 始まりの場合は除去したパスを指定する
-		return `https://www.orch-canvas.tokyo/cdn-cgi/image/${optionsString}/${src.startsWith('/') ? src.slice(1) : src}}`;
+		return `https://www.orch-canvas.tokyo/cdn-cgi/image/${optionsString}/${src.startsWith('/') ? src.slice(1) : src}`;
 	}
 </script>
 
