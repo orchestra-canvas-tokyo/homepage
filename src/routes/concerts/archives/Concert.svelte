@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Flyer from '$lib/components/Flyer.svelte';
 	import {
 		getConcertDateDayToDisplay,
 		getEncoreName
@@ -88,7 +89,9 @@
 
 	{#if concert.flyer}
 		<a href="/concerts/{concert.slug}">
-			<enhanced:img class="flyer" src={concert.flyer} alt="{concert.title}のフライヤー" />
+			<div class="flyer-container">
+				<Flyer src={concert.flyer} alt="{concert.title}のフライヤー" />
+			</div>
 		</a>
 	{/if}
 </div>
@@ -183,13 +186,12 @@
 		}
 	}
 
-	.flyer {
+	.flyer-container :global(img) {
 		height: auto;
 		max-width: 300px;
 		object-fit: contain;
-	}
-	@media (max-width: 950px) {
-		.flyer {
+
+		@media (max-width: 950px) {
 			height: auto;
 			width: 35vw;
 		}

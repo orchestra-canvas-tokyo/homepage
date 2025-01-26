@@ -5,6 +5,7 @@
 	import dayjs from 'dayjs';
 	import type { MoveEventDetail } from '@splidejs/svelte-splide/types';
 	import Meta from '$lib/components/Meta.svelte';
+	import Flyer from '$lib/components/Flyer.svelte';
 
 	export let data: PageServerData;
 
@@ -83,7 +84,7 @@
 					<SplideSlide>
 						<a href={`/concerts/${slug}`} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
-							<enhanced:img class="slideshow-img" src={flyer} alt="{title}のフライヤー" />
+							<Flyer src={flyer} alt="{title}のフライヤー" />
 						</a>
 					</SplideSlide>
 				{/if}
@@ -131,7 +132,7 @@
 		border-bottom: none;
 	}
 
-	.slideshow-img {
+	.slide-link :global(img) {
 		max-height: calc(var(--image-height));
 		max-width: calc(var(--slideshow-width));
 		height: auto;

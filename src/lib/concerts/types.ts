@@ -1,5 +1,3 @@
-import type { Picture } from 'vite-imagetools';
-
 /** 演奏会種別(ソースコード上で指定されるslug)の定義 */
 export type ConcertType = 'regular' | 'chamber';
 
@@ -23,7 +21,7 @@ export interface Concert {
 	number: number;
 	slug: string;
 	title: string;
-	flyer?: Picture;
+	flyer?: string;
 	dateTime: {
 		date: string;
 		day?: string; // "月祝"など特別な曜日表記を要する場合に使用

@@ -1,6 +1,6 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
-import flyer from './images/flyers/regular-13.png?enhanced';
+import flyer from './images/flyers/regular-13.png';
 
 const type = 'regular';
 const number = 13;

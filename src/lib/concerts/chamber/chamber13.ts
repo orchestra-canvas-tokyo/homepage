@@ -1,6 +1,6 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
-// import flyer from './images/flyers/chamber-13.webp?enhanced';
+// import flyer from './images/flyers/chamber-13.webp';
 
 const type = 'chamber';
 const number = 13;

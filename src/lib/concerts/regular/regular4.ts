@@ -1,6 +1,6 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
-import flyer from './images/flyers/regular-4.webp?enhanced';
+import flyer from './images/flyers/regular-4.webp';
 import hollywoodLatte from './images/hollywood-latte.png';
 
 const type = 'regular';
