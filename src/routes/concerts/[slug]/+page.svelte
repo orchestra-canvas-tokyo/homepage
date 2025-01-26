@@ -3,8 +3,9 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import dayjs from 'dayjs';
 	import 'dayjs/locale/ja';
-	import { getConcertShortName, getEncorName } from '$lib/concerts/generateContentsToDisplay';
+	import { getConcertShortName, getEncoreName } from '$lib/concerts/generateContentsToDisplay';
 	import Meta from '$lib/components/Meta.svelte';
+	import Flyer from '$lib/components/Flyer.svelte';
 
 	export let data: PageServerData;
 </script>
@@ -33,7 +34,9 @@
 	<h1 class="en">concerts</h1>
 	<h2>{data.title}</h2>
 	{#if data.flyer}
-		<enhanced:img class="flyer" src={data.flyer} alt="フライヤー" />
+		<div class="flyer-container">
+			<Flyer src={data.flyer} alt="フライヤー" />
+		</div>
 	{/if}
 
 	<div class="spacer" />
@@ -89,7 +92,7 @@
 						<dd>
 							<p>{program.name}</p>
 							{#if program.encoreType}
-								<p>（{getEncorName(program.encoreType)}）</p>
+								<p>（{getEncoreName(program.encoreType)}）</p>
 							{/if}
 						</dd>
 					{/each}
@@ -109,7 +112,7 @@
 					{#if credit.image}
 						<a href={credit.url} class="credit-image-link">
 							<span>{credit.name}</span>
-							<enhanced:img
+							<img
 								class="inline-icon"
 								style="max-height: {credit.image.maxHeight};"
 								src={credit.image.src}
@@ -193,7 +196,7 @@
 		}
 	}
 
-	.flyer {
+	.flyer-container :global(img) {
 		max-width: min(100%, 700px);
 		height: auto;
 	}

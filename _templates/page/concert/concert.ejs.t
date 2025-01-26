@@ -4,7 +4,7 @@ to: src/lib/concerts/<%= type %>/<%= type %><%= number %>.ts
 
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
-// import flyer from './images/flyers/<%= type %>-<%= number %>.webp?enhanced';
+// import flyer from './images/flyers/<%= type %>-<%= number %>.webp';
 
 const type = '<%= type %>';
 const number = <%= number %>;

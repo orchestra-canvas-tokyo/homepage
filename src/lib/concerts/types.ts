@@ -1,5 +1,3 @@
-import type { Picture } from 'vite-imagetools';
-
 /** 演奏会種別(ソースコード上で指定されるslug)の定義 */
 export type ConcertType = 'regular' | 'chamber';
 
@@ -15,7 +13,7 @@ export interface Soloist extends People {
 }
 
 /** アンコール種別の定義 */
-export type EncorType = 'standard' | 'soloist';
+export type EncoreType = 'standard' | 'soloist';
 
 /** いち演奏会に関する情報をまとめたインターフェース */
 export interface Concert {
@@ -23,7 +21,7 @@ export interface Concert {
 	number: number;
 	slug: string;
 	title: string;
-	flyer?: Picture;
+	flyer?: string;
 	dateTime: {
 		date: string;
 		day?: string; // "月祝"など特別な曜日表記を要する場合に使用
@@ -39,7 +37,7 @@ export interface Concert {
 		composer?: string;
 		arranger?: string;
 		name: string;
-		encoreType?: EncorType; // アンコールの場合のみ指定
+		encoreType?: EncoreType; // アンコールの場合のみ指定
 	}[];
 	// 協賛
 	credits?: {
@@ -47,7 +45,7 @@ export interface Concert {
 		name: string;
 		url: string;
 		image?: {
-			src: Picture;
+			src: string;
 			maxHeight: string; // 単位つきで指定
 		};
 	}[];

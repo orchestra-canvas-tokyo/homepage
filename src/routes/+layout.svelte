@@ -3,7 +3,7 @@
 	import { newsItems } from '$lib/news';
 
 	import logo from './logo.svg';
-	import logoSp from './canvas_symbol_white.png?enhanced';
+	import logoSp from './canvas_symbol_white.png';
 	import instagramIcon from './instagram-brands.svg';
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
@@ -142,7 +142,7 @@
 <header>
 	<a href="/">
 		<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
-		<enhanced:img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
+		<img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
 	</a>
 	<nav>
 		<input
