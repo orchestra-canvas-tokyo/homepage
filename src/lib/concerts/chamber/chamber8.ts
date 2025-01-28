@@ -16,19 +16,22 @@ export const concert: Concert = {
 		url: 'https://yshall-mitaka.jp/#access'
 	},
 	programs: [
-		{ name: 'プーランク / ピアノと管楽器のための六重奏曲 作品100' },
-		{ name: 'ベートーヴェン / 《ドン・ジョヴァンニ》より「お手をどうぞ」の主題による変奏曲' },
-		{ name: 'チャイコフスキー / 弦楽六重奏曲(フィレンツェの思い出）第1番 第2、第4楽章' },
-		{ name: 'グリーグ / 弦楽四重奏曲 ト短調 作品27 第1、2楽章' },
-		{ name: 'エラー / 管楽四重奏曲' },
-		{ name: 'Queen / Bohemian Rhapsody' },
-		{ name: 'メンデルスゾーン / ピアノ三重奏曲 第2番 ハ短調 作品66 第4楽章' },
-		{ name: 'ブラームス / ピアノ三重奏曲 第2番 ハ長調 作品87 第1,2楽章' },
-		{ name: 'ラヴェル / クープランの墓' },
-		{ name: 'ターナー / 四重奏曲 第1番' },
-		{ name: 'ワーグナー / ジークフリート牧歌' },
-		{ name: 'ラインベルガー / 九重奏曲 作品139' },
-		{ name: 'ブラームス / 弦楽五重奏第2番 1楽章' }
+		{ name: 'プーランク', composer: 'ピアノと管楽器のための六重奏曲 作品100' },
+		{
+			name: 'ベートーヴェン',
+			composer: '《ドン・ジョヴァンニ》より「お手をどうぞ」の主題による変奏曲'
+		},
+		{ name: 'チャイコフスキー', composer: '弦楽六重奏曲(フィレンツェの思い出）第1番 第2、第4楽章' },
+		{ name: 'グリーグ', composer: '弦楽四重奏曲 ト短調 作品27 第1、2楽章' },
+		{ name: 'エラー', composer: '管楽四重奏曲' },
+		{ name: 'Queen', composer: 'Bohemian Rhapsody' },
+		{ name: 'メンデルスゾーン', composer: 'ピアノ三重奏曲 第2番 ハ短調 作品66 第4楽章' },
+		{ name: 'ブラームス', composer: 'ピアノ三重奏曲 第2番 ハ長調 作品87 第1,2楽章' },
+		{ name: 'ラヴェル', composer: 'クープランの墓' },
+		{ name: 'ターナー', composer: '四重奏曲 第1番' },
+		{ name: 'ワーグナー', composer: 'ジークフリート牧歌' },
+		{ name: 'ラインベルガー', composer: '九重奏曲 作品139' },
+		{ name: 'ブラームス', composer: '弦楽五重奏第2番 1楽章' }
 	],
 	showLinkToProgramNote: false,
 	ticket: {
