@@ -33,8 +33,9 @@ export interface Concert {
 	};
 	conductor?: People;
 	soloist?: Soloist;
-	programs: {
-		composer?: string;
+	programs?: {
+		// 未定の場合はprograms=undefinedとする
+		composer: string;
 		arranger?: string;
 		name: string;
 		encoreType?: EncoreType; // アンコールの場合のみ指定
@@ -50,7 +51,10 @@ export interface Concert {
 		};
 	}[];
 	ticket?: {
-		description?: string | string[]; // 複数行にまたがる場合、各行を要素とする配列で指定
+		// 未定の場合はdescriptionに"未定"を指定
+		//   ※ 非公開演奏会でチケット販売情報がない場合があるため、
+		//      ticket=undefinedでは対応できない
+		description: string | string[]; // 複数行にまたがる場合、各行を要素とする配列で指定
 		url?: string;
 	};
 	showLinkToProgramNote?: boolean; // blogへのリンクを表示するかどうか

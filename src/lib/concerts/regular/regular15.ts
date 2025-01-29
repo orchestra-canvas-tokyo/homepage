@@ -1,6 +1,6 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
-// import flyer from './images/flyers/regular-15.webp';
+// import flyer from './images/flyers/regular-15.png';
 
 const type = 'regular';
 const number = 15;
@@ -18,19 +18,15 @@ export const concert: Concert = {
 	conductor: {
 		name: '石﨑真弥奈'
 	},
-	programs: [
-		// {
-		//	name: '●',
-		//	composer: '●'
-		// },
-		{
-			name: '未定'
-		}
-	],
-	ticket: {
-		description: '未定'
-		// url: '●'
-	},
+	// programs: [
+	// 	{
+	// 		name: '●',
+	// 		composer: '●'
+	// 	}
+	// ],
+	// ticket: {
+	// 	url: '●'
+	// },
 	showLinkToProgramNote: false
 	// cspell: disable-next-line
 	// youtubePlaylistId: '●'

@@ -37,9 +37,6 @@ export const concert: Concert = {
 			encoreType: 'standard'
 		}
 	],
-	ticket: {
-		url: 'https://ticket.orch-canvas.tokyo/'
-	},
 	showLinkToProgramNote: true,
 	// cspell: disable-next-line
 	youtubePlaylistId: 'PLlsZL5V_BM_HpIZKZVedc851bg-EFW3NR'
