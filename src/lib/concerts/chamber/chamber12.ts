@@ -16,16 +16,16 @@ export const concert: Concert = {
 		url: 'https://www.theatrefonte.com/access/'
 	},
 	programs: [
-		{ name: 'モーツァルト', composer: 'クラリネット五重奏曲より 第1, 4楽章' },
-		{ name: 'イベール', composer: '木管三重奏のための五つの小品' },
-		{ name: 'メンデルスゾーン', composer: '弦楽四重奏曲第4番より 第4楽章' },
-		{ name: 'エヴァルド', composer: '金管五重奏曲第2番' },
-		{ name: 'シューベルト', composer: '弦楽四重奏曲第14番より 第2, 4楽章' },
-		{ name: 'ロレンツ', composer: 'カレイドスコープ' },
-		{ name: 'フェルヘルスト', composer: 'トロンボーン四重奏曲第2番' },
-		{ name: 'モラレス', composer: 'シティースケープ' },
-		{ name: 'ブラームス', composer: '弦楽四重奏曲第2番より 第2, 4楽章' },
-		{ name: 'イェナー', composer: 'クラリネット、ホルン、ピアノのための三重奏曲' }
+		{ title: 'モーツァルト', composer: 'クラリネット五重奏曲より 第1, 4楽章' },
+		{ title: 'イベール', composer: '木管三重奏のための五つの小品' },
+		{ title: 'メンデルスゾーン', composer: '弦楽四重奏曲第4番より 第4楽章' },
+		{ title: 'エヴァルド', composer: '金管五重奏曲第2番' },
+		{ title: 'シューベルト', composer: '弦楽四重奏曲第14番より 第2, 4楽章' },
+		{ title: 'ロレンツ', composer: 'カレイドスコープ' },
+		{ title: 'フェルヘルスト', composer: 'トロンボーン四重奏曲第2番' },
+		{ title: 'モラレス', composer: 'シティースケープ' },
+		{ title: 'ブラームス', composer: '弦楽四重奏曲第2番より 第2, 4楽章' },
+		{ title: 'イェナー', composer: 'クラリネット、ホルン、ピアノのための三重奏曲' }
 	],
 	ticket: {
 		description: '入場無料',

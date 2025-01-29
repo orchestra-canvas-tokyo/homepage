@@ -23,15 +23,15 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: '狂詩曲「スペイン」',
+			title: '狂詩曲「スペイン」',
 			composer: 'シャブリエ'
 		},
 		{
-			name: '「アルルの女」第2組曲',
+			title: '「アルルの女」第2組曲',
 			composer: 'ビゼー'
 		},
 		{
-			name: '幻想交響曲 作品14',
+			title: '幻想交響曲 作品14',
 			composer: 'ベルリオーズ'
 		}
 	],

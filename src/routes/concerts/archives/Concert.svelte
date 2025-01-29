@@ -60,7 +60,7 @@
 							{/if}
 							/
 						{/if}
-						{program.name}
+						{program.title}
 						{#if program.encoreType}
 							（{getEncoreName(program.encoreType)}）
 						{/if}
@@ -73,7 +73,7 @@
 							{/if}
 							<br />
 						{/if}
-						{program.name}
+						{program.title}
 						{#if program.encoreType}
 							（{getEncoreName(program.encoreType)}）
 						{/if}

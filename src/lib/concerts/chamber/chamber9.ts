@@ -16,25 +16,25 @@ export const concert: Concert = {
 		url: 'https://www.l-i-c.com/hall/access/'
 	},
 	programs: [
-		{ name: 'モーツァルト', composer: 'ホルン五重奏曲 変ホ長調 K.407' },
-		{ name: 'ベートーヴェン', composer: '弦楽四重奏曲 第10番 変ホ長調 作品74 第1楽章' },
+		{ title: 'モーツァルト', composer: 'ホルン五重奏曲 変ホ長調 K.407' },
+		{ title: 'ベートーヴェン', composer: '弦楽四重奏曲 第10番 変ホ長調 作品74 第1楽章' },
 		{
-			name: 'チャイコフスキー(arr. 當波夏菜)',
+			title: 'チャイコフスキー(arr. 當波夏菜)',
 			composer: ' 弦楽六重奏曲(フィレンツェの思い出）第1番 1楽章 (オーボエ属六重奏版)'
 		},
-		{ name: 'ブラームス', composer: 'クラリネット五重奏曲 ロ短調 作品115 第1楽章' },
-		{ name: 'サン＝サーンス', composer: 'ピアノ三重奏曲 第2番 ホ短調 作品92 第1楽章' },
-		{ name: 'ニールセン', composer: '木管五重奏曲 作品43' },
-		{ name: 'ベートーヴェン', composer: '弦楽四重奏曲 第15番 イ短調 作品132 第1楽章' },
-		{ name: 'ブラームス', composer: '弦楽六重奏曲 第2番 イ短調 作品51-2 第2楽章' },
+		{ title: 'ブラームス', composer: 'クラリネット五重奏曲 ロ短調 作品115 第1楽章' },
+		{ title: 'サン＝サーンス', composer: 'ピアノ三重奏曲 第2番 ホ短調 作品92 第1楽章' },
+		{ title: 'ニールセン', composer: '木管五重奏曲 作品43' },
+		{ title: 'ベートーヴェン', composer: '弦楽四重奏曲 第15番 イ短調 作品132 第1楽章' },
+		{ title: 'ブラームス', composer: '弦楽六重奏曲 第2番 イ短調 作品51-2 第2楽章' },
 		{
-			name: 'ドヴォルザーク(arr. デイヴィッド・ワルター)',
+			title: 'ドヴォルザーク(arr. デイヴィッド・ワルター)',
 			composer: '弦楽四重奏曲 第12番 ヘ長調 作品96 「アメリカ」(木管五重奏版) 1,3,4楽章'
 		},
-		{ name: 'トゥイレ', composer: '六重奏曲 作品6 第3, 4楽章' },
-		{ name: 'ブラームス', composer: 'ピアノ四重奏曲 第3番 ハ短調 作品60 第2,4楽章' },
-		{ name: 'ドビュッシー', composer: '弦楽四重奏曲 ト短調 作品10 第1,3楽章' },
-		{ name: 'トマジ', composer: '春' }
+		{ title: 'トゥイレ', composer: '六重奏曲 作品6 第3, 4楽章' },
+		{ title: 'ブラームス', composer: 'ピアノ四重奏曲 第3番 ハ短調 作品60 第2,4楽章' },
+		{ title: 'ドビュッシー', composer: '弦楽四重奏曲 ト短調 作品10 第1,3楽章' },
+		{ title: 'トマジ', composer: '春' }
 	],
 	showLinkToProgramNote: false,
 	ticket: {

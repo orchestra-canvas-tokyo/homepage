@@ -20,11 +20,11 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: '楽劇『トリスタンとイゾルデ』 より前奏曲と愛の死',
+			title: '楽劇『トリスタンとイゾルデ』 より前奏曲と愛の死',
 			composer: 'ワーグナー'
 		},
 		{
-			name: '交響曲第8番 ハ短調 WAB108',
+			title: '交響曲第8番 ハ短調 WAB108',
 			composer: 'ブルックナー'
 		}
 	],

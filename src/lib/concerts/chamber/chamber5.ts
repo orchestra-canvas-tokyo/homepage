@@ -16,18 +16,18 @@ export const concert: Concert = {
 		url: 'https://www.urayasu-zaidan.or.jp/urayasu-bunka/1001527.html'
 	},
 	programs: [
-		{ name: 'ヘンデル＝ハルヴォルセン', composer: 'パッサカリア' },
-		{ name: 'ブラームス', composer: '弦楽六重奏曲第1番 変ロ長調 作品18 第1, 2楽章' },
-		{ name: 'ブラームス', composer: '弦楽六重奏曲第2番 ト長調 作品36 第1, 4楽章' },
+		{ title: 'ヘンデル＝ハルヴォルセン', composer: 'パッサカリア' },
+		{ title: 'ブラームス', composer: '弦楽六重奏曲第1番 変ロ長調 作品18 第1, 2楽章' },
+		{ title: 'ブラームス', composer: '弦楽六重奏曲第2番 ト長調 作品36 第1, 4楽章' },
 		{
-			name: 'ブラームス',
+			title: 'ブラームス',
 			composer: 'ピアノ四重奏曲第1番 ト短調 作品25 第1, 4楽章 (ピアノと木管五重奏のための六重奏版)'
 		},
-		{ name: 'フェルステル', composer: '木管五重奏曲 ニ長調 作品95' },
-		{ name: 'ニールセン', composer: '木管五重奏曲 イ長調 作品43' },
-		{ name: 'シュミット', composer: 'フルート、クラリネットとピアノのためのソナチネ 作品85' },
+		{ title: 'フェルステル', composer: '木管五重奏曲 ニ長調 作品95' },
+		{ title: 'ニールセン', composer: '木管五重奏曲 イ長調 作品43' },
+		{ title: 'シュミット', composer: 'フルート、クラリネットとピアノのためのソナチネ 作品85' },
 		{
-			name: 'ミヨー',
+			title: 'ミヨー',
 			composer:
 				'ルネ王の暖炉 Ⅰ.行列 Ⅱ.朝の歌 Ⅲ.軽業師 Ⅳ.ラ・マウザングラード Ⅴ.弓の試合 Ⅵ.ヴァラブルでの狩り Ⅶ.夜のマドリガル'
 		}

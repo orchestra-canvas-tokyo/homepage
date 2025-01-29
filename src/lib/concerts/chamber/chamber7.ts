@@ -16,10 +16,10 @@ export const concert: Concert = {
 		url: 'https://www.shinagawa-culture.or.jp/curian/access.html'
 	},
 	programs: [
-		{ name: 'ボロディン', composer: '弦楽四重奏曲第2番第1楽章' },
-		{ name: 'クレンゲル', composer: '讃歌' },
-		{ name: 'モーツァルト', composer: 'セレナーデ第11番 変ホ長調' },
-		{ name: 'ボウエン', composer: 'ホルンと弦楽四重奏のための五重奏曲 ほか' }
+		{ title: 'ボロディン', composer: '弦楽四重奏曲第2番第1楽章' },
+		{ title: 'クレンゲル', composer: '讃歌' },
+		{ title: 'モーツァルト', composer: 'セレナーデ第11番 変ホ長調' },
+		{ title: 'ボウエン', composer: 'ホルンと弦楽四重奏のための五重奏曲 ほか' }
 	],
 	showLinkToProgramNote: false,
 	ticket: {

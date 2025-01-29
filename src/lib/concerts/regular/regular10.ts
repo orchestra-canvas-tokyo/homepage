@@ -27,18 +27,18 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: '祝典序曲',
+			title: '祝典序曲',
 			composer: 'ショスタコーヴィチ'
 		},
 		{
-			name: 'ピアノ協奏曲第3番 ハ長調 作品26',
+			title: 'ピアノ協奏曲第3番 ハ長調 作品26',
 			composer: 'プロコフィエフ'
 		},
 		{
-			name: '交響曲第10番 ホ短調 作品93',
+			title: '交響曲第10番 ホ短調 作品93',
 			composer: 'ショスタコーヴィチ'
 		},
-		{ name: '音楽の玉手箱（オルゴール）', composer: 'リャードフ', encoreType: 'soloist' }
+		{ title: '音楽の玉手箱（オルゴール）', composer: 'リャードフ', encoreType: 'soloist' }
 	],
 	credits: [
 		{

@@ -16,23 +16,23 @@ export const concert: Concert = {
 		url: 'https://totsuka.hall-info.jp/access/'
 	},
 	programs: [
-		{ name: 'ハイドン', composer: 'ロンドントリオ 第1番 ハ長調' },
-		{ name: 'ベートーヴェン', composer: '3つの二重奏曲 第2番 へ長調' },
-		{ name: 'ラヴェル', composer: '弦楽四重奏曲 ヘ長調 第1,2楽章' },
-		{ name: 'タファネル', composer: '木管五重奏曲' },
-		{ name: 'ホルスト (エンガーニョ 編) ', composer: '組曲「惑星」より木星' },
-		{ name: 'ピアソラ (石田涼 編)', composer: 'リベルタンゴ' },
-		{ name: 'グリンカ', composer: '悲愴三重奏曲 ニ短調' },
-		{ name: 'フランク', composer: 'ピアノ五重奏曲 ヘ短調' },
-		{ name: 'ダマーズ', composer: '四重奏曲' },
-		{ name: 'メンデルスゾーン', composer: 'ピアノ三重奏曲 第2番 ハ短調 作品66 第2,第4楽章' },
-		{ name: 'ニコライ', composer: 'Horn Duo No.4' },
+		{ title: 'ハイドン', composer: 'ロンドントリオ 第1番 ハ長調' },
+		{ title: 'ベートーヴェン', composer: '3つの二重奏曲 第2番 へ長調' },
+		{ title: 'ラヴェル', composer: '弦楽四重奏曲 ヘ長調 第1,2楽章' },
+		{ title: 'タファネル', composer: '木管五重奏曲' },
+		{ title: 'ホルスト (エンガーニョ 編) ', composer: '組曲「惑星」より木星' },
+		{ title: 'ピアソラ (石田涼 編)', composer: 'リベルタンゴ' },
+		{ title: 'グリンカ', composer: '悲愴三重奏曲 ニ短調' },
+		{ title: 'フランク', composer: 'ピアノ五重奏曲 ヘ短調' },
+		{ title: 'ダマーズ', composer: '四重奏曲' },
+		{ title: 'メンデルスゾーン', composer: 'ピアノ三重奏曲 第2番 ハ短調 作品66 第2,第4楽章' },
+		{ title: 'ニコライ', composer: 'Horn Duo No.4' },
 		{
-			name: 'シュトラウス (ハーゼンエール 編)',
+			title: 'シュトラウス (ハーゼンエール 編)',
 			composer: 'もうひとりのティル・オイレンシュピーゲル'
 		},
-		{ name: 'チャイコフスキー', composer: '弦楽四重奏曲 第1番 ニ長調 作品11 第2,3,4楽章' },
-		{ name: 'ブラームス', composer: '弦楽器五重奏曲 第2番 ト長調 作品111 第1,4楽章' }
+		{ title: 'チャイコフスキー', composer: '弦楽四重奏曲 第1番 ニ長調 作品11 第2,3,4楽章' },
+		{ title: 'ブラームス', composer: '弦楽器五重奏曲 第2番 ト長調 作品111 第1,4楽章' }
 	],
 	showLinkToProgramNote: false,
 	ticket: {

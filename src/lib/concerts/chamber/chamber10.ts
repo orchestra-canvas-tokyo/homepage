@@ -16,20 +16,20 @@ export const concert: Concert = {
 		url: 'https://www.muse-tokorozawa.or.jp/access/'
 	},
 	programs: [
-		{ name: 'シンプソン', composer: '4本のトランペットのためのソナチネ' },
-		{ name: 'サン=サーンス', composer: 'タランテラ' },
-		{ name: 'シューベルト', composer: '弦楽五重奏曲 ハ長調 D956 第1楽章' },
-		{ name: 'ショスタコーヴィチ', composer: '弦楽四重奏曲 第8番 ハ短調 作品110' },
+		{ title: 'シンプソン', composer: '4本のトランペットのためのソナチネ' },
+		{ title: 'サン=サーンス', composer: 'タランテラ' },
+		{ title: 'シューベルト', composer: '弦楽五重奏曲 ハ長調 D956 第1楽章' },
+		{ title: 'ショスタコーヴィチ', composer: '弦楽四重奏曲 第8番 ハ短調 作品110' },
 		{
-			name: 'ダリウス・ミヨー',
+			title: 'ダリウス・ミヨー',
 			composer: '2つのヴァイオリンとピアノのためのソナタ 作品15 第1,2,3楽章'
 		},
-		{ name: 'フォーレ', composer: 'ピアノ四重奏曲 第1番 ハ短調 作品15' },
-		{ name: 'ブラームス', composer: 'クラリネット三重奏曲 イ短調 作品114 第1,4楽章' },
-		{ name: 'メンデルスゾーン', composer: 'ピアノ三重奏第1番 ニ短調 作品49 第1楽章' },
-		{ name: 'モーツァルト', composer: '協奏交響曲 変ホ長調 K364' },
-		{ name: 'ラヴェル', composer: 'クープランの墓' },
-		{ name: '小林健太郎', composer: 'ホルン四重奏曲 第3番「あらたなる旅立ちの時」' }
+		{ title: 'フォーレ', composer: 'ピアノ四重奏曲 第1番 ハ短調 作品15' },
+		{ title: 'ブラームス', composer: 'クラリネット三重奏曲 イ短調 作品114 第1,4楽章' },
+		{ title: 'メンデルスゾーン', composer: 'ピアノ三重奏第1番 ニ短調 作品49 第1楽章' },
+		{ title: 'モーツァルト', composer: '協奏交響曲 変ホ長調 K364' },
+		{ title: 'ラヴェル', composer: 'クープランの墓' },
+		{ title: '小林健太郎', composer: 'ホルン四重奏曲 第3番「あらたなる旅立ちの時」' }
 	],
 	showLinkToProgramNote: false,
 	ticket: {

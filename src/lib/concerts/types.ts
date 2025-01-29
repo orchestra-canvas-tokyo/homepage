@@ -37,7 +37,7 @@ export interface Concert {
 		// 未定の場合はprograms=undefinedとする
 		composer: string;
 		arranger?: string;
-		name: string;
+		title: string;
 		encoreType?: EncoreType; // アンコールの場合のみ指定
 	}[];
 	// 協賛

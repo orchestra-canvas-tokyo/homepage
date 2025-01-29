@@ -16,18 +16,18 @@ export const concert: Concert = {
 		url: 'https://himawari-sato.com/access'
 	},
 	programs: [
-		{ name: 'メンデルスゾーン', composer: '弦楽八重奏曲 変ホ長調 作品20 第1, 4楽章' },
-		{ name: 'ブラームス', composer: '弦楽五重奏曲第1番 へ長調 作品88 第1楽章' },
-		{ name: 'R.シュトラウス', composer: '13管楽器のためのセレナード 変ホ長調 作品7' },
+		{ title: 'メンデルスゾーン', composer: '弦楽八重奏曲 変ホ長調 作品20 第1, 4楽章' },
+		{ title: 'ブラームス', composer: '弦楽五重奏曲第1番 へ長調 作品88 第1楽章' },
+		{ title: 'R.シュトラウス', composer: '13管楽器のためのセレナード 変ホ長調 作品7' },
 		{
-			name: 'ライネッケ',
+			title: 'ライネッケ',
 			composer: 'クラリネット、ホルンとピアノのための三重奏曲 変ロ長調 作品274 第1, 2, 4楽章'
 		},
-		{ name: 'ボザ', composer: '森にて' },
-		{ name: 'クレスポ', composer: 'スピリチュアル・ワルツ' },
-		{ name: 'バーリン（ロバーツ編）', composer: 'プティン・オン・ザ・リッツ' },
-		{ name: 'ジョージ・ガーシュウィン（デニス・アーミテージ編）', composer: 'ポートレイト' },
-		{ name: 'ジェフリー・アグレル', composer: 'ゴスペル・タイム' }
+		{ title: 'ボザ', composer: '森にて' },
+		{ title: 'クレスポ', composer: 'スピリチュアル・ワルツ' },
+		{ title: 'バーリン（ロバーツ編）', composer: 'プティン・オン・ザ・リッツ' },
+		{ title: 'ジョージ・ガーシュウィン（デニス・アーミテージ編）', composer: 'ポートレイト' },
+		{ title: 'ジェフリー・アグレル', composer: 'ゴスペル・タイム' }
 	],
 	showLinkToProgramNote: false,
 	ticket: {

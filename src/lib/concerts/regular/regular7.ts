@@ -20,15 +20,15 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: '『コリオラン』序曲',
+			title: '『コリオラン』序曲',
 			composer: 'ベートーヴェン'
 		},
 		{
-			name: '交響曲第8番 ヘ長調 作品93',
+			title: '交響曲第8番 ヘ長調 作品93',
 			composer: 'ベートーヴェン'
 		},
 		{
-			name: '交響曲第7番 イ長調 作品92',
+			title: '交響曲第7番 イ長調 作品92',
 			composer: 'ベートーヴェン'
 		}
 	],

@@ -20,19 +20,19 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: 'パリのアメリカ人',
+			title: 'パリのアメリカ人',
 			composer: 'ガーシュウィン'
 		},
 		{
-			name: 'バレエ音楽「アパラチアの春」組曲',
+			title: 'バレエ音楽「アパラチアの春」組曲',
 			composer: 'コープランド'
 		},
 		{
-			name: '交響曲第9番 ホ短調 作品95「新世界より」',
+			title: '交響曲第9番 ホ短調 作品95「新世界より」',
 			composer: 'ドヴォルザーク'
 		},
 		{
-			name: 'そりすべり',
+			title: 'そりすべり',
 			composer: 'アンダーソン',
 			encoreType: 'standard'
 		}

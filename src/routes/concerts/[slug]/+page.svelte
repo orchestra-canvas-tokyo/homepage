@@ -90,7 +90,7 @@
 							{/if}
 						</dt>
 						<dd>
-							<p>{program.name}</p>
+							<p>{program.title}</p>
 							{#if program.encoreType}
 								<p>（{getEncoreName(program.encoreType)}）</p>
 							{/if}
@@ -102,9 +102,9 @@
 				<div class="programs no-composer">
 					{#each data.programs as program}
 						{#if program.arranger}
-							<p>{program.composer}（{program.arranger}編） / {program.name}</p>
+							<p>{program.composer}（{program.arranger}編） / {program.title}</p>
 						{:else}
-							<p>{program.composer} / {program.name}</p>
+							<p>{program.composer} / {program.title}</p>
 						{/if}
 					{/each}
 				</div>
