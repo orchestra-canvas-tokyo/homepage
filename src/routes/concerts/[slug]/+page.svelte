@@ -244,7 +244,7 @@
 		flex-direction: column;
 	}
 	@media (max-width: 950px) {
-		.programs {
+		.programs:not(.no-composer) {
 			display: flex;
 			flex-direction: column;
 			gap: 0;
