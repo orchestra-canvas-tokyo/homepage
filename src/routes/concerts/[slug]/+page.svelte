@@ -99,7 +99,7 @@
 				</dl>
 			{:else}
 				<!-- 室内楽演奏会 -->
-				<div class="programs no-composer">
+				<div class="programs chamber-programs">
 					{#each data.programs as program}
 						{#if program.arranger}
 							<p>{program.composer}（{program.arranger}編） / {program.title}</p>
@@ -239,12 +239,12 @@
 	.programs {
 		gap: 10px;
 	}
-	.no-composer {
+	.chamber-programs {
 		display: flex;
 		flex-direction: column;
 	}
 	@media (max-width: 950px) {
-		.programs:not(.no-composer) {
+		.programs:not(.chamber-programs) {
 			display: flex;
 			flex-direction: column;
 			gap: 0;
