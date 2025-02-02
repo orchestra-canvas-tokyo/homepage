@@ -23,11 +23,11 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: 'チェロ協奏曲 ロ短調 作品104',
+			title: 'チェロ協奏曲 ロ短調 作品104',
 			composer: 'ドヴォルザーク'
 		},
 		{
-			name: '連作交響詩《我が祖国》',
+			title: '連作交響詩《我が祖国》',
 			composer: 'スメタナ'
 		}
 	],

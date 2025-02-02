@@ -20,24 +20,24 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: 'となりのトトロ',
+			title: 'となりのトトロ',
 			composer: '久石譲'
 		},
 		{
-			name: '『パイレーツ・オブ・カリビアン』より',
+			title: '『パイレーツ・オブ・カリビアン』より',
 			composer: 'クラウス・バデルト',
 			arranger: 'テッド・リケッツ'
 		},
 		{
-			name: 'シンフォニック・ヴァリエーション『メリーゴーランド』',
+			title: 'シンフォニック・ヴァリエーション『メリーゴーランド』',
 			composer: '久石譲'
 		},
 		{
-			name: '『スター・ウォーズ』組曲',
+			title: '『スター・ウォーズ』組曲',
 			composer: 'ジョン・ウィリアムズ'
 		},
 		{
-			name: '『ジュラシックパーク』より テーマ',
+			title: '『ジュラシックパーク』より テーマ',
 			composer: 'ジョン・ウィリアムズ',
 			encoreType: 'standard'
 		}

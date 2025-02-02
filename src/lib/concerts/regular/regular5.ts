@@ -21,15 +21,15 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: '歌劇『ドン・ジョヴァンニ』K. 527：序曲',
+			title: '歌劇『ドン・ジョヴァンニ』K. 527：序曲',
 			composer: 'モーツァルト'
 		},
 		{
-			name: '交響詩《死と変容》作品24',
+			title: '交響詩《死と変容》作品24',
 			composer: 'R.シュトラウス'
 		},
 		{
-			name: '交響曲第1番 ニ長調',
+			title: '交響曲第1番 ニ長調',
 			composer: 'マーラー'
 		}
 	],

@@ -78,19 +78,19 @@
 		{/if}
 		<dt>曲目</dt>
 		<dd>
-			{#if data.programs.every((program) => program.composer)}
+			{#if !data.programs}
+				<p>未定</p>
+			{:else if data.type === 'regular'}
 				<dl class="programs">
 					{#each data.programs as program}
 						<dt>
-							{#if program.composer}
-								<p>{program.composer}</p>
-								{#if program.arranger}
-									<p>（{program.arranger}編）</p>
-								{/if}
+							<p>{program.composer}</p>
+							{#if program.arranger}
+								<p>（{program.arranger}編）</p>
 							{/if}
 						</dt>
 						<dd>
-							<p>{program.name}</p>
+							<p>{program.title}</p>
 							{#if program.encoreType}
 								<p>（{getEncoreName(program.encoreType)}）</p>
 							{/if}
@@ -98,9 +98,14 @@
 					{/each}
 				</dl>
 			{:else}
-				<div class="programs no-composer">
+				<!-- 室内楽演奏会 -->
+				<div class="programs chamber-programs">
 					{#each data.programs as program}
-						<p>{program.name}</p>
+						{#if program.arranger}
+							<p>{program.composer}（{program.arranger}編） / {program.title}</p>
+						{:else}
+							<p>{program.composer} / {program.title}</p>
+						{/if}
 					{/each}
 				</div>
 			{/if}
@@ -125,7 +130,7 @@
 				</dd>
 			{/each}
 		{/if}
-		{#if data.ticket && data.ticket.description}
+		{#if data.ticket}
 			<dt>チケット</dt>
 			{#if typeof data.ticket.description === 'string'}
 				<dd>{data.ticket.description}</dd>
@@ -140,13 +145,15 @@
 		{#if data.showLinkToProgramNote}
 			<dt>曲目解説</dt>
 			<dl>
-				<a
-					href="https://blog.orch-canvas.tokyo/tag/第{data.number}回{getConcertShortName(
-						data.type
-					)}"
-				>
-					# 第{data.number}回{getConcertShortName(data.type)}の記事一覧
-				</a>
+				<p>
+					<a
+						href="https://blog.orch-canvas.tokyo/tag/第{data.number}回{getConcertShortName(
+							data.type
+						)}"
+					>
+						# 第{data.number}回{getConcertShortName(data.type)}の記事一覧
+					</a>
+				</p>
 			</dl>
 		{/if}
 	</dl>
@@ -232,12 +239,12 @@
 	.programs {
 		gap: 10px;
 	}
-	.no-composer {
+	.chamber-programs {
 		display: flex;
 		flex-direction: column;
 	}
 	@media (max-width: 950px) {
-		.programs {
+		.programs:not(.chamber-programs) {
 			display: flex;
 			flex-direction: column;
 			gap: 0;

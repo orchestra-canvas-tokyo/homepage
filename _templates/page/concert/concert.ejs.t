@@ -4,7 +4,7 @@ to: src/lib/concerts/<%= type %>/<%= type %><%= number %>.ts
 
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
-// import flyer from './images/flyers/<%= type %>-<%= number %>.webp';
+// import flyer from './images/flyers/<%= type %>-<%= number %>.png';
 
 const type = '<%= type %>';
 const number = <%= number %>;
@@ -22,19 +22,15 @@ export const concert: Concert = {
 	conductor: {
 		name: '未定'
 	},
-	programs: [
-		// {
-		//	name: '●',
-		//	composer: '●'
-		// },
-		{
-            name: '未定'
-        }
-	],
-	ticket: {
-		description: '未定',
-		// url: '●'
-	},
+	// programs: [
+	// 	{
+	// 		name: '●',
+	// 		composer: '●'
+	// 	}
+	// ],
+	// ticket: {
+	// 	url: '●'
+	// },
 	showLinkToProgramNote: false,
 	// cspell: disable-next-line
 	// youtubePlaylistId: '●'

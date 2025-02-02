@@ -20,19 +20,19 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: '歌劇『イドメネオ』序曲',
+			title: '歌劇『イドメネオ』序曲',
 			composer: 'モーツァルト'
 		},
 		{
-			name: '交響曲第２番 ニ長調 作品36',
+			title: '交響曲第２番 ニ長調 作品36',
 			composer: 'ベートーヴェン'
 		},
 		{
-			name: '交響曲第２番 ニ長調 作品73',
+			title: '交響曲第２番 ニ長調 作品73',
 			composer: 'ブラームス'
 		},
 		{
-			name: 'ハンガリー舞曲第６番',
+			title: 'ハンガリー舞曲第６番',
 			composer: 'ブラームス',
 			encoreType: 'standard'
 		}

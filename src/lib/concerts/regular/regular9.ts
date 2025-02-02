@@ -20,19 +20,19 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: '『南国にて』',
+			title: '『南国にて』',
 			composer: 'エルガー'
 		},
 		{
-			name: '独創主題による変奏曲『エニグマ』',
+			title: '独創主題による変奏曲『エニグマ』',
 			composer: 'エルガー'
 		},
 		{
-			name: '交響曲第1番 変イ長調 作品55',
+			title: '交響曲第1番 変イ長調 作品55',
 			composer: 'エルガー'
 		},
 		{
-			name: '弦楽のためのエレジー',
+			title: '弦楽のためのエレジー',
 			composer: 'エルガー',
 			encoreType: 'standard'
 		}

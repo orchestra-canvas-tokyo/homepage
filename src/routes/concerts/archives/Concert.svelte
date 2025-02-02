@@ -48,34 +48,38 @@
 			{/if}
 		</div>
 		<div class="program">
-			{#each concert.programs as program}
-				<p class="hide-on-mobile">
-					{#if program.composer}
-						{program.composer}
-						{#if program.arranger}
-							（{program.arranger}編）
+			{#if !concert.programs}
+				<p>未定</p>
+			{:else}
+				{#each concert.programs as program}
+					<p class="hide-on-mobile">
+						{#if program.composer}
+							{program.composer}
+							{#if program.arranger}
+								（{program.arranger}編）
+							{/if}
+							/
 						{/if}
-						/
-					{/if}
-					{program.name}
-					{#if program.encoreType}
-						（{getEncoreName(program.encoreType)}）
-					{/if}
-				</p>
-				<p class="show-on-mobile">
-					{#if program.composer}
-						{program.composer}
-						{#if program.arranger}
-							（{program.arranger}編）
+						{program.title}
+						{#if program.encoreType}
+							（{getEncoreName(program.encoreType)}）
 						{/if}
-						<br />
-					{/if}
-					{program.name}
-					{#if program.encoreType}
-						（{getEncoreName(program.encoreType)}）
-					{/if}
-				</p>
-			{/each}
+					</p>
+					<p class="show-on-mobile">
+						{#if program.composer}
+							{program.composer}
+							{#if program.arranger}
+								（{program.arranger}編）
+							{/if}
+							<br />
+						{/if}
+						{program.title}
+						{#if program.encoreType}
+							（{getEncoreName(program.encoreType)}）
+						{/if}
+					</p>
+				{/each}
+			{/if}
 			{#if concert.youtubePlaylistId}
 				<a
 					class="hide-on-mobile"
