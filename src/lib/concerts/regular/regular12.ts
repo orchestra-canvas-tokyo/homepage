@@ -41,5 +41,6 @@ export const concert: Concert = {
 	ticket: {
 		description: '全席指定 1,000円',
 		url: 'https://teket.jp/1776/34677'
-	}
+	},
+	youtubePlaylistId: 'PLlsZL5V_BM_EY6W9G2hvfmHye6jX6GnsM'
 };
