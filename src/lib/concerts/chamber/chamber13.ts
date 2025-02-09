@@ -15,14 +15,12 @@ export const concert: Concert = {
 		name: '横浜市鶴見区民文化センター サルビアホール',
 		url: 'https://salvia.hall-info.jp/about/#access'
 	},
-	programs: [
-		// {
-		//	name: '●'
-		// },
-		{
-			name: '未定'
-		}
-	],
+	// programs: [
+	// 	{
+	// 		name: '●',
+	// 		composer: '●'
+	// 	}
+	// ],
 	ticket: {
 		description: '未定'
 		// url: '●'

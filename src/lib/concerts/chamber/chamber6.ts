@@ -16,10 +16,10 @@ export const concert: Concert = {
 		url: 'https://www.urayasu-concerthall.jp/access/'
 	},
 	programs: [
-		{ name: 'ブラームス／ピアノ四重奏曲第1番 ト短調 作品25 第3,4楽章' },
-		{ name: 'ニールセン／木管五重奏曲 作品43' },
-		{ name: 'ドヴォルザーク／弦楽四重奏曲第12番 作品96 『アメリカ』' },
-		{ name: 'ターナー／Farewell to Red Castle 他' }
+		{ composer: 'ブラームス', title: 'ピアノ四重奏曲第1番 ト短調 作品25 第3,4楽章' },
+		{ composer: 'ニールセン', title: '木管五重奏曲 作品43' },
+		{ composer: 'ドヴォルザーク', title: '弦楽四重奏曲第12番 作品96 『アメリカ』' },
+		{ composer: 'ターナー', title: 'Farewell to Red Castle 他' }
 	],
 	showLinkToProgramNote: false,
 	ticket: {

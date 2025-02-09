@@ -25,20 +25,20 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: '交響詩「死の島」',
+			title: '交響詩「死の島」',
 			composer: 'ラフマニノフ'
 		},
 		{
-			name: 'ピアノ協奏曲 第3番',
+			title: 'ピアノ協奏曲 第3番',
 			composer: 'ラフマニノフ'
 		},
 		{
-			name: '交響的舞曲',
+			title: '交響的舞曲',
 			composer: 'ラフマニノフ'
 		},
-		{ name: '絵画的練習曲《音の絵》作品33-2', composer: 'ラフマニノフ', encoreType: 'soloist' },
+		{ title: '絵画的練習曲《音の絵》作品33-2', composer: 'ラフマニノフ', encoreType: 'soloist' },
 		{
-			name: 'ヴォカリーズ',
+			title: 'ヴォカリーズ',
 			composer: 'ラフマニノフ',
 			encoreType: 'standard'
 		}

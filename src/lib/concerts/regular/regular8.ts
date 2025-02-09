@@ -25,19 +25,19 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: 'バレエ音楽《三角帽子》第2組曲',
+			title: 'バレエ音楽《三角帽子》第2組曲',
 			composer: 'ファリャ'
 		},
 		{
-			name: 'ヴァイオリン協奏曲 ニ短調 作品47',
+			title: 'ヴァイオリン協奏曲 ニ短調 作品47',
 			composer: 'シベリウス'
 		},
 		{
-			name: '交響曲第5番 ホ短調 作品64',
+			title: '交響曲第5番 ホ短調 作品64',
 			composer: 'チャイコフスキー'
 		},
 		{
-			name: '無伴奏ヴァイオリンソナタ第5番 第2楽章',
+			title: '無伴奏ヴァイオリンソナタ第5番 第2楽章',
 			composer: 'イザイ',
 			encoreType: 'soloist'
 		}

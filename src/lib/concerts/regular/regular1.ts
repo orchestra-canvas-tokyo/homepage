@@ -20,26 +20,23 @@ export const concert: Concert = {
 	},
 	programs: [
 		{
-			name: '交響詩「前奏曲」',
+			title: '交響詩「前奏曲」',
 			composer: 'リスト'
 		},
 		{
-			name: '交響曲第1番 ハ長調 作品 21',
+			title: '交響曲第1番 ハ長調 作品 21',
 			composer: 'ベートーヴェン'
 		},
 		{
-			name: '交響曲第1番 ハ短調 作品 68',
+			title: '交響曲第1番 ハ短調 作品 68',
 			composer: 'ブラームス'
 		},
 		{
-			name: '楽劇「ニュルンベルクのマイスタージンガー」より第1幕への前奏曲',
+			title: '楽劇「ニュルンベルクのマイスタージンガー」より第1幕への前奏曲',
 			composer: 'ワーグナー',
 			encoreType: 'standard'
 		}
 	],
-	ticket: {
-		url: 'https://ticket.orch-canvas.tokyo/'
-	},
 	showLinkToProgramNote: true,
 	// cspell: disable-next-line
 	youtubePlaylistId: 'PLlsZL5V_BM_HpIZKZVedc851bg-EFW3NR'
