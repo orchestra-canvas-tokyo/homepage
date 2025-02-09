@@ -230,5 +230,10 @@ export const newsItems: {
 		url: '/concerts/chamber-12',
 		date: '2024/10/29',
 		content: '第12回室内楽演奏会のチケットを販売開始しました。'
+	},
+	{
+		url: '/concerts/regular-13',
+		date: '2025/1/18',
+		content: '第13回定期演奏会の曲目解説を公開しました。'
 	}
 ];
