@@ -37,7 +37,7 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git checkout -b "$NEW_BRANCH"
-          git add view_count.txt
+          git add src/routes/support-us/youtube_total_view_count.txt
           git commit -m "総再生回数を更新：$TOTAL_VIEWS回"
           git push origin "$NEW_BRANCH"
 
