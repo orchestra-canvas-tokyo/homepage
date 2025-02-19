@@ -5,9 +5,9 @@
 	import mizuya from './mizuya.png';
 	import pdf from './ご支援のお願い.pdf';
 
-	import youTubeTotalViewCount from './youtube_total_view_count.txt';
+	import youTubeTotalViewCount from './youtube_total_view_count.txt?raw';
 	const displayingYouTubeTotalViewCount = `${
-		Math.floor(parseInt(youTubeTotalViewCount) / 100000) * 100
+		Math.floor(parseInt(youTubeTotalViewCount) / 100000) * 10
 	}万回`;
 </script>
 
