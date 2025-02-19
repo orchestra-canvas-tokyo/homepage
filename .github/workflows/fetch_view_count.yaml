@@ -32,7 +32,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git checkout -b $NEW_BRANCH
+          git checkout -b "$NEW_BRANCH"
           git add view_count.txt
           git commit -m "Update view count to $TOTAL_VIEWS"
           git push origin $NEW_BRANCH
@@ -45,5 +45,5 @@ jobs:
           PR_TITLE=$(python -c "print(f'Update view count to {int(int($TOTAL_VIEWS) / 100000) * 100000}')")
           gh pr create --title "$PR_TITLE" \
                       --body "Automated update of YouTube view count." \
-                      --base main --head $NEW_BRANCH \
+                      --base main --head "$NEW_BRANCH" \
                       --reviewer "REVIEWER_USERNAME"
