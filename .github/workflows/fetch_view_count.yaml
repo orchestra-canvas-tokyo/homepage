@@ -2,8 +2,12 @@ name: YouTubeの総再生回数を更新
 
 on:
   schedule:
-    - cron: '0 0 * * 1' # 毎週月曜日 00:00 UTC に実行
+    # 毎週金曜日 17:00 JST に実行
+    - cron: '0 8 * * 5'
   workflow_dispatch: # 手動実行も可能
+  push: # 開発ブランチのプッシュでも実行
+    branches:
+      - develop/auto-update-youtube-view-count
 
 jobs:
   update-view-count:
