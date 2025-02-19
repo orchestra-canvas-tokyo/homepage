@@ -4,6 +4,11 @@
 	import hollyWoodLatte from './hollywood-latte.png';
 	import mizuya from './mizuya.png';
 	import pdf from './ご支援のお願い.pdf';
+
+	import youTubeTotalViewCount from './youtube_total_view_count.txt';
+	const displayingYouTubeTotalViewCount = `${
+		Math.floor(parseInt(youTubeTotalViewCount) / 100000) * 100
+	}万回`;
 </script>
 
 <Meta title="ご支援のお願い" canonical="/support-us" />
@@ -28,7 +33,7 @@
 	<p>
 		当団は、2020 年に発足して以降、定期演奏会や室内楽演奏会を開催し、累計4,000
 		名を超えるお客様にご来場をいただきました。また、時間や場所の制約を超えて演奏をお届けしたいとの思いから、演奏会の様子をYouTube
-		にて公開し、合計 400,000 回を超える再生回数をいただいております。
+		にて公開し、合計{displayingYouTubeTotalViewCount}を超える再生回数をいただいております。
 	</p>
 	<p>
 		他方、活動規模の拡大に伴って演奏会開催に要する費用も増加をしており、奏者の負担を原資とする現在の財政においては、活動規模の上限を迎えつつあります。また、財政面を理由とする活動規模の上限は他団体さまも直面をする問題であり、このことがアマチュアオーケストラ界の企画の同質化を招いています。

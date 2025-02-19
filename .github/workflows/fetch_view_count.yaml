@@ -38,7 +38,7 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git checkout -b "$NEW_BRANCH"
           git add view_count.txt
-          git commit -m "Update view count to $TOTAL_VIEWS"
+          git commit -m "総再生回数を更新：$TOTAL_VIEWS回"
           git push origin "$NEW_BRANCH"
 
       - name: Create Pull Request
@@ -46,7 +46,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_TITLE=$(python -c "print(f'Update view count to {int(int($TOTAL_VIEWS) / 100000) * 100000}')")
+          PR_TITLE=$(python -c "print(f'総再生回数{int(int($TOTAL_VIEWS) / 100000) * 10}万回突破！')")
           gh pr create --title "$PR_TITLE" \
                       --body "Automated update of YouTube view count." \
                       --base main --head "$NEW_BRANCH" \

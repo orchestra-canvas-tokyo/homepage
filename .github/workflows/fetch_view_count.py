@@ -5,7 +5,7 @@ import sys
 
 API_KEY = os.getenv('YOUTUBE_API_KEY')
 CHANNEL_ID = os.getenv('CHANNEL_ID')
-VIEW_COUNT_FILE = 'view_count.txt'
+VIEW_COUNT_FILE = 'src/routes/support-us/youtube_total_view_count.txt'
 
 if not API_KEY or not CHANNEL_ID:
     print("Error: Missing API key or channel ID.")
