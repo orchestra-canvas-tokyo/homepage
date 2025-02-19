@@ -2,8 +2,8 @@ import { Resend } from 'resend';
 import { categories, type CategoryKey, type RequestBody } from './validator';
 
 const ccsByCategory: Record<string, string[]> = {
-	'concert, ticket': ['webadmin@orch-canvas.toyo', 'info@orch-canvas.toyo'],
-	advertisement: ['webadmin@orch-canvas.toyo', 'pr@orch-canvas.toyo'],
+	'concert, ticket': ['webadmin@orch-canvas.tokyo', 'info@orch-canvas.tokyo'],
+	advertisement: ['webadmin@orch-canvas.tokyo', 'pr@orch-canvas.tokyo'],
 	'hp, sns': ['webadmin@orch-canvas.tokyo'],
 	others: ['webadmin@orch-canvas.tokyo', 'contact@orch-canvas.tokyo']
 } as Record<CategoryKey, string[]>;
