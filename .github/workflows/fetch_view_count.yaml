@@ -50,4 +50,4 @@ jobs:
           gh pr create --title "$PR_TITLE" \
                       --body "Automated update of YouTube view count." \
                       --base main --head "$NEW_BRANCH" \
-                      --reviewer "REVIEWER_USERNAME"
+                      --reviewer "horn553"
