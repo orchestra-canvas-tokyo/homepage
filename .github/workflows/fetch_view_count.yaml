@@ -5,9 +5,6 @@ on:
     # 毎週金曜日 17:00 JST に実行
     - cron: '0 8 * * 5'
   workflow_dispatch: # 手動実行も可能
-  push: # 開発ブランチのプッシュでも実行
-    branches:
-      - develop/auto-update-youtube-view-count
 
 jobs:
   update-view-count:
