@@ -1,0 +1,49 @@
+name: YouTubeの総再生回数を更新
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # 毎週月曜日 00:00 UTC に実行
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  update-view-count:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch YouTube view count
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          # cspell: disable-next-line
+          CHANNEL_ID: 'UCX2SZ5NViwsaOza3biDNjIw'
+        run: python .github/workflows/fetch_view_count.py
+
+      - name: Commit and push changes
+        if: env.NEW_BRANCH != ''
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git checkout -b $NEW_BRANCH
+          git add view_count.txt
+          git commit -m "Update view count to $TOTAL_VIEWS"
+          git push origin $NEW_BRANCH
+
+      - name: Create Pull Request
+        if: env.NEW_BRANCH != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_TITLE=$(python -c "print(f'Update view count to {int(int($TOTAL_VIEWS) / 100000) * 100000}')")
+          gh pr create --title "$PR_TITLE" \
+                      --body "Automated update of YouTube view count." \
+                      --base main --head $NEW_BRANCH \
+                      --reviewer "REVIEWER_USERNAME"
