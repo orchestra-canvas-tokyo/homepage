@@ -35,7 +35,7 @@ jobs:
           git checkout -b "$NEW_BRANCH"
           git add view_count.txt
           git commit -m "Update view count to $TOTAL_VIEWS"
-          git push origin $NEW_BRANCH
+          git push origin "$NEW_BRANCH"
 
       - name: Create Pull Request
         if: env.NEW_BRANCH != ''
