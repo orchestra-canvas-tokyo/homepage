@@ -235,5 +235,10 @@ export const newsItems: {
 		url: '/concerts/regular-13',
 		date: '2025/1/18',
 		content: '第13回定期演奏会の曲目解説を公開しました。'
+	},
+	{
+		url: '/concerts/regular-14',
+		date: '2025/2/24',
+		content: '第14回定期演奏会のチケットを発売しました。'
 	}
 ];

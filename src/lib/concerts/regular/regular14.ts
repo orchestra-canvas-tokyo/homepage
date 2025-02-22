@@ -33,8 +33,8 @@ export const concert: Concert = {
 		}
 	],
 	ticket: {
-		description: '全席指定 1,000円'
-		// url: '●'
+		description: '全席指定 1,000円',
+		url: 'https://teket.jp/1776/44429?uid=hp'
 	},
 	showLinkToProgramNote: false
 	// cspell: disable-next-line
