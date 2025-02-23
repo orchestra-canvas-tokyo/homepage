@@ -1,6 +1,6 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
-// import flyer from './images/flyers/regular-14.webp';
+import flyer from './images/flyers/regular-14.png';
 
 const type = 'regular';
 const number = 14;
@@ -9,7 +9,7 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
-	// flyer: flyer,
+	flyer: flyer,
 	dateTime: { date: '2025-7-12', time: '13:15開場 14:00開演' },
 	place: {
 		name: '練馬区立練馬文化センター 大ホール',
