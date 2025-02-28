@@ -57,10 +57,11 @@
 			<span>柿沼　威司　様</span>
 			<span>神山　和子　様</span>
 			<span>神山　　怜　様</span>
+			<span>鈴木　辰生　様</span>
 			<span>螺良　修一　様</span>
-			<span>吉田　裕之　様</span>
 		</div>
 		<div class="halfwidth-supporters-right">
+			<span>吉田　裕之　様</span>
 			<span>和田　　愛　様</span>
 			<span>和田　　究　様</span>
 			<span>渡邉　信也　様</span>
