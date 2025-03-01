@@ -90,12 +90,12 @@
 		on:move={updatePaginationColor}
 	>
 		<SplideTrack>
-			{#each slideshowItems as { title, flyers, slug, isNew }}
+			{#each slideshowItems as { title, flyers, slug, isNew }, index}
 				{#if flyers}
 					<SplideSlide>
 						<a href={`/concerts/${slug}`} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
-							<Flyer src={flyers[0].src} alt="{title}のフライヤー" />
+							<Flyer src={flyers[0].src} alt="{title}のフライヤー" lazy={2 < index} />
 						</a>
 					</SplideSlide>
 				{/if}
