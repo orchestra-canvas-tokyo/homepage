@@ -1,6 +1,7 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
 import flyer from './images/flyers/regular-12.png';
+import flyerBack from './images/flyers/regular-12-back.png';
 
 const type = 'regular';
 const number = 12;
@@ -9,7 +10,10 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
-	flyer: flyer,
+	flyers: [
+		{ src: flyer, alt: 'フライヤー' },
+		{ src: flyerBack, alt: 'フライヤー（裏面）' }
+	],
 	dateTime: { date: '2024-9-22', time: '12:30開場 13:00開演' },
 	place: {
 		name: '所沢市民文化センター ミューズ アークホール',
