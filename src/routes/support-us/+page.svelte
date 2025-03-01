@@ -67,7 +67,7 @@
 			<span>渡邉　信也　様</span>
 			<span>S. N.　様</span>
 		</div>
-		<div class="fullwidth-supporters">（他匿名6名様）</div>
+		<div class="fullwidth-supporters">（他匿名7名様）</div>
 	</div>
 
 	<h2>ご寄付のお願い・ご返礼</h2>
