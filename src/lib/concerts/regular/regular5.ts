@@ -1,6 +1,7 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
 import flyer from './images/flyers/regular-5.webp';
+import flyerBack from './images/flyers/regular-5-back.png';
 import hollywoodLatte from './images/hollywood-latte.png';
 
 const type = 'regular';
@@ -10,7 +11,10 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
-	flyers: [{ src: flyer, alt: 'フライヤー' }],
+	flyers: [
+		{ src: flyer, alt: 'フライヤー' },
+		{ src: flyerBack, alt: 'フライヤー裏' }
+	],
 	dateTime: { date: '2022-9-3', time: '17:30開場 18:30開演' },
 	place: {
 		name: 'ミューザ川崎シンフォニーホール',
