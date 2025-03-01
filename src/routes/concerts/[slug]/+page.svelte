@@ -34,20 +34,9 @@
 	<h1 class="en">concerts</h1>
 	<h2>{data.title}</h2>
 
-	{#if data.flyer}
+	{#if data.flyers}
 		<div class="flyer-container">
-			<Slider
-				slides={[
-					{
-						src: data.flyer,
-						alt: 'フライヤー（表面）'
-					},
-					{
-						src: data.flyer,
-						alt: 'フライヤー（表面）'
-					}
-				]}
-			/>
+			<Slider slides={data.flyers} />
 		</div>
 	{/if}
 

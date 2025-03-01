@@ -35,12 +35,12 @@
 		});
 	const slideshowItems = [...newSlideshowItems, ...nonNewSlideshowItems]
 		.filter((concert) => {
-			return concert.flyer;
+			return concert.flyers;
 		})
 		.map((concert) => {
 			return {
 				title: concert.title,
-				flyer: concert.flyer,
+				flyers: concert.flyers,
 				slug: concert.slug,
 				isNew: newConcerts.includes(concert.slug)
 			};
@@ -79,12 +79,12 @@
 		on:move={updatePaginationColor}
 	>
 		<SplideTrack>
-			{#each slideshowItems as { title, flyer, slug, isNew }}
-				{#if flyer}
+			{#each slideshowItems as { title, flyers, slug, isNew }}
+				{#if flyers}
 					<SplideSlide>
 						<a href={`/concerts/${slug}`} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
-							<Flyer src={flyer} alt="{title}のフライヤー" />
+							<Flyer src={flyers[0].src} alt="{title}のフライヤー" />
 						</a>
 					</SplideSlide>
 				{/if}
