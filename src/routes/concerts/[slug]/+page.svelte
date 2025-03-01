@@ -6,6 +6,7 @@
 	import { getConcertShortName, getEncoreName } from '$lib/concerts/generateContentsToDisplay';
 	import Meta from '$lib/components/Meta.svelte';
 	import Slider from '$lib/components/Slider.svelte';
+	import Flyer from '$lib/components/Flyer.svelte';
 
 	export let data: PageServerData;
 </script>
@@ -36,7 +37,11 @@
 
 	{#if data.flyers}
 		<div class="flyer-container">
-			<Slider slides={data.flyers} />
+			{#if data.flyers.length > 1}
+				<Slider slides={data.flyers} />
+			{:else}
+				<Flyer src={data.flyers[0].src} alt={data.flyers[0].alt} />
+			{/if}
 		</div>
 	{/if}
 
@@ -232,6 +237,11 @@
 	}
 	dl p {
 		margin: 0;
+	}
+
+	.flyer-container :global(img) {
+		max-width: min(100%, 700px);
+		height: auto;
 	}
 
 	.programs {

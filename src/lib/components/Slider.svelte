@@ -32,9 +32,4 @@
 		--swiper-navigation-color: var(--main-color);
 		--swiper-pagination-color: var(--main-color);
 	}
-
-	swiper-slide :global(img) {
-		max-width: min(100%, 700px);
-		height: auto;
-	}
 </style>
