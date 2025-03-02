@@ -161,7 +161,9 @@
 	{#if // チケット情報があり、開催日が未来か今日だったら
 	data.ticket && data.ticket.url && (dayjs(data.dateTime.date).isAfter(dayjs()) || dayjs(data.dateTime.date).isSame(dayjs(), 'day'))}
 		<div class="spacer" />
-		<a href={data.ticket.url} class="full-width-button"> チケットを申し込む </a>
+		<a href={data.ticket.url} class="full-width-button">
+			<img src="/teket-logo-v-white.svg" alt="teketロゴ" class="teket-logo" />
+		</a>
 	{/if}
 
 	{#if data.youtubePlaylistId}
@@ -274,18 +276,23 @@
 	}
 
 	.full-width-button {
-		display: block;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		border: 1px solid;
-		padding: 15px 0;
 		width: 100%;
-		text-align: center;
-		color: var(--main-color);
 		background-color: var(--background-color);
-		text-decoration: none;
-		transition-duration: 0.3s;
 	}
+
 	.full-width-button:hover {
-		color: var(--background-color);
 		background-color: var(--main-color);
+	}
+
+	.full-width-button:hover .teket-logo {
+		content: url('/teket-logo-v-dark.svg');
+	}
+
+	.teket-logo {
+		height: 60px;
 	}
 </style>
