@@ -48,6 +48,7 @@
 		"resend": "^4.0.1-alpha.0",
 		"svelte-kit-connect-cloudflare-kv": "^0.1.0",
 		"svelte-kit-sessions": "^0.3.2",
+		"swiper": "^11.2.4",
 		"zod": "^3.23.8"
 	},
 	"optionalDependencies": {
