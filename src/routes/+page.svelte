@@ -92,10 +92,15 @@
 		<SplideTrack>
 			{#each slideshowItems as { title, flyers, slug, isNew }, index}
 				{#if flyers}
+					{@const expectedToBeInFirstView = index <= 2}
 					<SplideSlide>
 						<a href={`/concerts/${slug}`} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
-							<Flyer src={flyers[0].src} alt="{title}のフライヤー" lazy={2 < index} />
+							<Flyer
+								src={flyers[0].src}
+								alt="{title}のフライヤー"
+								lazy={!expectedToBeInFirstView}
+							/>
 						</a>
 					</SplideSlide>
 				{/if}
