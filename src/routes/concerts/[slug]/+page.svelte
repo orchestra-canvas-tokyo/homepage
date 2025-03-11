@@ -45,8 +45,6 @@
 		</div>
 	{/if}
 
-	<Slider />
-
 	<div class="spacer" />
 
 	<dl>

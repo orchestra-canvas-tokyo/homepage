@@ -10,10 +10,10 @@
 	import Flyer from './Flyer.svelte';
 
 	register();
-	export let slides: Slide[] = [];
+	export let slides: Slide[];
 </script>
 
-<swiper-container centered-slides={true} navigation={true} effect="flip">
+<swiper-container centered-slides={true} navigation={true} loop={true} effect="flip">
 	{#each slides as slide}
 		<swiper-slide>
 			<Flyer src={slide.src} alt={slide.alt} />
