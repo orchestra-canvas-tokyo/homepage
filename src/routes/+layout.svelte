@@ -12,9 +12,30 @@
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, beforeNavigate } from '$app/navigation';
+	import { PawEngine } from './nyanvas/pawEngine';
 
 	export let data: LayoutData;
+
+	/** Nyanvas用 */
+	let pawEngine: PawEngine | null = null;
+
+	afterNavigate(() => {
+		pawEngine = new PawEngine(
+			document.body,
+			[window.innerWidth, window.innerHeight],
+			window.devicePixelRatio
+		);
+	});
+
+	const onclick = (e: MouseEvent) => {
+		if (!pawEngine) return;
+		pawEngine.onClick(e.clientX, e.clientY);
+	};
+
+	beforeNavigate(() => {
+		document.querySelector('body > canvas')?.remove();
+	});
 
 	const upcomingConcerts = data.concerts
 		.filter((concert) => {
@@ -139,6 +160,9 @@
 	});
 </script>
 
+<!-- Nyanvas用 -->
+<svelte:window on:click={onclick} />
+
 <header>
 	<a href="/">
 		<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
@@ -229,6 +253,16 @@
 </main>
 
 <style>
+	/* Nyanvas用 */
+	:global(canvas) {
+		position: fixed;
+		top: 0;
+		left: 0;
+	}
+	main {
+		z-index: 100;
+	}
+
 	:global(body) {
 		display: grid;
 		grid-template-areas:

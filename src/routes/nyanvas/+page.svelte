@@ -1,29 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { PawEngine } from './pawEngine';
 	import oldLogo from '../logo.svg';
 	import logo from '../orchestra-nyanvas-tokyo.png';
-	import { beforeNavigate } from '$app/navigation';
-
-	let pawEngine: PawEngine | null = null;
-
-	onMount(() => {
-		pawEngine = new PawEngine(
-			document.body,
-			[window.innerWidth, window.innerHeight],
-			window.devicePixelRatio
-		);
-	});
-
-	const onclick = (e: MouseEvent) => {
-		if (!pawEngine) return;
-		pawEngine.onClick(e.clientX, e.clientY);
-	};
-
-	beforeNavigate(() => {
-		if (!pawEngine) return;
-		pawEngine.destroy();
-	});
 </script>
 
 <svelte:head>
@@ -34,8 +11,6 @@
 		rel="stylesheet"
 	/>
 </svelte:head>
-
-<svelte:window on:click={onclick} />
 
 <div class="container">
 	<article>
@@ -111,11 +86,5 @@
 
 	p {
 		margin: 0;
-	}
-
-	:global(canvas) {
-		position: fixed;
-		top: 0;
-		left: 0;
 	}
 </style>
