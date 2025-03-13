@@ -280,6 +280,7 @@
 		width: 100%;
 		text-align: center;
 		color: var(--main-color);
+		background-color: var(--background-color);
 		text-decoration: none;
 		transition-duration: 0.3s;
 	}
