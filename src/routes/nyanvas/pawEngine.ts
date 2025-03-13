@@ -91,7 +91,6 @@ export class PawEngine {
 		const imageSize = 1000;
 		const scale = circleSize / (imageSize / 2);
 		const paw = Matter.Bodies.circle(x, y, circleSize, {
-			mass: 100,
 			render: {
 				sprite: {
 					texture: pawPng,
