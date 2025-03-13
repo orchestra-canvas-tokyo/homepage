@@ -60,6 +60,11 @@ export class PawEngine {
 		});
 
 		Matter.World.add(this.engine.world, mouseConstraint);
+
+		// ランダムに10個生成する
+		for (let i = 0; i < 10; i++) {
+			this.addPaw(Math.random() * width, Math.random() * height);
+		}
 	}
 
 	onClick(x: number, y: number) {
@@ -82,10 +87,11 @@ export class PawEngine {
 	}
 
 	async addPaw(x: number, y: number) {
-		const circleSize = 40;
+		const circleSize = 30;
 		const imageSize = 1000;
 		const scale = circleSize / (imageSize / 2);
 		const paw = Matter.Bodies.circle(x, y, circleSize, {
+			mass: 100,
 			render: {
 				sprite: {
 					texture: pawPng,
@@ -97,5 +103,9 @@ export class PawEngine {
 
 		Matter.World.add(this.engine.world, paw);
 		this.paws.push(paw);
+	}
+
+	destroy() {
+		Matter.Engine.clear(this.engine);
 	}
 }

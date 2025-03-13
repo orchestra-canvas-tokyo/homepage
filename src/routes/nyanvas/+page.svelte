@@ -3,6 +3,7 @@
 	import { PawEngine } from './pawEngine';
 	import oldLogo from '../logo.svg';
 	import logo from '../orchestra-nyanvas-tokyo.png';
+	import { beforeNavigate } from '$app/navigation';
 
 	let pawEngine: PawEngine | null = null;
 
@@ -18,6 +19,11 @@
 		if (!pawEngine) return;
 		pawEngine.onClick(e.clientX, e.clientY);
 	};
+
+	beforeNavigate(() => {
+		if (!pawEngine) return;
+		pawEngine.destroy();
+	});
 </script>
 
 <svelte:head>
