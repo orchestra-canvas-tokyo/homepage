@@ -4,6 +4,7 @@ import pawPng from './paw.png?url';
 export class PawEngine {
 	private engine: Matter.Engine;
 	private render: Matter.Render;
+	private boxBodies: Matter.Body[] = [];
 	private paws: Matter.Body[] = [];
 
 	constructor(element: HTMLElement, [width, height]: [number, number], pixelRatio: number) {
@@ -24,25 +25,7 @@ export class PawEngine {
 			}
 		});
 
-		// create box
-		const thickness = 9999;
-		const ceil = Matter.Bodies.rectangle(width / 2, -thickness / 2, width, thickness, {
-			isStatic: true
-		});
-		const floor = Matter.Bodies.rectangle(width / 2, height + thickness / 2, width, thickness, {
-			isStatic: true
-		});
-		const walls = [
-			Matter.Bodies.rectangle(-thickness / 2 - 1, height / 2, thickness, height, {
-				isStatic: true
-			}),
-			Matter.Bodies.rectangle(width + thickness / 2, height / 2, thickness, height, {
-				isStatic: true
-			})
-		];
-
-		// add all of the bodies to the world
-		Matter.Composite.add(this.engine.world, [ceil, floor, ...walls]);
+		this.updateBox(width, height);
 
 		// run the renderer
 		Matter.Render.run(this.render);
@@ -66,6 +49,31 @@ export class PawEngine {
 		for (let i = 0; i < 10; i++) {
 			this.addPaw(Math.random() * width, Math.random() * height);
 		}
+	}
+
+	updateBox(width: number, height: number) {
+		if (0 < this.boxBodies.length) Matter.Composite.remove(this.engine.world, this.boxBodies);
+
+		const thickness = 9999;
+		const ceil = Matter.Bodies.rectangle(width / 2, -thickness / 2, width, thickness, {
+			isStatic: true
+		});
+		const floor = Matter.Bodies.rectangle(width / 2, height + thickness / 2, width, thickness, {
+			isStatic: true
+		});
+		const walls = [
+			Matter.Bodies.rectangle(-thickness / 2 - 1, height / 2, thickness, height, {
+				isStatic: true
+			}),
+			Matter.Bodies.rectangle(width + thickness / 2, height / 2, thickness, height, {
+				isStatic: true
+			})
+		];
+
+		this.boxBodies = [ceil, floor, ...walls];
+
+		// add all of the bodies to the world
+		Matter.Composite.add(this.engine.world, this.boxBodies);
 	}
 
 	onClick(x: number, y: number) {
@@ -108,6 +116,16 @@ export class PawEngine {
 	updateGravity(x: number, y: number) {
 		this.engine.gravity.x = x;
 		this.engine.gravity.y = y;
+	}
+
+	resize(width: number, height: number) {
+		this.updateBox(width, height);
+		this.render.bounds.max.x = width;
+		this.render.bounds.max.y = height;
+		this.render.options.width = width;
+		this.render.options.height = height;
+		this.render.canvas.width = width;
+		this.render.canvas.height = height;
 	}
 
 	destroy() {

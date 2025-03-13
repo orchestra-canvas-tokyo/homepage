@@ -42,7 +42,7 @@
 		pawEngine.destroy();
 	});
 
-	//デバイスが動くたびに実行 : devicemotion
+	// デバイスが動くたびに実行 : devicemotion
 	const ondevicemotion = (e: DeviceMotionEvent) => {
 		if (!pawEngine) return;
 		if (
@@ -82,6 +82,11 @@
 		}
 
 		pawEngine.updateGravity(...gravity);
+	};
+
+	const onresize = () => {
+		if (!pawEngine) return;
+		pawEngine.resize(window.innerWidth, window.innerHeight);
 	};
 
 	/** ここまでNyanvas */
@@ -210,7 +215,7 @@
 </script>
 
 <!-- Nyanvas用 -->
-<svelte:window on:click={onclick} on:devicemotion={ondevicemotion} />
+<svelte:window on:click={onclick} on:devicemotion={ondevicemotion} on:resize={onresize} />
 
 <header>
 	<!-- /nyanvas からはトップページのリンクとする -->
