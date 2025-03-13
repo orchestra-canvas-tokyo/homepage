@@ -2,8 +2,8 @@
 	import type { LayoutData } from './$types';
 	import { newsItems } from '$lib/news';
 
-	import logo from './orchestra-nyanvas-tokyo.png';
-	import logoSp from './orchestra-nyanvas-tokyo-small.png';
+	import logo from './nyanvas/orchestra-nyanvas-tokyo.png';
+	import logoSp from './nyanvas/orchestra-nyanvas-tokyo-small.png';
 	import instagramIcon from './instagram-brands.svg';
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';

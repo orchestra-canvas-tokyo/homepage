@@ -1,6 +1,6 @@
 <script lang="ts">
 	import oldLogo from '../logo.svg';
-	import logo from '../orchestra-nyanvas-tokyo.png';
+	import logo from './orchestra-nyanvas-tokyo.png';
 	import catStamp from './catStamp.png';
 </script>
 
