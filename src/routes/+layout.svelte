@@ -42,8 +42,6 @@
 		pawEngine.destroy();
 	});
 
-	var deviceOrientation = window.orientation; //デバイスの傾きを取得
-
 	//デバイスが動くたびに実行 : devicemotion
 	const ondevicemotion = (e: DeviceMotionEvent) => {
 		if (!pawEngine) return;
@@ -64,24 +62,23 @@
 		let gravity: [number, number];
 
 		// 傾きに応じて重力を調節
-		switch (deviceOrientation) {
-			case 0:
-				gravity = [-gy + e.acceleration.y, gx + e.acceleration.x];
+		switch (window.screen.orientation.type) {
+			case 'landscape-primary':
+				// 横長
+				gravity = [gy, gx];
 				break;
-			case 90:
-				gravity = [-gy - e.acceleration.x, -gx + e.acceleration.x];
+			case 'landscape-secondary':
+				// 横長逆転
+				gravity = [-gy, -gx];
 				break;
-			case -90:
-				gravity = [gy + e.acceleration.x, gx - e.acceleration.x];
+			case 'portrait-secondary':
+				// 縦長逆転
+				gravity = [gx, -gy];
 				break;
-			default: // case 180
-				gravity = [-gx - e.acceleration.x, gy - e.acceleration.x];
+			default: // case 'portrait-primary'
+				// 縦長 or プロパティ未対応
+				gravity = [-gx, gy];
 				break;
-		}
-
-		// androidとiOSは加速度が真逆なのでその対応
-		if (window.navigator.userAgent.indexOf('Android') > 0) {
-			gravity = [gravity[1], gravity[0]];
 		}
 
 		pawEngine.updateGravity(...gravity);
