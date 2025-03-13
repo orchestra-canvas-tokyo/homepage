@@ -1,6 +1,7 @@
 <script lang="ts">
 	import oldLogo from '../logo.svg';
 	import logo from '../orchestra-nyanvas-tokyo.png';
+	import catStamp from './catStamp.png';
 </script>
 
 <svelte:head>
@@ -26,16 +27,23 @@
 		<hr />
 
 		<p>
-			人類が愛してやまない「猫」<br />
-			私たちも例にもれず、猫を愛してやみません
+			人類が愛してやまない生き物、「猫」<br />
+			私たちも例にもれません
 		</p>
 
 		<p>
 			猫を愛し、猫に愛される者として<br />
-			猫への奉仕を厭わない者として
+			猫への忠誠を誓う者として
 		</p>
 
 		<p>今日からOrchestra "Nyan"vas Tokyoに改名します！</p>
+
+		<p>
+			ニャンともステキで<br />
+			キャットう的に<br />
+			ニャンだフルな<br />
+			演奏会を開催していきます<img src={catStamp} class="cat-stamp" alt="" />
+		</p>
 	</article>
 </div>
 
@@ -57,7 +65,13 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 30px;
+		gap: 40px;
+	}
+
+	@media (max-height: 750px) {
+		article {
+			padding: 40px 0 120px 0;
+		}
 	}
 
 	img {
@@ -86,5 +100,12 @@
 
 	p {
 		margin: 0;
+	}
+
+	.cat-stamp {
+		position: absolute;
+		width: 35px;
+		height: 35px;
+		transform: translateX(-7px);
 	}
 </style>
