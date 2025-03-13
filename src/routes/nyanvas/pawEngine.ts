@@ -104,7 +104,8 @@ export class PawEngine {
 		this.paws.push(paw);
 	}
 
-	destroy() {
-		Matter.Engine.clear(this.engine);
+	updateGravity(x: number, y: number) {
+		this.engine.gravity.x = x;
+		this.engine.gravity.y = y;
 	}
 }
