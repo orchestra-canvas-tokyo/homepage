@@ -66,12 +66,7 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 40px;
-	}
-
-	@media (max-height: 750px) {
-		article {
-			padding: 40px 0 120px 0;
-		}
+		padding: 80px 0 120px 0;
 	}
 
 	img {
