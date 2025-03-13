@@ -7,7 +7,11 @@
 	let pawEngine: PawEngine | null = null;
 
 	onMount(() => {
-		pawEngine = new PawEngine(document.body, [window.innerWidth, window.innerHeight]);
+		pawEngine = new PawEngine(
+			document.body,
+			[window.innerWidth, window.innerHeight],
+			window.devicePixelRatio
+		);
 	});
 
 	const onclick = (e: MouseEvent) => {

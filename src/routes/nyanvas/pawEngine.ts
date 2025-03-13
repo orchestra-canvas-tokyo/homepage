@@ -5,7 +5,7 @@ export class PawEngine {
 	private engine: Matter.Engine;
 	private paws: Matter.Body[] = [];
 
-	constructor(element: HTMLElement, [width, height]: [number, number]) {
+	constructor(element: HTMLElement, [width, height]: [number, number], pixelRatio: number) {
 		// create an engine
 		this.engine = Matter.Engine.create();
 
@@ -18,6 +18,7 @@ export class PawEngine {
 				height,
 				hasBounds: true,
 				background: '',
+				pixelRatio: pixelRatio,
 				wireframes: false
 			}
 		});
