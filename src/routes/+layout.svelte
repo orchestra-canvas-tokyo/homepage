@@ -20,12 +20,16 @@
 	/** Nyanvas用 */
 	let pawEngine: PawEngine | null = null;
 
+	$: headerHref = '/nyanvas';
+
 	afterNavigate(() => {
 		pawEngine = new PawEngine(
 			document.body,
 			[window.innerWidth, window.innerHeight],
 			window.devicePixelRatio
 		);
+
+		headerHref = window.location.pathname === '/nyanvas' ? '/' : '/nyanvas';
 	});
 
 	const onclick = (e: MouseEvent) => {
@@ -165,7 +169,7 @@
 
 <header>
 	<!-- /nyanvas からはトップページのリンクとする -->
-	<a href={window.location.pathname === '/nyanvas' ? '/' : 'nyanvas'}>
+	<a href={headerHref}>
 		<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
 		<img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
 	</a>
