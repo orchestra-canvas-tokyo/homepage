@@ -3,6 +3,7 @@ import pawPng from './paw.png?url';
 
 export class PawEngine {
 	private engine: Matter.Engine;
+	private render: Matter.Render;
 	private paws: Matter.Body[] = [];
 
 	constructor(element: HTMLElement, [width, height]: [number, number], pixelRatio: number) {
@@ -10,7 +11,7 @@ export class PawEngine {
 		this.engine = Matter.Engine.create();
 
 		// create a renderer
-		const render = Matter.Render.create({
+		this.render = Matter.Render.create({
 			element: element,
 			engine: this.engine,
 			options: {
@@ -44,7 +45,7 @@ export class PawEngine {
 		Matter.Composite.add(this.engine.world, [ceil, floor, ...walls]);
 
 		// run the renderer
-		Matter.Render.run(render);
+		Matter.Render.run(this.render);
 
 		// create runner
 		const runner = Matter.Runner.create();
@@ -53,7 +54,7 @@ export class PawEngine {
 		Matter.Runner.run(runner, this.engine);
 
 		// マウス制約の作成
-		const mouse = Matter.Mouse.create(render.canvas);
+		const mouse = Matter.Mouse.create(this.render.canvas);
 		const mouseConstraint = Matter.MouseConstraint.create(this.engine, {
 			mouse: mouse,
 			constraint: { stiffness: 0.2, render: { visible: false } }
@@ -107,5 +108,9 @@ export class PawEngine {
 	updateGravity(x: number, y: number) {
 		this.engine.gravity.x = x;
 		this.engine.gravity.y = y;
+	}
+
+	destroy() {
+		this.render.canvas.remove();
 	}
 }

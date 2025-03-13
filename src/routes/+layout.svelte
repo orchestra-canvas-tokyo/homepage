@@ -38,7 +38,8 @@
 	};
 
 	beforeNavigate(() => {
-		document.querySelector('body > canvas')?.remove();
+		if (!pawEngine) return;
+		pawEngine.destroy();
 	});
 
 	var deviceOrientation = window.orientation; //デバイスの傾きを取得
