@@ -44,37 +44,37 @@
 	var deviceOrientation = window.orientation; //デバイスの傾きを取得
 
 	//デバイスが動くたびに実行 : devicemotion
-	window.addEventListener('devicemotion', function devicemotionHandler(event) {
+	const ondevicemotion = (e: DeviceMotionEvent) => {
 		if (!pawEngine) return;
 		if (
-			!event.accelerationIncludingGravity ||
-			!event.accelerationIncludingGravity.x ||
-			!event.accelerationIncludingGravity.y ||
-			!event.acceleration ||
-			!event.acceleration.x ||
-			!event.acceleration.y
+			!e.accelerationIncludingGravity ||
+			!e.accelerationIncludingGravity.x ||
+			!e.accelerationIncludingGravity.y ||
+			!e.acceleration ||
+			!e.acceleration.x ||
+			!e.acceleration.y
 		)
 			return;
 
 		//重力加速度 (物体の重力を調節)
-		const gx = event.accelerationIncludingGravity.x / 10;
-		const gy = event.accelerationIncludingGravity.y / 10;
+		const gx = e.accelerationIncludingGravity.x / 10;
+		const gy = e.accelerationIncludingGravity.y / 10;
 
 		let gravity: [number, number];
 
 		// 傾きに応じて重力を調節
 		switch (deviceOrientation) {
 			case 0:
-				gravity = [-gy + event.acceleration.y, gx + event.acceleration.x];
+				gravity = [-gy + e.acceleration.y, gx + e.acceleration.x];
 				break;
 			case 90:
-				gravity = [-gy - event.acceleration.x, -gx + event.acceleration.x];
+				gravity = [-gy - e.acceleration.x, -gx + e.acceleration.x];
 				break;
 			case -90:
-				gravity = [gy + event.acceleration.x, gx - event.acceleration.x];
+				gravity = [gy + e.acceleration.x, gx - e.acceleration.x];
 				break;
 			default: // case 180
-				gravity = [-gx - event.acceleration.x, gy - event.acceleration.x];
+				gravity = [-gx - e.acceleration.x, gy - e.acceleration.x];
 				break;
 		}
 
@@ -84,7 +84,7 @@
 		}
 
 		pawEngine.updateGravity(...gravity);
-	});
+	};
 
 	/** ここまでNyanvas */
 
@@ -212,7 +212,7 @@
 </script>
 
 <!-- Nyanvas用 -->
-<svelte:window on:click={onclick} />
+<svelte:window on:click={onclick} on:devicemotion={ondevicemotion} />
 
 <header>
 	<!-- /nyanvas からはトップページのリンクとする -->
