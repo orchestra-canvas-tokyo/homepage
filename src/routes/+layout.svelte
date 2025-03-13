@@ -3,7 +3,7 @@
 	import { newsItems } from '$lib/news';
 
 	import logo from './orchestra-nyanvas-tokyo.png';
-	import logoSp from './canvas_symbol_white.png';
+	import logoSp from './orchestra-nyanvas-tokyo-small.png';
 	import instagramIcon from './instagram-brands.svg';
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
@@ -164,7 +164,7 @@
 <svelte:window on:click={onclick} />
 
 <header>
-	<a href="/">
+	<a href="/nyanvas">
 		<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
 		<img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
 	</a>
