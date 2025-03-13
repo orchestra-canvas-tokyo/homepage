@@ -164,7 +164,8 @@
 <svelte:window on:click={onclick} />
 
 <header>
-	<a href="/nyanvas">
+	<!-- /nyanvas からはトップページのリンクとする -->
+	<a href={window.location.pathname === '/nyanvas' ? '/' : 'nyanvas'}>
 		<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
 		<img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
 	</a>
