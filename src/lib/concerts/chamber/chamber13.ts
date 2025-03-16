@@ -29,7 +29,7 @@ export const concert: Concert = {
 		{ composer: 'ライネッケ', title: 'ピアノ三重奏曲' }
 	],
 	ticket: {
-		description: '未定',
+		description: '入場無料',
 		url: 'https://teket.jp/1776/47046'
 	},
 	showLinkToProgramNote: false
