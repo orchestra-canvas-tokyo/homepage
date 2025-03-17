@@ -86,11 +86,7 @@
 
 	const onresize = () => {
 		if (!pawEngine) return;
-
-		const htmlEl = document.querySelector('html');
-		if (!htmlEl) return;
-
-		pawEngine.resize(htmlEl.clientWidth, htmlEl.clientHeight);
+		pawEngine.resize(window.innerWidth, window.innerHeight);
 	};
 
 	/** ここまでNyanvas */
