@@ -5,7 +5,6 @@
 	import dayjs from 'dayjs';
 	import type { MoveEventDetail } from '@splidejs/svelte-splide/types';
 	import Meta from '$lib/components/Meta.svelte';
-	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
 
 	export let data: PageServerData;
@@ -35,32 +34,22 @@
 			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
 		});
 	const slideshowItems = [...newSlideshowItems, ...nonNewSlideshowItems]
+		.filter((concert) => {
+			return concert.flyer;
+		})
 		.map((concert) => {
 			return {
 				title: concert.title,
-				flyers: concert.flyers,
+				flyer: concert.flyer,
 				slug: concert.slug,
 				isNew: newConcerts.includes(concert.slug)
 			};
-		})
-		.filter(
-			(
-				concert
-			): concert is {
-				title: string;
-				flyers: FlyerType[];
-				slug: string;
-				isNew: boolean;
-			} => {
-				// フライヤーがないものは表示しない
-				return concert.flyers !== undefined;
-			}
-		);
+		});
 
 	const updatePaginationColor = (e: CustomEvent<MoveEventDetail> | undefined) => {
 		if (!e) return;
-		const paginationButtons = document.querySelectorAll('.splide__pagination button');
-		paginationButtons.forEach((pagination, index) => {
+		const paginations = document.querySelectorAll('.splide__pagination button');
+		paginations.forEach((pagination, index) => {
 			if (index === e.detail.index) {
 				(pagination as HTMLButtonElement).style.backgroundColor = 'var(--primary-color)';
 			} else if (Math.abs(index - e.detail.index) === 1) {
@@ -90,17 +79,12 @@
 		on:move={updatePaginationColor}
 	>
 		<SplideTrack>
-			{#each slideshowItems as { title, flyers, slug, isNew }, index}
-				{#if flyers}
-					{@const expectedToBeInFirstView = index <= 2}
+			{#each slideshowItems as { title, flyer, slug, isNew }}
+				{#if flyer}
 					<SplideSlide>
 						<a href={`/concerts/${slug}`} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
-							<Flyer
-								src={flyers[0].src}
-								alt="{title}のフライヤー"
-								lazy={!expectedToBeInFirstView}
-							/>
+							<Flyer src={flyer} alt="{title}のフライヤー" />
 						</a>
 					</SplideSlide>
 				{/if}
@@ -129,10 +113,6 @@
 			);
 			--slideshow-width: calc(100dvw);
 		}
-	}
-
-	:global(swiper-slide) {
-		height: var(--slideshow-height);
 	}
 
 	.slideshow a {
@@ -209,18 +189,13 @@
 
 	:global(.splide__pagination) {
 		margin-top: 10px;
-		padding: 0 10px;
-		gap: 10px;
-	}
-	:global(.splide__pagination li) {
-		flex-basis: 60px;
-		flex-shrink: 1;
 	}
 	:global(.splide__pagination button) {
 		padding: 0;
 		border: 0;
 		margin: 0;
-		width: 100%;
+		margin-right: 10px;
+		width: 60px;
 		height: 4px;
 		border-radius: 2px;
 		transition: 0.3s;

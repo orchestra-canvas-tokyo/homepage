@@ -5,7 +5,6 @@
 	import 'dayjs/locale/ja';
 	import { getConcertShortName, getEncoreName } from '$lib/concerts/generateContentsToDisplay';
 	import Meta from '$lib/components/Meta.svelte';
-	import Slider from '$lib/components/Slider.svelte';
 	import Flyer from '$lib/components/Flyer.svelte';
 
 	export let data: PageServerData;
@@ -34,14 +33,9 @@
 <article>
 	<h1 class="en">concerts</h1>
 	<h2>{data.title}</h2>
-
-	{#if data.flyers}
+	{#if data.flyer}
 		<div class="flyer-container">
-			{#if data.flyers.length > 1}
-				<Slider slides={data.flyers} />
-			{:else}
-				<Flyer src={data.flyers[0].src} alt={data.flyers[0].alt} />
-			{/if}
+			<Flyer src={data.flyer} alt="フライヤー" />
 		</div>
 	{/if}
 
@@ -209,6 +203,11 @@
 		}
 	}
 
+	.flyer-container :global(img) {
+		max-width: min(100%, 700px);
+		height: auto;
+	}
+
 	.spacer {
 		height: 40px;
 	}
@@ -235,11 +234,6 @@
 	}
 	dl p {
 		margin: 0;
-	}
-
-	.flyer-container :global(img) {
-		max-width: min(100%, 700px);
-		height: auto;
 	}
 
 	.programs {

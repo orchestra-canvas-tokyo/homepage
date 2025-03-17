@@ -91,10 +91,10 @@
 		</div>
 	</div>
 
-	{#if concert.flyers}
+	{#if concert.flyer}
 		<a href="/concerts/{concert.slug}">
 			<div class="flyer-container">
-				<Flyer src={concert.flyers[0].src} alt="{concert.title}のフライヤー" />
+				<Flyer src={concert.flyer} alt="{concert.title}のフライヤー" />
 			</div>
 		</a>
 	{/if}

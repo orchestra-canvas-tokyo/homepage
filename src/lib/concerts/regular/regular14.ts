@@ -9,7 +9,7 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
-	flyers: [{ src: flyer, alt: 'フライヤー' }],
+	flyer: flyer,
 	dateTime: { date: '2025-7-12', time: '13:15開場 14:00開演' },
 	place: {
 		name: '練馬区立練馬文化センター 大ホール',

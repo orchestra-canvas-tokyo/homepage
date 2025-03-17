@@ -1,7 +1,6 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
 import flyer from './images/flyers/regular-3.webp';
-import flyerBack from './images/flyers/regular-3-back.png';
 
 const type = 'regular';
 const number = 3;
@@ -10,10 +9,7 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
-	flyers: [
-		{ src: flyer, alt: 'フライヤー' },
-		{ src: flyerBack, alt: 'フライヤー（裏面）' }
-	],
+	flyer: flyer,
 	dateTime: {
 		date: '2022-2-23',
 		time: '13:00開場 13:30開演'
