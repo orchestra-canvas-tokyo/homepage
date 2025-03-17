@@ -119,13 +119,16 @@ export class PawEngine {
 	}
 
 	resize(width: number, height: number) {
+		// 周囲の壁を更新
 		this.updateBox(width, height);
+
+		// 物理エンジンのサイズを変更
 		this.render.bounds.max.x = width;
 		this.render.bounds.max.y = height;
-		this.render.options.width = width;
-		this.render.options.height = height;
-		this.render.canvas.width = width;
-		this.render.canvas.height = height;
+
+		// 描画キャンバスのサイズを変更
+		this.render.canvas.style.width = `${width.toString()}px`;
+		this.render.canvas.style.height = `${height.toString()}px`;
 	}
 
 	destroy() {
