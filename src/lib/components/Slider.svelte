@@ -13,7 +13,7 @@
 	export let slides: Slide[];
 </script>
 
-<swiper-container centered-slides={true} navigation={true} loop={true} effect="flip">
+<swiper-container centered-slides={true} navigation={true} effect="flip">
 	{#each slides as slide}
 		<swiper-slide>
 			<Flyer src={slide.src} alt={slide.alt} />
@@ -22,16 +22,12 @@
 </swiper-container>
 
 <style>
+	:root {
+		--swiper-navigation-color: var(--main-color);
+	}
+
 	swiper-slide {
 		display: flex;
 		justify-content: center;
-	}
-
-	swiper-slide :global(img) {
-		height: 100%;
-	}
-
-	:root {
-		--swiper-navigation-color: var(--main-color);
 	}
 </style>
