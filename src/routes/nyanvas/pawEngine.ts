@@ -1,5 +1,6 @@
 import Matter from 'matter-js';
 import pawPng from './paw.png?url';
+import pawGoldPng from './paws/paw-gold.png?url';
 
 export class PawEngine {
 	private engine: Matter.Engine;
@@ -95,6 +96,16 @@ export class PawEngine {
 		if (!pawRemoveFlag) this.addPaw(x, y);
 	}
 
+	static getPawTexture(): string {
+		const value = Math.random();
+
+		if (value < 0.05) {
+			return pawGoldPng;
+		}
+
+		return pawPng;
+	}
+
 	async addPaw(x: number, y: number) {
 		const circleSize = 30;
 		const imageSize = 1000;
@@ -102,7 +113,7 @@ export class PawEngine {
 		const paw = Matter.Bodies.circle(x, y, circleSize, {
 			render: {
 				sprite: {
-					texture: pawPng,
+					texture: PawEngine.getPawTexture(),
 					xScale: scale,
 					yScale: scale
 				}
