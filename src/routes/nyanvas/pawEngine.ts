@@ -1,6 +1,7 @@
 import Matter from 'matter-js';
-import pawPng from './paw.png?url';
-import pawGoldPng from './paws/paw-gold.png?url';
+import paw from './paw.png';
+import pawOct from './paws/paw-oct.png';
+import pawGold from './paws/paw-gold.png';
 
 export class PawEngine {
 	private engine: Matter.Engine;
@@ -47,7 +48,8 @@ export class PawEngine {
 		Matter.World.add(this.engine.world, mouseConstraint);
 
 		// ランダムに10個生成する
-		for (let i = 0; i < 10; i++) {
+		const initialPawCount = 10;
+		for (let i = 0; i < initialPawCount; i++) {
 			this.addPaw(Math.random() * width, Math.random() * height);
 		}
 	}
@@ -99,11 +101,11 @@ export class PawEngine {
 	static getPawTexture(): string {
 		const value = Math.random();
 
-		if (value < 0.05) {
-			return pawGoldPng;
-		}
-
-		return pawPng;
+		// 5%の確率で金色を
+		// 10%の確率でOCTロゴを
+		if (value < 0.05) return pawGold;
+		if (value < 0.05 + 0.1) return pawOct;
+		return paw;
 	}
 
 	async addPaw(x: number, y: number) {
