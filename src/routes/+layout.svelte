@@ -306,6 +306,9 @@
 	#hamburger-menu-button {
 		display: none;
 	}
+	.hamburger-sns-container {
+		display: none;
+	}
 	@media (max-width: 950px) {
 		#hamburger-menu-button {
 			display: flex;
@@ -334,11 +337,11 @@
 		#hamburger-menu-check:checked ~ #hamburger-menu-button span:nth-of-type(3) {
 			transform: translateY(calc(-1 * var(--distance))) rotate(-30deg);
 		}
-	}
 
-	.hamburger-sns-container {
-		display: flex;
-		justify-content: space-between;
+		.hamburger-sns-container {
+			display: flex;
+			justify-content: space-between;
+		}
 	}
 
 	/* 親メニュー */
