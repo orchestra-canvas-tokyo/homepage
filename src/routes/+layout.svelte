@@ -13,6 +13,7 @@
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
+	import pawIcon from './nyanvas/paw.png';
 
 	export let data: LayoutData;
 
@@ -117,6 +118,11 @@
 			url: 'https://www.youtube.com/channel/UCX2SZ5NViwsaOza3biDNjIw',
 			icon: youtubeIcon,
 			alt: 'YouTube'
+		},
+		{
+			url: '/nyanvas',
+			icon: pawIcon,
+			alt: 'Nyanvas'
 		}
 	];
 
@@ -527,10 +533,6 @@
 		font-size: 0.9em;
 		line-height: 1.25;
 		/* word-break: auto-phrase; */
-	}
-
-	aside img {
-		filter: invert(1);
 	}
 
 	main {
