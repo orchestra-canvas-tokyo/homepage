@@ -2,8 +2,8 @@
 	import type { LayoutData } from './$types';
 	import { newsItems } from '$lib/news';
 
-	import logo from './nyanvas/orchestra-nyanvas-tokyo.png';
-	import logoSp from './nyanvas/orchestra-nyanvas-tokyo-small.png';
+	import logo from './logo.svg';
+	import logoSp from './canvas_symbol_white.png';
 	import instagramIcon from './instagram-brands.svg';
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
@@ -12,84 +12,9 @@
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
-	import { afterNavigate, beforeNavigate } from '$app/navigation';
-	import { PawEngine } from './nyanvas/pawEngine';
+	import { afterNavigate } from '$app/navigation';
 
 	export let data: LayoutData;
-
-	/** Nyanvas用 */
-	let pawEngine: PawEngine | null = null;
-
-	$: headerHref = '/nyanvas';
-
-	afterNavigate(() => {
-		pawEngine = new PawEngine(
-			document.body,
-			[window.innerWidth, window.innerHeight],
-			window.devicePixelRatio
-		);
-
-		headerHref = window.location.pathname === '/nyanvas' ? '/' : '/nyanvas';
-	});
-
-	const onclick = (e: MouseEvent) => {
-		if (!pawEngine) return;
-		pawEngine.onClick(e.clientX, e.clientY);
-	};
-
-	beforeNavigate(() => {
-		if (!pawEngine) return;
-		pawEngine.destroy();
-	});
-
-	// デバイスが動くたびに実行 : devicemotion
-	const ondevicemotion = (e: DeviceMotionEvent) => {
-		if (!pawEngine) return;
-		if (
-			!e.accelerationIncludingGravity ||
-			!e.accelerationIncludingGravity.x ||
-			!e.accelerationIncludingGravity.y ||
-			!e.acceleration ||
-			!e.acceleration.x ||
-			!e.acceleration.y
-		)
-			return;
-
-		//重力加速度 (物体の重力を調節)
-		const gx = e.accelerationIncludingGravity.x / 10;
-		const gy = e.accelerationIncludingGravity.y / 10;
-
-		let gravity: [number, number];
-
-		// 傾きに応じて重力を調節
-		switch (window.screen.orientation.type) {
-			case 'landscape-primary':
-				// 横長
-				gravity = [gy, gx];
-				break;
-			case 'landscape-secondary':
-				// 横長逆転
-				gravity = [-gy, -gx];
-				break;
-			case 'portrait-secondary':
-				// 縦長逆転
-				gravity = [gx, -gy];
-				break;
-			default: // case 'portrait-primary'
-				// 縦長 or プロパティ未対応
-				gravity = [-gx, gy];
-				break;
-		}
-
-		pawEngine.updateGravity(...gravity);
-	};
-
-	const onresize = () => {
-		if (!pawEngine) return;
-		pawEngine.resize(window.innerWidth, window.innerHeight);
-	};
-
-	/** ここまでNyanvas */
 
 	const upcomingConcerts = data.concerts
 		.filter((concert) => {
@@ -214,12 +139,8 @@
 	});
 </script>
 
-<!-- Nyanvas用 -->
-<svelte:window on:click={onclick} on:devicemotion={ondevicemotion} on:resize={onresize} />
-
 <header>
-	<!-- /nyanvas からはトップページのリンクとする -->
-	<a href={headerHref}>
+	<a href="/">
 		<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
 		<img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
 	</a>

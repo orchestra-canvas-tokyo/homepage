@@ -2,6 +2,76 @@
 	import oldLogo from '../logo.svg';
 	import logo from './orchestra-nyanvas-tokyo.png';
 	import catStamp from './catStamp.png';
+
+	import { afterNavigate, beforeNavigate } from '$app/navigation';
+	import { PawEngine } from './pawEngine';
+
+	let pawEngine: PawEngine | null = null;
+
+	afterNavigate(() => {
+		pawEngine = new PawEngine(
+			document.body,
+			[window.innerWidth, window.innerHeight],
+			window.devicePixelRatio
+		);
+	});
+
+	const onclick = (e: MouseEvent) => {
+		if (!pawEngine) return;
+		pawEngine.onClick(e.clientX, e.clientY);
+	};
+
+	beforeNavigate(() => {
+		if (!pawEngine) return;
+		pawEngine.destroy();
+	});
+
+	// デバイスが動くたびに実行 : devicemotion
+	const ondevicemotion = (e: DeviceMotionEvent) => {
+		if (!pawEngine) return;
+		if (
+			!e.accelerationIncludingGravity ||
+			!e.accelerationIncludingGravity.x ||
+			!e.accelerationIncludingGravity.y ||
+			!e.acceleration ||
+			!e.acceleration.x ||
+			!e.acceleration.y
+		)
+			return;
+
+		//重力加速度 (物体の重力を調節)
+		const gx = e.accelerationIncludingGravity.x / 10;
+		const gy = e.accelerationIncludingGravity.y / 10;
+
+		let gravity: [number, number];
+
+		// 傾きに応じて重力を調節
+		switch (window.screen.orientation.type) {
+			case 'landscape-primary':
+				// 横長
+				gravity = [gy, gx];
+				break;
+			case 'landscape-secondary':
+				// 横長逆転
+				gravity = [-gy, -gx];
+				break;
+			case 'portrait-secondary':
+				// 縦長逆転
+				gravity = [gx, -gy];
+				break;
+			default: // case 'portrait-primary'
+				// 縦長 or プロパティ未対応
+				gravity = [-gx, gy];
+				break;
+		}
+
+		pawEngine.updateGravity(...gravity);
+	};
+
+	const onresize = () => {
+		if (!pawEngine) return;
+		pawEngine.resize(window.innerWidth, window.innerHeight);
+	};
 </script>
 
 <svelte:head>
@@ -12,6 +82,8 @@
 		rel="stylesheet"
 	/>
 </svelte:head>
+
+<svelte:window on:click={onclick} on:devicemotion={ondevicemotion} on:resize={onresize} />
 
 <div class="container">
 	<article>
