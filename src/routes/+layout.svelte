@@ -186,6 +186,11 @@
 					{/if}
 				</li>
 			{/each}
+			<li class="hamburger-sns-container">
+				{#each snsMenuItems as sns}
+					<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+				{/each}
+			</li>
 		</ul>
 	</nav>
 </header>
@@ -329,6 +334,11 @@
 		#hamburger-menu-check:checked ~ #hamburger-menu-button span:nth-of-type(3) {
 			transform: translateY(calc(-1 * var(--distance))) rotate(-30deg);
 		}
+	}
+
+	.hamburger-sns-container {
+		display: flex;
+		justify-content: space-between;
 	}
 
 	/* 親メニュー */
