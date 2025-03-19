@@ -111,8 +111,11 @@ export class PawEngine {
 	async addPaw(x: number, y: number) {
 		const circleSize = 30;
 		const imageSize = 1000;
+		const mass = 75;
+
 		const scale = circleSize / (imageSize / 2);
 		const paw = Matter.Bodies.circle(x, y, circleSize, {
+			mass,
 			render: {
 				sprite: {
 					texture: PawEngine.getPawTexture(),
