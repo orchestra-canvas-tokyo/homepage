@@ -1,5 +1,5 @@
 import Matter from 'matter-js';
-import paw from './paw.png';
+import paw from './paws/paw.png';
 import pawNikukyu from './paws/paw-nikukyu.png';
 import pawGold from './paws/paw-gold.png';
 
