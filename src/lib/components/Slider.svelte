@@ -13,7 +13,7 @@
 	export let slides: Slide[];
 </script>
 
-<swiper-container centered-slides={true} navigation={true} effect="flip">
+<swiper-container centered-slides={true} navigation={true} effect="flip" lazy={true}>
 	{#each slides as slide}
 		<swiper-slide>
 			<Flyer src={slide.src} alt={slide.alt} />
