@@ -30,4 +30,9 @@
 		display: flex;
 		justify-content: center;
 	}
+
+	swiper-container::part(button-next),
+	swiper-container::part(button-prev) {
+		filter: drop-shadow(0 0 4px var(--secondary-color));
+	}
 </style>
