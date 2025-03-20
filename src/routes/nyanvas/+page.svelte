@@ -31,18 +31,15 @@
 			私たちも例にもれません
 		</p>
 
-		<p>
-			猫を愛し、猫に愛される者として<br />
-			猫への忠誠を誓う者として
-		</p>
+		<p>猫を愛し、猫に愛される者として</p>
 
 		<p>今日からOrchestra "Nyan"vas Tokyoに改名します！</p>
 
 		<p>
-			ニャンともステキで<br />
+			まネッコされるぐらい<br />
 			キャットう的に<br />
 			ニャンだフルな<br />
-			演奏会を開催していきます<img src={catStamp} class="cat-stamp" alt="" />
+			演奏を発信していきます<img src={catStamp} class="cat-stamp" alt="" />
 		</p>
 	</article>
 </div>
