@@ -1,6 +1,6 @@
 import Matter from 'matter-js';
 import paw from './paw.png';
-import pawOct from './paws/paw-oct.png';
+import pawNikukyu from './paws/paw-nikukyu.png';
 import pawGold from './paws/paw-gold.png';
 
 export class PawEngine {
@@ -102,9 +102,9 @@ export class PawEngine {
 		const value = Math.random();
 
 		// 5%の確率で金色を
-		// 10%の確率でOCTロゴを
+		// 10%の確率で肉球色を
 		if (value < 0.05) return pawGold;
-		if (value < 0.05 + 0.1) return pawOct;
+		if (value < 0.05 + 0.1) return pawNikukyu;
 		return paw;
 	}
 
