@@ -2,7 +2,10 @@
 	import oldLogo from '../logo.svg';
 	import logo from './orchestra-nyanvas-tokyo.png';
 	import catStamp from './catStamp.png';
+	import Meta from '$lib/components/Meta.svelte';
 </script>
+
+<Meta title="&quot;Nyan&quot;vas" canonical="/nyanvas" />
 
 <svelte:head>
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
