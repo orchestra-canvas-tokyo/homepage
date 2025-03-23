@@ -30,7 +30,7 @@ export const concert: Concert = {
 	],
 	ticket: {
 		description: '入場無料',
-		url: 'https://teket.jp/1776/47046'
+		url: 'https://teket.jp/1776/47046?uid=hp'
 	},
 	showLinkToProgramNote: false
 	// cspell: disable-next-line
