@@ -86,7 +86,7 @@
 			lang: 'en',
 			children: [
 				{
-					title: 'orchestra',
+					title: 'music',
 					url: 'https://blog.orch-canvas.tokyo/',
 					lang: 'en'
 				},
