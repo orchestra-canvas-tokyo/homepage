@@ -13,10 +13,11 @@
 	export let slides: Slide[];
 </script>
 
-<swiper-container centered-slides={true} navigation={true} effect="flip" lazy={true}>
-	{#each slides as slide}
-		<swiper-slide>
-			<Flyer src={slide.src} alt={slide.alt} />
+<swiper-container centered-slides={true} navigation={true} effect="flip">
+	{#each slides as slide, index}
+		{@const lazy = 0 < index}
+		<swiper-slide {lazy}>
+			<Flyer src={slide.src} alt={slide.alt} {lazy} />
 		</swiper-slide>
 	{/each}
 </swiper-container>
