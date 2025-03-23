@@ -84,7 +84,18 @@
 		{
 			title: 'blog',
 			lang: 'en',
-			url: 'https://blog.orch-canvas.tokyo/'
+			children: [
+				{
+					title: 'music',
+					url: 'https://blog.orch-canvas.tokyo/',
+					lang: 'en'
+				},
+				{
+					title: 'tech',
+					url: 'https://zenn.dev/p/orch_canvas',
+					lang: 'en'
+				}
+			]
 		},
 		{
 			title: 'contact',
