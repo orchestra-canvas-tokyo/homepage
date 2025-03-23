@@ -7,7 +7,7 @@
 	export let canonical: string;
 
 	$: fullTitle = title !== '' ? `${title} - Orchestra Canvas Tokyo` : 'Orchestra Canvas Tokyo';
-	$: fullCanonical = `https://orch-canvas.tokyo${canonical}`;
+	$: fullCanonical = `https://www.orch-canvas.tokyo${canonical}`;
 </script>
 
 <MetaTags
