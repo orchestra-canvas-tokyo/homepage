@@ -1,21 +1,15 @@
 export class DeviceMotionController {
 	readonly isIOS: boolean;
-	readonly isAvailable: boolean;
 
 	constructor() {
 		this.isIOS = window.DeviceMotionEvent && 'requestPermission' in window.DeviceMotionEvent;
-		this.isAvailable = 'DeviceMotionEvent' in window;
 	}
 
-	requestPermission(ondevicemotion: (e: DeviceMotionEvent) => void): void {
+	requestPermission(): void {
 		if (!this.isIOS) return;
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(window.DeviceMotionEvent as any).requestPermission().then((permissionState: string) => {
-			if (permissionState === 'granted') {
-				window.addEventListener('devicemotion', ondevicemotion);
-			}
-		});
+		(window.DeviceMotionEvent as any).requestPermission();
 	}
 
 	/**

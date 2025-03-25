@@ -23,6 +23,7 @@
 	let deviceMotionController: DeviceMotionController | null = null;
 
 	$: headerHref = '/nyanvas';
+	$: showPermissionModal = false;
 
 	afterNavigate(() => {
 		pawEngine = new PawEngine(
@@ -34,10 +35,9 @@
 		headerHref = window.location.pathname === '/nyanvas' ? '/' : '/nyanvas';
 
 		deviceMotionController = new DeviceMotionController();
-		if (deviceMotionController.isAvailable) {
-			window.ondevicemotion = ondevicemotion;
-			if (!deviceMotionController.isIOS)
-				document.getElementById('grant-permission-button')?.remove();
+		window.ondevicemotion = ondevicemotion;
+		if (deviceMotionController.isIOS) {
+			showPermissionModal = true;
 		}
 	});
 
@@ -68,7 +68,8 @@
 
 	const onclickGrantPermission = () => {
 		if (!deviceMotionController) return;
-		deviceMotionController.requestPermission(ondevicemotion);
+		deviceMotionController.requestPermission();
+		showPermissionModal = false;
 	};
 
 	/** ここまでNyanvas */
@@ -285,8 +286,6 @@
 </aside>
 
 <main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
-	<button id="grant-permission-button" on:click={onclickGrantPermission}>Grant Permission</button>
-
 	<slot />
 
 	{#if data.isRoot}
@@ -302,6 +301,11 @@
 	{/if}
 </main>
 
+<div id="permission-modal" class:show={showPermissionModal}>
+	ぜひ、加速度センサー付きでご覧ください！
+	<button on:click={onclickGrantPermission}>進む</button>
+</div>
+
 <style>
 	/* Nyanvas用 */
 	:global(canvas) {
@@ -311,6 +315,72 @@
 	}
 	main {
 		z-index: 100;
+	}
+	#permission-modal {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: calc(infinity);
+
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 12px;
+
+		font-size: 16px;
+
+		background-color: rgba(0, 0, 0, 0.5);
+		backdrop-filter: blur(5px);
+
+		animation: fadeOut 1s ease-in 0 forwards;
+		/* display: none;
+		opacity: 0; */
+	}
+	#permission-modal.show {
+		animation: fadeIn 1s ease-in 0 forwards;
+		display: flex;
+		opacity: 1;
+	}
+	@keyframes fadeIn {
+		0% {
+			display: none;
+			opacity: 0;
+			transform: scale(0.95);
+		}
+		1% {
+			display: flex;
+			opacity: 0;
+		}
+		100% {
+			display: flex;
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+	@keyframes fadeOut {
+		0% {
+			display: flex;
+			opacity: 1;
+			transform: scale(1);
+		}
+		99% {
+			display: flex;
+			opacity: 0;
+		}
+		100% {
+			display: none;
+			opacity: 0;
+			transform: scale(0.95);
+		}
+	}
+	#permission-modal button {
+		padding: 4px 16px;
+		border: 1px solid var(--main-color);
+		border-radius: 4px;
+		font-size: 14px;
 	}
 
 	:global(body) {
