@@ -14,7 +14,7 @@
 	import dayjs from 'dayjs';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import { PawEngine } from './nyanvas/pawEngine';
-	import { DeviceMotionController } from './nyanvas/deviceMotionController';
+	import { DeviceMotionController } from './nyanvas/DeviceMotionController';
 
 	export let data: LayoutData;
 
