@@ -85,10 +85,17 @@
 	};
 
 	onMount(() => {
-		if (
-			typeof window.DeviceMotionEvent !== 'undefined' &&
-			'requestPermission' in DeviceMotionEvent
-		) {
+		if (window.DeviceMotionEvent && 'requestPermission' in window.DeviceMotionEvent) {
+			// iOS 13+ の場合、何もしない
+		} else {
+			// それ以外の場合、デフォルトでイベントリスナーを追加する
+			document.getElementById('grant-permission-button')?.remove();
+			window.addEventListener('devicemotion', ondevicemotion);
+		}
+	});
+
+	const grantPermission = () => {
+		if (window.DeviceMotionEvent && 'requestPermission' in window.DeviceMotionEvent) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(window.DeviceMotionEvent as any).requestPermission().then((permissionState: string) => {
 				if (permissionState === 'granted') {
@@ -98,7 +105,7 @@
 		} else {
 			window.addEventListener('devicemotion', ondevicemotion);
 		}
-	});
+	};
 
 	const onresize = () => {
 		if (!pawEngine) return;
@@ -319,6 +326,8 @@
 </aside>
 
 <main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
+	<button id="grant-permission-button" on:click={grantPermission}>Grant Permission</button>
+
 	<slot />
 
 	{#if data.isRoot}
