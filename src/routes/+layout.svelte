@@ -36,9 +36,6 @@
 
 		deviceMotionController = new DeviceMotionController();
 		window.ondevicemotion = ondevicemotion;
-		if (deviceMotionController.isIOS) {
-			showPermissionToast = true;
-		}
 	});
 
 	beforeNavigate(() => {
@@ -57,6 +54,9 @@
 
 		const gravity = deviceMotionController.getGravity(e);
 		if (!gravity) return;
+
+		// iOSでもすでに許可されている場合は、Toastを表示しない
+		showPermissionToast = false;
 
 		pawEngine.updateGravity(...gravity);
 	};
