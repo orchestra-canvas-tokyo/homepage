@@ -8,17 +8,19 @@
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
-	import { PawEngine } from './nyanvas/pawEngine';
+	import { PawEngine } from './nyanvas/PawEngine';
+	import { DeviceMotionController } from './nyanvas/DeviceMotionController';
 
 	export let data: LayoutData;
 
 	/** Nyanvas用 */
 	let pawEngine: PawEngine | null = null;
+	let deviceMotionController: DeviceMotionController | null = null;
 
 	$: headerHref = '/nyanvas';
 
@@ -30,6 +32,18 @@
 		);
 
 		headerHref = window.location.pathname === '/nyanvas' ? '/' : '/nyanvas';
+
+		deviceMotionController = new DeviceMotionController();
+		if (deviceMotionController.isAvailable) {
+			window.ondevicemotion = ondevicemotion;
+			if (!deviceMotionController.isIOS)
+				document.getElementById('grant-permission-button')?.remove();
+		}
+	});
+
+	beforeNavigate(() => {
+		if (!pawEngine) return;
+		pawEngine.destroy();
 	});
 
 	const onclick = (e: MouseEvent) => {
@@ -37,79 +51,24 @@
 		pawEngine.onClick(e.clientX, e.clientY);
 	};
 
-	beforeNavigate(() => {
-		if (!pawEngine) return;
-		pawEngine.destroy();
-	});
-
-	// デバイスが動くたびに実行 : devicemotion
 	const ondevicemotion = (e: DeviceMotionEvent) => {
 		if (!pawEngine) return;
-		if (
-			!e.accelerationIncludingGravity ||
-			!e.accelerationIncludingGravity.x ||
-			!e.accelerationIncludingGravity.y ||
-			!e.acceleration ||
-			!e.acceleration.x ||
-			!e.acceleration.y
-		)
-			return;
+		if (!deviceMotionController) return;
 
-		//重力加速度 (物体の重力を調節)
-		const gx = e.accelerationIncludingGravity.x / 10;
-		const gy = e.accelerationIncludingGravity.y / 10;
-
-		let gravity: [number, number];
-
-		// 傾きに応じて重力を調節
-		switch (window.screen.orientation.type) {
-			case 'landscape-primary':
-				// 横長
-				gravity = [gy, gx];
-				break;
-			case 'landscape-secondary':
-				// 横長逆転
-				gravity = [-gy, -gx];
-				break;
-			case 'portrait-secondary':
-				// 縦長逆転
-				gravity = [gx, -gy];
-				break;
-			default: // case 'portrait-primary'
-				// 縦長 or プロパティ未対応
-				gravity = [-gx, gy];
-				break;
-		}
+		const gravity = deviceMotionController.getGravity(e);
+		if (!gravity) return;
 
 		pawEngine.updateGravity(...gravity);
-	};
-
-	onMount(() => {
-		if (window.DeviceMotionEvent && 'requestPermission' in window.DeviceMotionEvent) {
-			// iOS 13+ の場合、何もしない
-		} else {
-			// それ以外の場合、デフォルトでイベントリスナーを追加する
-			document.getElementById('grant-permission-button')?.remove();
-			window.addEventListener('devicemotion', ondevicemotion);
-		}
-	});
-
-	const grantPermission = () => {
-		if (window.DeviceMotionEvent && 'requestPermission' in window.DeviceMotionEvent) {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			(window.DeviceMotionEvent as any).requestPermission().then((permissionState: string) => {
-				if (permissionState === 'granted') {
-					window.addEventListener('devicemotion', ondevicemotion);
-				}
-			});
-		} else {
-			window.addEventListener('devicemotion', ondevicemotion);
-		}
 	};
 
 	const onresize = () => {
 		if (!pawEngine) return;
 		pawEngine.resize(window.innerWidth, window.innerHeight);
+	};
+
+	const onclickGrantPermission = () => {
+		if (!deviceMotionController) return;
+		deviceMotionController.requestPermission(ondevicemotion);
 	};
 
 	/** ここまでNyanvas */
@@ -326,7 +285,7 @@
 </aside>
 
 <main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
-	<button id="grant-permission-button" on:click={grantPermission}>Grant Permission</button>
+	<button id="grant-permission-button" on:click={onclickGrantPermission}>Grant Permission</button>
 
 	<slot />
 
