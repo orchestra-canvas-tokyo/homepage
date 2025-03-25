@@ -8,7 +8,7 @@
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
@@ -83,6 +83,22 @@
 
 		pawEngine.updateGravity(...gravity);
 	};
+
+	onMount(() => {
+		if (
+			typeof window.DeviceMotionEvent !== 'undefined' &&
+			'requestPermission' in DeviceMotionEvent
+		) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(window.DeviceMotionEvent as any).requestPermission().then((permissionState: string) => {
+				if (permissionState === 'granted') {
+					window.addEventListener('devicemotion', ondevicemotion);
+				}
+			});
+		} else {
+			window.addEventListener('devicemotion', ondevicemotion);
+		}
+	});
 
 	const onresize = () => {
 		if (!pawEngine) return;
@@ -226,7 +242,7 @@
 </script>
 
 <!-- Nyanvas用 -->
-<svelte:window on:click={onclick} on:devicemotion={ondevicemotion} on:resize={onresize} />
+<svelte:window on:click={onclick} on:resize={onresize} />
 
 <header>
 	<!-- /nyanvas からはトップページのリンクとする -->
