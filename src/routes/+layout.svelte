@@ -13,7 +13,7 @@
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
-	import { PawEngine } from './nyanvas/pawEngine';
+	import { PawEngine } from './nyanvas/PawEngine';
 	import { DeviceMotionController } from './nyanvas/DeviceMotionController';
 
 	export let data: LayoutData;
