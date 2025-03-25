@@ -64,7 +64,7 @@ export class DeviceMotionController {
 		}
 
 		// iOS の場合は重力ベクトルを反転
-		// if (this.isIOS) gravity = [-gravity[0], -gravity[1]];
+		if (this.isIOS) return [-gravity[0], -gravity[1]];
 
 		return gravity;
 	}
