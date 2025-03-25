@@ -13,7 +13,7 @@
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
-	import { PawEngine } from './nyanvas/PawEngine';
+	import { PawEngine } from './nyanvas/pawEngine';
 	import { DeviceMotionController } from './nyanvas/DeviceMotionController';
 
 	export let data: LayoutData;
@@ -23,7 +23,7 @@
 	let deviceMotionController: DeviceMotionController | null = null;
 
 	$: headerHref = '/nyanvas';
-	$: showPermissionModal = false;
+	$: showPermissionToast = false;
 
 	afterNavigate(() => {
 		pawEngine = new PawEngine(
@@ -37,7 +37,7 @@
 		deviceMotionController = new DeviceMotionController();
 		window.ondevicemotion = ondevicemotion;
 		if (deviceMotionController.isIOS) {
-			showPermissionModal = true;
+			showPermissionToast = true;
 		}
 	});
 
@@ -69,7 +69,7 @@
 	const onclickGrantPermission = () => {
 		if (!deviceMotionController) return;
 		deviceMotionController.requestPermission();
-		showPermissionModal = false;
+		showPermissionToast = false;
 	};
 
 	/** ここまでNyanvas */
@@ -301,8 +301,8 @@
 	{/if}
 </main>
 
-<div id="permission-modal" class:show={showPermissionModal}>
-	ぜひ、加速度センサー付きでご覧ください！
+<div id="permission-toast" class="toast" class:show={showPermissionToast}>
+	<p>ぜひ、加速度センサー付きでご覧ください！</p>
 	<button on:click={onclickGrantPermission}>進む</button>
 </div>
 
@@ -316,31 +316,38 @@
 	main {
 		z-index: 100;
 	}
-	#permission-modal {
+	.toast {
+		--spacing-unit: 4px;
+
 		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
-		z-index: calc(infinity);
+		/* bottom: calc(var(--spacing-unit) * 8);
+		left: 50%;
+		transform: translateY(50%); */
+		inset: 0;
+		margin: auto;
+		width: fit-content;
+		height: fit-content;
 
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		gap: 12px;
+		z-index: 9999;
 
-		font-size: 16px;
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		padding: calc(var(--spacing-unit) * 6);
 
-		background-color: rgba(0, 0, 0, 0.5);
+		box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+		border-radius: var(--spacing-unit);
+		background-color: rgba(0, 0, 0, 0.25);
 		backdrop-filter: blur(5px);
 
-		animation: fadeOut 1s ease-in 0 forwards;
-		/* display: none;
-		opacity: 0; */
+		flex-direction: column;
+		align-items: center;
+		gap: calc(var(--spacing-unit) * 4);
+
+		animation: fadeOut 0.5s ease-in 0s forwards;
+		display: none;
+		opacity: 0;
 	}
-	#permission-modal.show {
-		animation: fadeIn 1s ease-in 0 forwards;
+	.show {
+		animation: fadeIn 0.5s ease-in 0s forwards;
 		display: flex;
 		opacity: 1;
 	}
@@ -376,11 +383,14 @@
 			transform: scale(0.95);
 		}
 	}
-	#permission-modal button {
+	#permission-toast button {
 		padding: 4px 16px;
 		border: 1px solid var(--main-color);
 		border-radius: 4px;
 		font-size: 14px;
+	}
+	#permission-toast p {
+		margin: 0;
 	}
 
 	:global(body) {
