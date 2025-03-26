@@ -36,7 +36,7 @@ export class DeviceMotionController {
 		const isDeviceMotionEventWithRequestPermission = (
 			unknownDeviceMotionEvent: unknown
 		): unknownDeviceMotionEvent is deviceMotionEventWithRequestPermission =>
-			typeof unknownDeviceMotionEvent === 'object' &&
+			typeof unknownDeviceMotionEvent === 'function' &&
 			unknownDeviceMotionEvent !== null &&
 			'requestPermission' in unknownDeviceMotionEvent &&
 			typeof unknownDeviceMotionEvent.requestPermission === 'function';
