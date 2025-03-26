@@ -34,7 +34,11 @@
 
 		headerHref = window.location.pathname === '/nyanvas' ? '/' : '/nyanvas';
 
-		deviceMotionController = new DeviceMotionController();
+		const updatePermissionStatusCallback = (permitted: boolean) => {
+			showPermissionToast = !permitted;
+		};
+		deviceMotionController = new DeviceMotionController(updatePermissionStatusCallback);
+		deviceMotionController.requestPermission();
 		window.ondevicemotion = ondevicemotion;
 	});
 
@@ -54,9 +58,6 @@
 
 		const gravity = deviceMotionController.getGravity(e);
 		if (!gravity) return;
-
-		// iOSでもすでに許可されている場合は、Toastを表示しない
-		showPermissionToast = false;
 
 		pawEngine.updateGravity(...gravity);
 	};

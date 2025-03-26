@@ -1,15 +1,56 @@
 export class DeviceMotionController {
 	readonly isIOS: boolean;
+	readonly updatePermissionStatusCallback: (permitted: boolean) => void;
 
-	constructor() {
+	/**
+	 * コンストラクタ
+	 * @param updatePermissionStatusCallback
+	 * 加速度センサーにアクセスするためのパーミッション状態が変更されたときに呼び出されるコールバック。
+	 * このコールバックは、`DeviceMotionController` のパーミッション状態が変更されたときに呼び出されます。
+	 */
+	constructor(updatePermissionStatusCallback: typeof this.updatePermissionStatusCallback) {
+		this.updatePermissionStatusCallback = updatePermissionStatusCallback;
 		this.isIOS = window.DeviceMotionEvent && 'requestPermission' in window.DeviceMotionEvent;
 	}
 
+	/**
+	 * 加速度センサーにアクセスするためのパーミッションを要求します。
+	 * iOS では、`DeviceMotionEvent.requestPermission()` を呼び出して
+	 * パーミッション状態を変更することができます。
+	 */
 	requestPermission(): void {
-		if (!this.isIOS) return;
+		const unknownDeviceMotionEvent = window.DeviceMotionEvent as unknown;
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(window.DeviceMotionEvent as any).requestPermission();
+		type deviceMotionEventWithRequestPermission = typeof window.DeviceMotionEvent & {
+			requestPermission: () => Promise<'granted' | 'denied'>;
+		};
+
+		/**
+		 * @param unknownDeviceMotionEvent - `unknown` 型の `DeviceMotionEvent`。
+		 * @returns `unknownDeviceMotionEvent` が `DeviceMotionEvent` であるかどうか。
+		 *          つまり、`unknownDeviceMotionEvent` が `DeviceMotionEvent` である
+		 *          かつ `requestPermission` メソッドを持つかどうかをチェックします。
+		 *          `true` である場合は、`unknownDeviceMotionEvent` は
+		 *          `deviceMotionEventWithRequestPermission` 型に assignable です。
+		 */
+		const isDeviceMotionEventWithRequestPermission = (
+			unknownDeviceMotionEvent: unknown
+		): unknownDeviceMotionEvent is deviceMotionEventWithRequestPermission =>
+			typeof unknownDeviceMotionEvent === 'object' &&
+			unknownDeviceMotionEvent !== null &&
+			'requestPermission' in unknownDeviceMotionEvent &&
+			typeof unknownDeviceMotionEvent.requestPermission === 'function';
+
+		if (!isDeviceMotionEventWithRequestPermission(unknownDeviceMotionEvent)) {
+			// 許可取得が不要な環境
+			return;
+		}
+
+		unknownDeviceMotionEvent.requestPermission().then((permissionState) => {
+			this.updatePermissionStatusCallback(permissionState === 'granted');
+		});
+
+		return this.updatePermissionStatusCallback(false);
 	}
 
 	/**
