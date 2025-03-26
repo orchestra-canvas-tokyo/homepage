@@ -47,10 +47,16 @@ export class DeviceMotionController {
 			return;
 		}
 
-		unknownDeviceMotionEvent.requestPermission().then((permissionState) => {
-			alert(`permissionState: ${permissionState}`);
-			this.updatePermissionStatusCallback(permissionState === 'granted');
-		});
+		unknownDeviceMotionEvent
+			.requestPermission()
+			.then((permissionState) => {
+				alert(`permissionState: ${permissionState}`);
+				this.updatePermissionStatusCallback(permissionState === 'granted');
+			})
+			.catch(() => {
+				alert(`permissionState: promise rejected`);
+				this.updatePermissionStatusCallback(false);
+			});
 	}
 
 	/**
