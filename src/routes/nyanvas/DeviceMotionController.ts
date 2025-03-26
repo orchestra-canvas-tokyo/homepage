@@ -43,18 +43,16 @@ export class DeviceMotionController {
 
 		if (!isDeviceMotionEventWithRequestPermission(unknownDeviceMotionEvent)) {
 			// 許可取得が不要な環境
-			alert('許可取得が不要な環境');
 			return;
 		}
 
 		unknownDeviceMotionEvent
 			.requestPermission()
 			.then((permissionState) => {
-				alert(`permissionState: ${permissionState}`);
 				this.updatePermissionStatusCallback(permissionState === 'granted');
 			})
 			.catch(() => {
-				alert(`permissionState: promise rejected`);
+				// ユーザーのインタラクションに依らない許可申請の場合など
 				this.updatePermissionStatusCallback(false);
 			});
 	}
