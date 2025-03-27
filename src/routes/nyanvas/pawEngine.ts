@@ -144,6 +144,13 @@ export class PawEngine {
 			const newY = (y / this.render.bounds.max.y) * height;
 
 			Matter.Body.setPosition(paw, { x: newX, y: newY });
+
+			// 肉球に慣性のような速度を与える
+			const velocityCoefficient = 0.01;
+			Matter.Body.setVelocity(paw, {
+				x: velocityCoefficient * (newX - x),
+				y: velocityCoefficient * (newY - y)
+			});
 		});
 
 		// 周囲の壁を更新
