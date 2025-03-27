@@ -321,9 +321,6 @@
 		--spacing-unit: 4px;
 
 		position: fixed;
-		/* bottom: calc(var(--spacing-unit) * 8);
-		left: 50%;
-		transform: translateY(50%); */
 		inset: 0;
 		margin: auto;
 		width: fit-content;
@@ -389,8 +386,11 @@
 		appearance: none;
 
 		padding: 4px 16px;
-		border: 1px solid var(--main-color);
+		border: 1px solid rgba(255, 255, 255, 0.5);
 		border-radius: 4px;
+		background-color: var(--background-color);
+		color: var(--main-color);
+
 		font-size: 14px;
 	}
 	#permission-toast p {
