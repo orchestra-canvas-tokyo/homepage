@@ -385,6 +385,9 @@
 		}
 	}
 	#permission-toast button {
+		-webkit-appearance: none;
+		appearance: none;
+
 		padding: 4px 16px;
 		border: 1px solid var(--main-color);
 		border-radius: 4px;
