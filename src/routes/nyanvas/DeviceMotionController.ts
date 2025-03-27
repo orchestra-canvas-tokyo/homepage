@@ -1,5 +1,5 @@
 export class DeviceMotionController {
-	readonly isIOS: boolean;
+	readonly isWithRequestPermission: boolean;
 	readonly updatePermissionStatusCallback: (permitted: boolean) => void;
 
 	/**
@@ -10,7 +10,13 @@ export class DeviceMotionController {
 	 */
 	constructor(updatePermissionStatusCallback: typeof this.updatePermissionStatusCallback) {
 		this.updatePermissionStatusCallback = updatePermissionStatusCallback;
-		this.isIOS = window.DeviceMotionEvent && 'requestPermission' in window.DeviceMotionEvent;
+
+		const unknownDeviceMotionEvent = window.DeviceMotionEvent as unknown;
+		this.isWithRequestPermission =
+			typeof unknownDeviceMotionEvent === 'function' &&
+			unknownDeviceMotionEvent !== null &&
+			'requestPermission' in unknownDeviceMotionEvent &&
+			typeof unknownDeviceMotionEvent.requestPermission === 'function';
 	}
 
 	/**
@@ -25,21 +31,10 @@ export class DeviceMotionController {
 			requestPermission: () => Promise<'granted' | 'denied'>;
 		};
 
-		/**
-		 * @param unknownDeviceMotionEvent - `unknown` 型の `DeviceMotionEvent`。
-		 * @returns `unknownDeviceMotionEvent` が `DeviceMotionEvent` であるかどうか。
-		 *          つまり、`unknownDeviceMotionEvent` が `DeviceMotionEvent` である
-		 *          かつ `requestPermission` メソッドを持つかどうかをチェックします。
-		 *          `true` である場合は、`unknownDeviceMotionEvent` は
-		 *          `deviceMotionEventWithRequestPermission` 型に assignable です。
-		 */
 		const isDeviceMotionEventWithRequestPermission = (
 			unknownDeviceMotionEvent: unknown
 		): unknownDeviceMotionEvent is deviceMotionEventWithRequestPermission =>
-			typeof unknownDeviceMotionEvent === 'function' &&
-			unknownDeviceMotionEvent !== null &&
-			'requestPermission' in unknownDeviceMotionEvent &&
-			typeof unknownDeviceMotionEvent.requestPermission === 'function';
+			this.isWithRequestPermission;
 
 		if (!isDeviceMotionEventWithRequestPermission(unknownDeviceMotionEvent)) {
 			// 許可取得が不要な環境
@@ -103,7 +98,8 @@ export class DeviceMotionController {
 		}
 
 		// iOS の場合は重力ベクトルを反転
-		if (this.isIOS) return [-gravity[0], -gravity[1]];
+		const isIOS = this.isWithRequestPermission;
+		if (isIOS) return [-gravity[0], -gravity[1]];
 
 		return gravity;
 	}
