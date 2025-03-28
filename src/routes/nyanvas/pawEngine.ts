@@ -9,6 +9,8 @@ export class PawEngine {
 	private boxBodies: Matter.Body[] = [];
 	private paws: Matter.Body[] = [];
 
+	private restitution: number = 1;
+
 	constructor(element: HTMLElement, [width, height]: [number, number], pixelRatio: number) {
 		// create an engine
 		this.engine = Matter.Engine.create();
@@ -59,16 +61,20 @@ export class PawEngine {
 
 		const thickness = 9999;
 		const ceil = Matter.Bodies.rectangle(width / 2, -thickness / 2, width, thickness, {
+			restitution: this.restitution,
 			isStatic: true
 		});
 		const floor = Matter.Bodies.rectangle(width / 2, height + thickness / 2, width, thickness, {
+			restitution: this.restitution,
 			isStatic: true
 		});
 		const walls = [
 			Matter.Bodies.rectangle(-thickness / 2 - 1, height / 2, thickness, height, {
+				restitution: this.restitution,
 				isStatic: true
 			}),
 			Matter.Bodies.rectangle(width + thickness / 2, height / 2, thickness, height, {
+				restitution: this.restitution,
 				isStatic: true
 			})
 		];
@@ -116,6 +122,7 @@ export class PawEngine {
 		const scale = circleSize / (imageSize / 2);
 		const paw = Matter.Bodies.circle(x, y, circleSize, {
 			mass,
+			restitution: this.restitution,
 			render: {
 				sprite: {
 					texture: PawEngine.getPawTexture(),
