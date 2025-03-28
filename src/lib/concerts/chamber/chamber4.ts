@@ -9,7 +9,7 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
-	flyer: flyer,
+	flyers: [{ src: flyer, alt: 'フライヤー' }],
 	dateTime: { date: '2022-10-1', time: '13:00開場 13:30開演' },
 	place: {
 		name: '港南区民文化センター「ひまわりの郷」ホール',

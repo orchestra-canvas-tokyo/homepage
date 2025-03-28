@@ -135,6 +135,24 @@ export class PawEngine {
 	}
 
 	resize(width: number, height: number) {
+		// 肉球の位置を更新
+		this.paws.forEach((paw) => {
+			const x = paw.position.x;
+			const y = paw.position.y;
+
+			const newX = (x / this.render.bounds.max.x) * width;
+			const newY = (y / this.render.bounds.max.y) * height;
+
+			Matter.Body.setPosition(paw, { x: newX, y: newY });
+
+			// 肉球に慣性のような速度を与える
+			const velocityCoefficient = 0.01;
+			Matter.Body.setVelocity(paw, {
+				x: velocityCoefficient * (newX - x),
+				y: velocityCoefficient * (newY - y)
+			});
+		});
+
 		// 周囲の壁を更新
 		this.updateBox(width, height);
 

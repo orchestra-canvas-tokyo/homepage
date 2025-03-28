@@ -5,8 +5,12 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import { PawEngine } from './pawEngine';
+	import { DeviceMotionController } from './DeviceMotionController';
 
 	let pawEngine: PawEngine | null = null;
+	let deviceMotionController: DeviceMotionController | null = null;
+
+	$: showPermissionToast = false;
 
 	afterNavigate(() => {
 		pawEngine = new PawEngine(
@@ -14,6 +18,18 @@
 			[window.innerWidth, window.innerHeight],
 			window.devicePixelRatio
 		);
+
+		const updatePermissionStatusCallback = (permitted: boolean) => {
+			showPermissionToast = !permitted;
+		};
+		deviceMotionController = new DeviceMotionController(updatePermissionStatusCallback);
+		deviceMotionController.requestPermission();
+		window.ondevicemotion = ondevicemotion;
+	});
+
+	beforeNavigate(() => {
+		if (!pawEngine) return;
+		pawEngine.destroy();
 	});
 
 	const onclick = (e: MouseEvent) => {
@@ -21,49 +37,12 @@
 		pawEngine.onClick(e.clientX, e.clientY);
 	};
 
-	beforeNavigate(() => {
-		if (!pawEngine) return;
-		pawEngine.destroy();
-	});
-
-	// デバイスが動くたびに実行 : devicemotion
 	const ondevicemotion = (e: DeviceMotionEvent) => {
 		if (!pawEngine) return;
-		if (
-			!e.accelerationIncludingGravity ||
-			!e.accelerationIncludingGravity.x ||
-			!e.accelerationIncludingGravity.y ||
-			!e.acceleration ||
-			!e.acceleration.x ||
-			!e.acceleration.y
-		)
-			return;
+		if (!deviceMotionController) return;
 
-		//重力加速度 (物体の重力を調節)
-		const gx = e.accelerationIncludingGravity.x / 10;
-		const gy = e.accelerationIncludingGravity.y / 10;
-
-		let gravity: [number, number];
-
-		// 傾きに応じて重力を調節
-		switch (window.screen.orientation.type) {
-			case 'landscape-primary':
-				// 横長
-				gravity = [gy, gx];
-				break;
-			case 'landscape-secondary':
-				// 横長逆転
-				gravity = [-gy, -gx];
-				break;
-			case 'portrait-secondary':
-				// 縦長逆転
-				gravity = [gx, -gy];
-				break;
-			default: // case 'portrait-primary'
-				// 縦長 or プロパティ未対応
-				gravity = [-gx, gy];
-				break;
-		}
+		const gravity = deviceMotionController.getGravity(e);
+		if (!gravity) return;
 
 		pawEngine.updateGravity(...gravity);
 	};
@@ -71,6 +50,12 @@
 	const onresize = () => {
 		if (!pawEngine) return;
 		pawEngine.resize(window.innerWidth, window.innerHeight);
+	};
+
+	const onclickGrantPermission = () => {
+		if (!deviceMotionController) return;
+		deviceMotionController.requestPermission();
+		showPermissionToast = false;
 	};
 </script>
 
@@ -116,6 +101,11 @@
 			演奏を発信していきます<img src={catStamp} class="cat-stamp" alt="" />
 		</p>
 	</article>
+</div>
+
+<div id="permission-toast" class="toast" class:show={showPermissionToast}>
+	<p>ぜひ、加速度センサー付きでご覧ください！</p>
+	<button on:click={onclickGrantPermission}>進む</button>
 </div>
 
 <style>
@@ -173,5 +163,90 @@
 		width: 35px;
 		height: 35px;
 		transform: translateX(-7px);
+	}
+
+	.toast {
+		--spacing-unit: 4px;
+
+		position: fixed;
+		inset: 0;
+		margin: auto;
+		width: fit-content;
+		height: fit-content;
+
+		z-index: 9999;
+
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		padding: calc(var(--spacing-unit) * 6);
+
+		box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+		border-radius: var(--spacing-unit);
+		background-color: rgba(0, 0, 0, 0.25);
+		backdrop-filter: blur(5px);
+
+		flex-direction: column;
+		align-items: center;
+		gap: calc(var(--spacing-unit) * 4);
+
+		animation: fadeOut 0.5s ease-in 0s forwards;
+		display: none;
+		opacity: 0;
+	}
+
+	.show {
+		animation: fadeIn 0.5s ease-in 0s forwards;
+		display: flex;
+		opacity: 1;
+	}
+
+	@keyframes fadeIn {
+		0% {
+			display: none;
+			opacity: 0;
+			transform: scale(0.95);
+		}
+		1% {
+			display: flex;
+			opacity: 0;
+		}
+		100% {
+			display: flex;
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	@keyframes fadeOut {
+		0% {
+			display: flex;
+			opacity: 1;
+			transform: scale(1);
+		}
+		99% {
+			display: flex;
+			opacity: 0;
+		}
+		100% {
+			display: none;
+			opacity: 0;
+			transform: scale(0.95);
+		}
+	}
+
+	#permission-toast button {
+		-webkit-appearance: none;
+		appearance: none;
+
+		padding: 4px 16px;
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		border-radius: 4px;
+		background-color: var(--background-color);
+		color: var(--main-color);
+
+		font-size: 14px;
+	}
+
+	#permission-toast p {
+		margin: 0;
 	}
 </style>
