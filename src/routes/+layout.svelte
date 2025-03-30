@@ -2,8 +2,8 @@
 	import type { LayoutData } from './$types';
 	import { newsItems } from '$lib/news';
 
-	import logo from './logo.svg';
-	import logoSp from './canvas_symbol_white.png';
+	import logo from './nyanvas/orchestra-nyanvas-tokyo.png';
+	import logoSp from './nyanvas/orchestra-nyanvas-tokyo-small.png';
 	import instagramIcon from './instagram-brands.svg';
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
@@ -12,9 +12,68 @@
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, beforeNavigate } from '$app/navigation';
+	import { PawEngine } from './nyanvas/pawEngine';
+	import { DeviceMotionController } from './nyanvas/DeviceMotionController';
 
 	export let data: LayoutData;
+
+	/** Nyanvas用 */
+	let pawEngine: PawEngine | null = null;
+	let deviceMotionController: DeviceMotionController | null = null;
+
+	$: headerHref = '/nyanvas';
+	$: showPermissionToast = false;
+
+	afterNavigate(() => {
+		pawEngine = new PawEngine(
+			document.body,
+			[window.innerWidth, window.innerHeight],
+			window.devicePixelRatio
+		);
+
+		headerHref = window.location.pathname === '/nyanvas' ? '/' : '/nyanvas';
+
+		const updatePermissionStatusCallback = (permitted: boolean) => {
+			showPermissionToast = !permitted;
+		};
+		deviceMotionController = new DeviceMotionController(updatePermissionStatusCallback);
+		deviceMotionController.requestPermission();
+		window.ondevicemotion = ondevicemotion;
+	});
+
+	beforeNavigate(() => {
+		if (!pawEngine) return;
+		pawEngine.destroy();
+	});
+
+	const onclick = (e: MouseEvent) => {
+		if (!pawEngine) return;
+		pawEngine.onClick(e.clientX, e.clientY);
+	};
+
+	const ondevicemotion = (e: DeviceMotionEvent) => {
+		if (!pawEngine) return;
+		if (!deviceMotionController) return;
+
+		const gravity = deviceMotionController.getGravity(e);
+		if (!gravity) return;
+
+		pawEngine.updateGravity(...gravity);
+	};
+
+	const onresize = () => {
+		if (!pawEngine) return;
+		pawEngine.resize(window.innerWidth, window.innerHeight);
+	};
+
+	const onclickGrantPermission = () => {
+		if (!deviceMotionController) return;
+		deviceMotionController.requestPermission();
+		showPermissionToast = false;
+	};
+
+	/** ここまでNyanvas */
 
 	const upcomingConcerts = data.concerts
 		.filter((concert) => {
@@ -150,8 +209,12 @@
 	});
 </script>
 
+<!-- Nyanvas用 -->
+<svelte:window on:click={onclick} on:resize={onresize} />
+
 <header>
-	<a href="/">
+	<!-- /nyanvas からはトップページのリンクとする -->
+	<a href={headerHref}>
 		<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
 		<img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
 	</a>
@@ -239,7 +302,101 @@
 	{/if}
 </main>
 
+<div id="permission-toast" class="toast" class:show={showPermissionToast}>
+	<p>ぜひ、加速度センサー付きでご覧ください！</p>
+	<button on:click={onclickGrantPermission}>進む</button>
+</div>
+
 <style>
+	/* Nyanvas用 */
+	:global(canvas) {
+		position: fixed;
+		top: 0;
+		left: 0;
+	}
+	main {
+		z-index: 100;
+	}
+	.toast {
+		--spacing-unit: 4px;
+
+		position: fixed;
+		inset: 0;
+		margin: auto;
+		width: fit-content;
+		height: fit-content;
+
+		z-index: 9999;
+
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		padding: calc(var(--spacing-unit) * 6);
+
+		box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+		border-radius: var(--spacing-unit);
+		background-color: rgba(0, 0, 0, 0.25);
+		backdrop-filter: blur(5px);
+
+		flex-direction: column;
+		align-items: center;
+		gap: calc(var(--spacing-unit) * 4);
+
+		animation: fadeOut 0.5s ease-in 0s forwards;
+		display: none;
+		opacity: 0;
+	}
+	.show {
+		animation: fadeIn 0.5s ease-in 0s forwards;
+		display: flex;
+		opacity: 1;
+	}
+	@keyframes fadeIn {
+		0% {
+			display: none;
+			opacity: 0;
+			transform: scale(0.95);
+		}
+		1% {
+			display: flex;
+			opacity: 0;
+		}
+		100% {
+			display: flex;
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+	@keyframes fadeOut {
+		0% {
+			display: flex;
+			opacity: 1;
+			transform: scale(1);
+		}
+		99% {
+			display: flex;
+			opacity: 0;
+		}
+		100% {
+			display: none;
+			opacity: 0;
+			transform: scale(0.95);
+		}
+	}
+	#permission-toast button {
+		-webkit-appearance: none;
+		appearance: none;
+
+		padding: 4px 16px;
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		border-radius: 4px;
+		background-color: var(--background-color);
+		color: var(--main-color);
+
+		font-size: 14px;
+	}
+	#permission-toast p {
+		margin: 0;
+	}
+
 	:global(body) {
 		display: grid;
 		grid-template-areas:
