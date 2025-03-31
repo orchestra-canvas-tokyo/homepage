@@ -44,7 +44,11 @@
 	"dependencies": {
 		"@splidejs/svelte-splide": "^0.2.9",
 		"@types/grecaptcha": "^3.0.9",
+		"@types/matter-js": "^0.19.8",
 		"dayjs": "^1.11.13",
+		"dotenv": "^16.4.5",
+		"drizzle-orm": "^0.36.0",
+		"matter-js": "^0.20.0",
 		"resend": "^4.0.1-alpha.0",
 		"svelte-kit-connect-cloudflare-kv": "^0.1.0",
 		"svelte-kit-sessions": "^0.3.2",
