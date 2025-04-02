@@ -7,6 +7,7 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import { onMount } from 'svelte';
 
 	export let data: PageServerData;
 
@@ -72,6 +73,15 @@
 			}
 		});
 	};
+
+	let splide: Splide;
+	onMount(() => {
+		// ページ遷移時にスライドが右にずれることがある問題を回避
+		splide.go(1);
+		setTimeout(() => {
+			splide.go('-1');
+		}, 1000 / 30);
+	});
 </script>
 
 <Meta title="" canonical="/" />
@@ -88,6 +98,7 @@
 			trimSpace: false
 		}}
 		on:move={updatePaginationColor}
+		bind:this={splide}
 	>
 		<SplideTrack>
 			{#each slideshowItems as { title, flyers, slug, isNew }, index}
