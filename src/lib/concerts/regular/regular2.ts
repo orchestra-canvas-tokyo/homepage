@@ -15,7 +15,7 @@ export const concert: Concert = {
 		{ src: flyerBack, alt: 'フライヤー（裏面）' }
 	],
 	dateTime: { date: '2021-11-23', time: '12:30開場 13:00開演' },
-	place: {
+	venue: {
 		name: '武蔵野市民文化会館 大ホール',
 		url: 'http://www.musashino-culture.or.jp/access/index.html'
 	},

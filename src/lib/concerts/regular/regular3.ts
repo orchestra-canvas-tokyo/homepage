@@ -18,7 +18,7 @@ export const concert: Concert = {
 		date: '2022-2-23',
 		time: '13:00開場 13:30開演'
 	},
-	place: {
+	venue: {
 		name: '所沢市民文化センター ミューズ アークホール',
 		url: 'https://www.muse-tokorozawa.or.jp/access/'
 	},

@@ -11,7 +11,7 @@ export const concert: Concert = {
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	flyers: [{ src: flyer, alt: 'フライヤー' }],
 	dateTime: { date: '2023-7-22', time: '12:15開場 12:30開演' },
-	place: {
+	venue: {
 		name: 'きゅりあん（品川区立総合区民会館） 小ホール',
 		url: 'https://www.shinagawa-culture.or.jp/curian/access.html'
 	},

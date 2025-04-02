@@ -15,7 +15,7 @@ export const concert: Concert = {
 		{ src: flyerBack, alt: 'フライヤー（裏面）' }
 	],
 	dateTime: { date: '2024-9-22', time: '12:30開場 13:00開演' },
-	place: {
+	venue: {
 		name: '所沢市民文化センター ミューズ アークホール',
 		url: 'https://www.muse-tokorozawa.or.jp/access/'
 	},

@@ -11,7 +11,7 @@ export const concert: Concert = {
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	// flyer: flyer,
 	dateTime: { date: '2025-11-24', day: '月祝', time: '昼公演' },
-	place: {
+	venue: {
 		name: 'ミューザ川崎シンフォニーホール',
 		url: 'https://www.kawasaki-sym-hall.jp/visit/access/'
 	},

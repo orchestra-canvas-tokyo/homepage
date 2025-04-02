@@ -15,7 +15,7 @@ export const concert: Concert = {
 		{ src: flyerBack, alt: 'フライヤー（裏面）' }
 	],
 	dateTime: { date: '2022-12-4', time: '13:00開場 13:30開演' },
-	place: {
+	venue: {
 		name: '北とぴあ さくらホール',
 		url: 'https://www.hokutopia.jp/access/'
 	},

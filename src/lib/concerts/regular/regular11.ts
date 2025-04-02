@@ -15,7 +15,7 @@ export const concert: Concert = {
 		{ src: flyerBack, alt: 'フライヤー（裏面）' }
 	],
 	dateTime: { date: '2024-6-2', time: '14:00開場 14:30開演' },
-	place: {
+	venue: {
 		name: '文京シビックホール 大ホール',
 		url: 'https://www.b-academy.jp/access/index.html'
 	},

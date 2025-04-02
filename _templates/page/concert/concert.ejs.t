@@ -15,7 +15,7 @@ export const concert: Concert = {
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	// flyer: flyer,
 	dateTime: { date: '●-●-●', time: '●' },
-	place: {
+	venue: {
 		name: '●',
 		url: '●'
 	},

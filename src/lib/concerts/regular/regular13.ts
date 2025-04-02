@@ -15,7 +15,7 @@ export const concert: Concert = {
 		{ src: flyerBack, alt: 'フライヤー（裏面）' }
 	],
 	dateTime: { date: '2025-02-24', day: '月祝', time: '12:45開場 13:30開演' },
-	place: {
+	venue: {
 		name: '横浜みなとみらいホール 大ホール',
 		url: 'https://yokohama-minatomiraihall.jp/access/'
 	},

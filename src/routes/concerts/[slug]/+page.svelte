@@ -59,8 +59,10 @@
 		</dd>
 		<dt>場所</dt>
 		<dd>
-			<p>{data.place.name}</p>
-			<p><a href={data.place.url}>交通アクセス</a></p>
+			<p>{data.venue.name}</p>
+			{#if data.venue.url}
+				<p><a href={data.venue.url}>交通アクセス</a></p>
+			{/if}
 		</dd>
 		{#if data.conductor}
 			<dt>指揮</dt>

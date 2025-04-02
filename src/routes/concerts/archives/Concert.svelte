@@ -31,7 +31,7 @@
 				{getConcertDateDayToDisplay(concert)}
 			</p>
 			<h2><a href="/concerts/{concert.slug}">{concert.title}</a></h2>
-			<p class="hide-on-mobile">{concert.place.name}</p>
+			<p class="hide-on-mobile">{concert.venue.name}</p>
 			{#if concert.conductor}
 				<p>指揮：{concert.conductor?.name}</p>
 			{/if}

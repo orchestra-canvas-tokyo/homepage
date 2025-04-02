@@ -15,7 +15,7 @@ export const concert: Concert = {
 		{ src: flyerBack, alt: 'フライヤー（裏面）' }
 	],
 	dateTime: { date: '2023-4-8', time: '13:00開場 13:30開演' },
-	place: {
+	venue: {
 		name: '神奈川県立音楽堂',
 		url: 'https://www.kanagawa-ongakudo.com/access'
 	},

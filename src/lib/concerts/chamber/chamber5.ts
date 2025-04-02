@@ -11,7 +11,7 @@ export const concert: Concert = {
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	flyers: [{ src: flyer, alt: 'フライヤー' }],
 	dateTime: { date: '2023-2-12', time: '12:30開場 13:00開演' },
-	place: {
+	venue: {
 		name: '浦安市文化会館 小ホール',
 		url: 'https://www.urayasu-zaidan.or.jp/urayasu-bunka/1001527.html'
 	},

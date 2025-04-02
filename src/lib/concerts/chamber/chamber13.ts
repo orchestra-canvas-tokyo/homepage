@@ -11,7 +11,7 @@ export const concert: Concert = {
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	// flyer: flyer,
 	dateTime: { date: '2025-4-20', time: '昼公演' },
-	place: {
+	venue: {
 		name: '横浜市鶴見区民文化センター サルビアホール',
 		url: 'https://salvia.hall-info.jp/about/#access'
 	},

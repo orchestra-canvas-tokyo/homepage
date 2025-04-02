@@ -16,7 +16,7 @@ export const concert: Concert = {
 		{ src: flyerBack, alt: 'フライヤー（裏面）' }
 	],
 	dateTime: { date: '2024-2-24', time: '13:00開場 14:00開演' },
-	place: {
+	venue: {
 		name: '東京芸術劇場 コンサートホール',
 		url: 'https://www.geigeki.jp/access/index.html'
 	},

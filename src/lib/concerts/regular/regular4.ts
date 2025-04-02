@@ -16,7 +16,7 @@ export const concert: Concert = {
 		{ src: flyerBack, alt: 'フライヤー（裏面）' }
 	],
 	dateTime: { date: '2022-5-29', time: '14:15開場 15:00開演' },
-	place: {
+	venue: {
 		name: '杉並公会堂 大ホール',
 		url: 'https://www.suginamikoukaidou.com/access/'
 	},

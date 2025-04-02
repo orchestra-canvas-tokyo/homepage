@@ -11,7 +11,7 @@ export const concert: Concert = {
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	flyers: [{ src: flyer, alt: 'フライヤー' }],
 	dateTime: { date: '2022-7-2', time: '12:30開場 13:00開演' },
-	place: {
+	venue: {
 		name: 'かつしかシンフォニーヒルズ アイリスホール',
 		url: 'https://www.k-mil.gr.jp/institution/access/sym_access.html'
 	},

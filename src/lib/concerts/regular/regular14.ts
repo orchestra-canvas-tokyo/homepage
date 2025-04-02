@@ -11,7 +11,7 @@ export const concert: Concert = {
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	flyers: [{ src: flyer, alt: 'フライヤー' }],
 	dateTime: { date: '2025-7-12', time: '13:15開場 14:00開演' },
-	place: {
+	venue: {
 		name: '練馬区立練馬文化センター 大ホール',
 		url: 'https://neribun.or.jp/access/nerima.html'
 	},

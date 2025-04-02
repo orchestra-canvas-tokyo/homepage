@@ -11,7 +11,7 @@ export const concert: Concert = {
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	flyers: [{ src: flyer, alt: 'フライヤー' }],
 	dateTime: { date: '2024-04-20', time: '12:15開場 12:30開演' },
-	place: {
+	venue: {
 		name: '所沢市民文化センター ミューズ マーキーホール',
 		url: 'https://www.muse-tokorozawa.or.jp/access/'
 	},

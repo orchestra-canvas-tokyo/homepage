@@ -16,7 +16,7 @@ export const concert: Concert = {
 		{ src: flyerBack, alt: 'フライヤー裏' }
 	],
 	dateTime: { date: '2022-9-3', time: '17:30開場 18:30開演' },
-	place: {
+	venue: {
 		name: 'ミューザ川崎シンフォニーホール',
 		url: 'https://www.kawasaki-sym-hall.jp/access/'
 	},

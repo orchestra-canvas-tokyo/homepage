@@ -33,7 +33,7 @@ export interface Concert {
 		day?: string; // "月祝"など特別な曜日表記を要する場合に使用
 		time: string; // 会場開演など、自由に表記可能
 	};
-	place: {
+	venue: {
 		name: string;
 		url?: string;
 	};
