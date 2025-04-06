@@ -20,7 +20,7 @@ export const concert: Concert = {
 		url: 'https://www.hokutopia.jp/access/'
 	},
 	conductor: {
-		name: '吉崎理乃'
+		name: '𠮷﨑理乃'
 	},
 	soloist: {
 		name: '朴 賢娥'
