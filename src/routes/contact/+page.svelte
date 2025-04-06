@@ -38,7 +38,7 @@
 		height="635"
 		frameborder="0"
 		title="お問い合わせフォーム"
-	/>
+	></iframe>
 </article>
 
 <style>

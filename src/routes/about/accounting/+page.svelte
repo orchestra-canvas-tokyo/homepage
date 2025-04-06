@@ -3,7 +3,11 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
 
-	export let data: PageServerData;
+	interface Props {
+		data: PageServerData;
+	}
+
+	let { data }: Props = $props();
 
 	const items: { title: string; duration: string; url: string }[] = data.reports.map(
 		(report, index) => ({

@@ -10,7 +10,7 @@
 	let pawEngine: PawEngine | null = null;
 	let deviceMotionController: DeviceMotionController | null = null;
 
-	$: showPermissionToast = false;
+	let showPermissionToast = $state(false);
 
 	afterNavigate(() => {
 		pawEngine = new PawEngine(
@@ -70,12 +70,12 @@
 	/>
 </svelte:head>
 
-<svelte:window on:click={onclick} on:devicemotion={ondevicemotion} on:resize={onresize} />
+<svelte:window {onclick} {ondevicemotion} {onresize} />
 
 <div class="container">
 	<article>
 		<img src={oldLogo} alt="Orchestra Canvas Tokyo" />
-		<span class="arrow" />
+		<span class="arrow"></span>
 		<section>
 			<h1>
 				<img src={logo} alt="Orchestra Nyanvas Tokyo" />
@@ -105,7 +105,7 @@
 
 <div id="permission-toast" class="toast" class:show={showPermissionToast}>
 	<p>ぜひ、加速度センサー付きでご覧ください！</p>
-	<button on:click={onclickGrantPermission}>進む</button>
+	<button onclick={onclickGrantPermission}>進む</button>
 </div>
 
 <style>

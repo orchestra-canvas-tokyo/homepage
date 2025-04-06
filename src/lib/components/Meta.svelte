@@ -1,13 +1,19 @@
 <script lang="ts">
 	import { MetaTags } from 'svelte-meta-tags';
 
-	/** ページのタイトル。ルートは空文字列を指定 */
-	export let title: string;
-	/** 正規URL。相対URLを指定。e.g. '/concerts/example' */
-	export let canonical: string;
+	interface Props {
+		/** ページのタイトル。ルートは空文字列を指定 */
+		title: string;
+		/** 正規URL。相対URLを指定。e.g. '/concerts/example' */
+		canonical: string;
+	}
 
-	$: fullTitle = title !== '' ? `${title} - Orchestra Canvas Tokyo` : 'Orchestra Canvas Tokyo';
-	$: fullCanonical = `https://www.orch-canvas.tokyo${canonical}`;
+	let { title, canonical }: Props = $props();
+
+	let fullTitle = $derived(
+		title !== '' ? `${title} - Orchestra Canvas Tokyo` : 'Orchestra Canvas Tokyo'
+	);
+	let fullCanonical = $derived(`https://www.orch-canvas.tokyo${canonical}`);
 </script>
 
 <MetaTags

@@ -8,7 +8,11 @@
 	import Slider from '$lib/components/Slider.svelte';
 	import Flyer from '$lib/components/Flyer.svelte';
 
-	export let data: PageServerData;
+	interface Props {
+		data: PageServerData;
+	}
+
+	let { data }: Props = $props();
 </script>
 
 <Meta title={data.title} canonical="/concerts/{data.slug}" />
@@ -45,7 +49,7 @@
 		</div>
 	{/if}
 
-	<div class="spacer" />
+	<div class="spacer"></div>
 
 	<dl>
 		<dt>日時</dt>
@@ -166,12 +170,12 @@
 
 	{#if // チケット情報があり、開催日が未来か今日だったら
 	data.ticket && data.ticket.url && (dayjs(data.dateTime.date).isAfter(dayjs()) || dayjs(data.dateTime.date).isSame(dayjs(), 'day'))}
-		<div class="spacer" />
+		<div class="spacer"></div>
 		<a href={data.ticket.url} class="full-width-button"> チケットを申し込む </a>
 	{/if}
 
 	{#if data.youtubePlaylistId}
-		<div class="spacer" />
+		<div class="spacer"></div>
 		<iframe
 			width="560"
 			height="315"

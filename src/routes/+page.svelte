@@ -8,7 +8,11 @@
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
 
-	export let data: PageServerData;
+	interface Props {
+		data: PageServerData;
+	}
+
+	let { data }: Props = $props();
 
 	const nonRegularDisplayingConcerts: string[] = [];
 	const newConcerts: string[] = ['regular-14'];

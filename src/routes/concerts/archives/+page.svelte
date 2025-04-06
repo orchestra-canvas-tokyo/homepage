@@ -9,7 +9,11 @@
 	import type { YearlyFirstConcerts } from './YearAnchors';
 	import Meta from '$lib/components/Meta.svelte';
 
-	export let data: PageServerData;
+	interface Props {
+		data: PageServerData;
+	}
+
+	let { data }: Props = $props();
 
 	// 開催後の定期演奏会を抽出し、開催日昇順でソートしておく
 	const regularConcerts = data.concerts
@@ -24,7 +28,7 @@
 		)
 		.sort((a, b) => (dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1));
 
-	let yearlyFirstRegularConcerts: YearlyFirstConcerts = {};
+	let yearlyFirstRegularConcerts: YearlyFirstConcerts = $state({});
 	let currentYear = null;
 	// 各年の最初の定期演奏会を抽出
 	// 後ほど、アンカーリンクを張るのに使う
@@ -36,7 +40,7 @@
 		}
 	}
 
-	let yearlyFirstChamberConcerts: YearlyFirstConcerts = {};
+	let yearlyFirstChamberConcerts: YearlyFirstConcerts = $state({});
 	currentYear = null;
 	// 各年の最初の室内楽演奏会を抽出
 	for (let concert of chamberConcerts) {
@@ -72,7 +76,7 @@
 
 	// ページ遷移前後で定期・室内楽の選択状態が保持されるようにする
 	// SvelteKitのSnapshotを用いており、これは内部的にはSessionStorage
-	let checkedConcertType: string = 'regular';
+	let checkedConcertType: string = $state('regular');
 	export const snapshot: Snapshot<string> = {
 		capture: () => checkedConcertType,
 		restore: (value) => (checkedConcertType = value)
