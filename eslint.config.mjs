@@ -35,7 +35,7 @@ export default [
 	...compat.extends(
 		'eslint:recommended',
 		'plugin:@typescript-eslint/recommended',
-		'plugin:svelte/recommended',
+		// 'plugin:svelte/recommended',
 		'prettier'
 	),
 	{
