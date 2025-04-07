@@ -13,8 +13,12 @@
 		"lint:eslint": "eslint .",
 		"format": "prettier --write .",
 		"prepare": "husky",
-		"precommit": "npm-run-all --parallel check lint:*",
-		"add:concert": "npx hygen page concert"
+		"precommit": "npm-run-all --parallel check lint:* test",
+		"add:concert": "npx hygen page concert",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:ui": "vitest --ui",
+		"test:file": "vitest run"
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3.1.0",
@@ -22,6 +26,8 @@
 		"@sveltejs/adapter-cloudflare": "^4.7.3",
 		"@sveltejs/kit": "^2.7.1",
 		"@sveltejs/vite-plugin-svelte": "^3.1.2",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/svelte": "^5.2.7",
 		"@types/eslint": "^9.6.1",
 		"@typescript-eslint/eslint-plugin": "^8.10.0",
 		"@typescript-eslint/parser": "^8.10.0",
@@ -30,6 +36,7 @@
 		"eslint-plugin-svelte": "^2.45.1",
 		"globals": "^15.11.0",
 		"husky": "^9.1.6",
+		"jsdom": "^26.0.0",
 		"npm-run-all": "^4.1.5",
 		"prettier": "^3.3.3",
 		"prettier-plugin-svelte": "^3.2.7",
