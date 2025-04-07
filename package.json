@@ -17,8 +17,7 @@
 		"add:concert": "npx hygen page concert",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"test:ui": "vitest --ui",
-		"test:file": "vitest run"
+		"test:ui": "vitest --ui"
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3.1.0",
