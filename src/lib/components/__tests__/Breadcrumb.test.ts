@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/svelte';
 import '@testing-library/jest-dom';
 import Breadcrumb from '../Breadcrumb.svelte';
 
-describe('Breadcrumb', () => {
-	it('renders correctly with empty segments', () => {
+describe('Breadcrumb.svelte', () => {
+	it('空のセグメントで正しくレンダリングされる', () => {
 		const { container } = render(Breadcrumb, { props: { segments: [] } });
 
 		// ナビゲーションとリストが存在することを確認
@@ -15,7 +15,7 @@ describe('Breadcrumb', () => {
 		expect(container.querySelectorAll('li').length).toBe(0);
 	});
 
-	it('renders segments correctly', () => {
+	it('セグメントが正しくレンダリングされる', () => {
 		const segments: { title: string; lang: 'en' | 'ja'; url?: string }[] = [
 			{ title: 'ホーム', lang: 'ja' },
 			{ title: 'About', lang: 'en' }
@@ -32,7 +32,7 @@ describe('Breadcrumb', () => {
 		expect(listItems[1].textContent).toContain('About');
 	});
 
-	it('renders links for segments with URLs', () => {
+	it('URLを持つセグメントがリンクとしてレンダリングされる', () => {
 		const segments: { title: string; lang: 'en' | 'ja'; url?: string }[] = [
 			{ title: 'ホーム', lang: 'ja', url: '/' },
 			{ title: 'About', lang: 'en' }
@@ -52,7 +52,7 @@ describe('Breadcrumb', () => {
 		expect(secondSegment.querySelector('span')).not.toBeNull();
 	});
 
-	it('applies language classes correctly', () => {
+	it('言語クラスが正しく適用される', () => {
 		const segments: { title: string; lang: 'en' | 'ja'; url?: string }[] = [
 			{ title: 'ホーム', lang: 'ja' },
 			{ title: 'About', lang: 'en' }
@@ -68,7 +68,7 @@ describe('Breadcrumb', () => {
 		expect(secondSegment.querySelector('.en')).not.toBeNull();
 	});
 
-	it('has correct aria-label for accessibility', () => {
+	it('アクセシビリティのためのaria-labelが正しく設定されている', () => {
 		render(Breadcrumb, { props: { segments: [] } });
 
 		// アクセシビリティのためのaria-labelが正しく設定されていることを確認
