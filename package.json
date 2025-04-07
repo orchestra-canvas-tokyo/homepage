@@ -17,7 +17,8 @@
 		"add:concert": "npx hygen page concert",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"test:ui": "vitest --ui"
+		"test:ui": "vitest --ui",
+		"test:coverage": "vitest run --coverage"
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3.1.0",
@@ -30,6 +31,7 @@
 		"@types/eslint": "^9.6.1",
 		"@typescript-eslint/eslint-plugin": "^8.10.0",
 		"@typescript-eslint/parser": "^8.10.0",
+		"@vitest/coverage-v8": "^3.1.1",
 		"eslint": "^9.13.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.45.1",
