@@ -77,8 +77,8 @@ describe('Meta.svelte', () => {
 	});
 
 	describe('基本構造', () => {
-		it('[pos] MetaTagsコンポーネントが正しく使用される', () => {
-			// 仕様: MetaTagsコンポーネントが使用される
+		it('[pos] MetaTagsコンポーネントが使用される', () => {
+			// 仕様: SEOとソーシャルメディア共有のためにMetaTagsコンポーネントが使用される
 			render(Meta, {
 				props: defaultProps
 			});
@@ -87,17 +87,43 @@ describe('Meta.svelte', () => {
 			expect(MetaTagsMock).toHaveBeenCalled();
 		});
 
-		it('[pos] 必要なプロパティがMetaTagsに正しく渡される', () => {
-			// 仕様: 必要なプロパティがMetaTagsに正しく渡される
+		it('[pos] title属性が正しく渡される', () => {
+			// 仕様: title属性が正しく渡される
 			render(Meta, {
 				props: defaultProps
 			});
 
-			// MetaTagsコンポーネントに必要なプロパティが渡されたことを確認
+			// MetaTagsコンポーネントにtitle属性が渡されたことを確認
 			expect(MetaTagsMock).toHaveBeenCalledWith(
 				expect.objectContaining({
-					title: expect.any(String),
-					canonical: expect.any(String),
+					title: expect.any(String)
+				})
+			);
+		});
+
+		it('[pos] canonical属性が正しく渡される', () => {
+			// 仕様: canonical属性が正しく渡される
+			render(Meta, {
+				props: defaultProps
+			});
+
+			// MetaTagsコンポーネントにcanonical属性が渡されたことを確認
+			expect(MetaTagsMock).toHaveBeenCalledWith(
+				expect.objectContaining({
+					canonical: expect.any(String)
+				})
+			);
+		});
+
+		it('[pos] twitter属性が正しく渡される', () => {
+			// 仕様: twitter属性が正しく渡される
+			render(Meta, {
+				props: defaultProps
+			});
+
+			// MetaTagsコンポーネントにtwitter属性が渡されたことを確認
+			expect(MetaTagsMock).toHaveBeenCalledWith(
+				expect.objectContaining({
 					twitter: expect.any(Object)
 				})
 			);
@@ -217,26 +243,6 @@ describe('Meta.svelte', () => {
 	});
 
 	describe('Twitter Card', () => {
-		it('[pos] 正しいTwitter Cardの設定が行われる', () => {
-			// 仕様: Twitter Cardの設定が正しく行われる
-			render(Meta, {
-				props: defaultProps
-			});
-
-			// MetaTagsコンポーネントに正しいTwitter Cardの設定が渡されたことを確認
-			expect(MetaTagsMock).toHaveBeenCalledWith(
-				expect.objectContaining({
-					twitter: {
-						site: '@Orch_canvas',
-						cardType: 'summary',
-						title: 'テストページ - Orchestra Canvas Tokyo',
-						image: 'https://www.orch-canvas.tokyo/web-app-manifest-512x512.png',
-						imageAlt: 'Orchestra Canvas Tokyoのロゴ'
-					}
-				})
-			);
-		});
-
 		it('[pos] Twitter Cardのsite属性が正しく設定される', () => {
 			// 仕様: Twitter Cardのsite属性が正しく設定される
 			render(Meta, {
@@ -465,6 +471,27 @@ describe('Meta.svelte', () => {
 			);
 		});
 	});
+
+	// 注: 現在のMetaコンポーネントにはviewport設定が含まれていないため、
+	// レスポンシブデザインのテストは省略します。
+	// 将来的にviewport設定が追加された場合は、以下のようなテストを追加することを推奨します。
+	/*
+	describe('レスポンシブデザイン', () => {
+		it('[pos] モバイルデバイスを含む全てのデバイスで適切に表示されるためのviewport設定が含まれる', () => {
+			// 仕様: モバイルデバイスを含む全てのデバイスで適切に表示されるためのviewport設定が含まれる
+			render(Meta, {
+				props: defaultProps
+			});
+			
+			// MetaTagsコンポーネントに適切なviewport設定が渡されていることを確認
+			expect(MetaTagsMock).toHaveBeenCalledWith(
+				expect.objectContaining({
+					viewport: 'width=device-width, initial-scale=1'
+				})
+			);
+		});
+	});
+	*/
 
 	describe('SEO対策', () => {
 		it('[pos] 正規URLが適切に設定される', () => {

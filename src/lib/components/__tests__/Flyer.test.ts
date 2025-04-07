@@ -76,7 +76,7 @@ describe('Flyer.svelte', () => {
 	};
 
 	describe('基本構造', () => {
-		it('[pos] imgタグが正しく表示される', () => {
+		it('[pos] 画像表示のためのimgタグが生成される', () => {
 			// 仕様: Flyerコンポーネントはimgタグを使用して画像を表示する
 			const { container } = render(Flyer, {
 				props: {
@@ -90,7 +90,7 @@ describe('Flyer.svelte', () => {
 			expect(img?.tagName).toBe('IMG');
 		});
 
-		it('[pos] 画像のみが表示され、余分な要素は含まれない', () => {
+		it('[pos] 余分な要素を含まないシンプルな構造である', () => {
 			// 仕様: Flyerコンポーネントは画像のみを表示し、余分な要素は含まれない
 			const { container } = render(Flyer, {
 				props: {
@@ -344,7 +344,7 @@ describe('Flyer.svelte', () => {
 	});
 
 	describe('アクセシビリティ対応', () => {
-		it('[pos] alt属性が設定され、スクリーンリーダーで認識できる', () => {
+		it('[pos] スクリーンリーダー対応のためのalt属性が設定される', () => {
 			// 仕様: alt属性が設定され、スクリーンリーダーで認識できる
 			const alt = 'アクセシビリティテスト画像';
 			render(Flyer, {
@@ -372,6 +372,72 @@ describe('Flyer.svelte', () => {
 			const img = container.querySelector('img');
 			expect(img?.hasAttribute('alt')).toBe(true);
 			expect(img?.getAttribute('alt')).toBe('');
+		});
+	});
+
+	describe('レスポンシブデザイン', () => {
+		it('[pos] Cloudflare Images使用時にfit=scale-downパラメータが設定される', async () => {
+			// 仕様: Cloudflare Images使用時にfit=scale-downパラメータが設定される
+			setCloudflareHostname();
+
+			const { container } = render(Flyer, {
+				props: {
+					src: '/test-image.jpg',
+					alt: 'レスポンシブテスト画像'
+				}
+			});
+
+			// onMountの実行を待つためにタイマーを進める
+			await vi.dynamicImportSettled();
+
+			const img = container.querySelector('img');
+			const srcAttr = img?.getAttribute('src') || '';
+
+			// fit=scale-downパラメータが設定されていることを確認
+			expect(srcAttr).toContain('fit=scale-down');
+		});
+
+		it('[pos] 高解像度ディスプレイ用のsrcset属性が設定される', async () => {
+			// 仕様: 高解像度ディスプレイ用のsrcset属性が設定される
+			setCloudflareHostname();
+
+			const { container } = render(Flyer, {
+				props: {
+					src: '/test-image.jpg',
+					alt: 'レスポンシブテスト画像'
+				}
+			});
+
+			// onMountの実行を待つためにタイマーを進める
+			await vi.dynamicImportSettled();
+
+			const img = container.querySelector('img');
+			const srcset = img?.getAttribute('srcset') || '';
+
+			// 高解像度ディスプレイ用のsrcsetが設定されていることを確認
+			expect(srcset).toContain('2x');
+			expect(srcset).toContain('height=3840');
+		});
+
+		it('[pos] 画像は適切な高さパラメータを持ち、様々な画面サイズで最適に表示される', async () => {
+			// 仕様: 画像は適切な高さパラメータを持ち、様々な画面サイズで最適に表示される
+			setCloudflareHostname();
+
+			const { container } = render(Flyer, {
+				props: {
+					src: '/test-image.jpg',
+					alt: 'テスト画像'
+				}
+			});
+
+			// onMountの実行を待つためにタイマーを進める
+			await vi.dynamicImportSettled();
+
+			const img = container.querySelector('img');
+			const srcAttr = img?.getAttribute('src') || '';
+
+			// 基本の高さパラメータが設定されていることを確認
+			expect(srcAttr).toContain('height=1920');
 		});
 	});
 
@@ -426,14 +492,14 @@ describe('Flyer.svelte', () => {
 			}
 		});
 
-		it('[pos] レスポンシブ対応のための高解像度画像の提供', async () => {
-			// 仕様: Cloudflare Images使用時に高解像度画像（2x）が提供される
+		it('[pos] 様々なデバイスでの表示に対応するための最適な画像フォーマットが自動選択される', async () => {
+			// 仕様: 様々なデバイスでの表示に対応するための最適な画像フォーマットが自動選択される
 			setCloudflareHostname();
 
 			const { container } = render(Flyer, {
 				props: {
 					src: '/test-image.jpg',
-					alt: 'レスポンシブテスト画像'
+					alt: 'フォーマット最適化テスト画像'
 				}
 			});
 
@@ -441,11 +507,10 @@ describe('Flyer.svelte', () => {
 			await vi.dynamicImportSettled();
 
 			const img = container.querySelector('img');
+			const srcAttr = img?.getAttribute('src') || '';
 
-			// srcsetが設定されていることを確認
-			const srcset = img?.getAttribute('srcset') || '';
-			expect(srcset).toContain('2x');
-			expect(srcset).toContain('height=3840');
+			// format=autoパラメータが設定されていることを確認
+			expect(srcAttr).toContain('format=auto');
 		});
 	});
 });

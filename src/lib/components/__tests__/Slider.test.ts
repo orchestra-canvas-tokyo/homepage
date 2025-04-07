@@ -86,8 +86,8 @@ describe('Slider.svelte', () => {
 	});
 
 	describe('基本構造', () => {
-		it('[pos] swiper-containerとswiper-slideが正しく表示される', () => {
-			// 仕様: swiper-containerとswiper-slideが表示される
+		it('[pos] スライダーはswiper-containerとswiper-slideの適切な構造で表示される', () => {
+			// 仕様: スライダーはswiper-containerとswiper-slideの適切な構造で表示され、各スライドが正しく配置される
 			const { container } = render(Slider, {
 				props: {
 					slides: testSlides
@@ -103,8 +103,8 @@ describe('Slider.svelte', () => {
 			expect(slideMatches?.length).toBe(testSlides.length);
 		});
 
-		it('[pos] swiper-containerに必要な属性が設定されている', () => {
-			// 仕様: swiper-containerに必要な属性が設定されている
+		it('[pos] スライダーには必要な属性（centered-slides, navigation, effect）が設定されている', () => {
+			// 仕様: スライダーには中央配置、ナビゲーション、フリップエフェクトの属性が設定されている
 			const { container } = render(Slider, {
 				props: {
 					slides: testSlides
@@ -158,8 +158,9 @@ describe('Slider.svelte', () => {
 			expect(flyerMock).toHaveBeenCalledTimes(testSlides.length);
 		});
 
-		it('[pos] 最初のスライド以外はlazyロードが適用される', () => {
-			// 仕様: 最初のスライド以外はlazyロードが適用される
+		it('[pos] パフォーマンス最適化のため、最初のスライド以外はlazyロードが適用される', () => {
+			// 仕様: パフォーマンス最適化のため、最初のスライド以外はlazyロードが適用される
+			// 最初のスライドは即時表示のためlazyロードなし、2番目以降は必要に応じて読み込むためlazyロード適用
 			render(Slider, {
 				props: {
 					slides: testSlides
@@ -185,10 +186,9 @@ describe('Slider.svelte', () => {
 			}
 		});
 	});
-
-	describe('スタイル', () => {
-		it('[pos] スライドは中央に配置される', () => {
-			// 仕様: スライドは中央に配置される
+	describe('スタイルとレスポンシブデザイン', () => {
+		it('[pos] スライドが中央に配置されるようcentered-slides属性が設定されている', () => {
+			// 仕様: スライドが中央に配置されるようcentered-slides属性が設定されている
 			const { container } = render(Slider, {
 				props: {
 					slides: testSlides
@@ -199,8 +199,8 @@ describe('Slider.svelte', () => {
 			expect(container.innerHTML).toContain('centered-slides="true"');
 		});
 
-		it('[pos] ナビゲーションボタンが表示される', () => {
-			// 仕様: ナビゲーションボタンが表示される
+		it('[pos] ナビゲーションボタンを表示するためのnavigation属性が設定されている', () => {
+			// 仕様: ナビゲーションボタンを表示するためのnavigation属性が設定されている
 			const { container } = render(Slider, {
 				props: {
 					slides: testSlides
@@ -209,6 +209,18 @@ describe('Slider.svelte', () => {
 
 			// swiper-containerにnavigation="true"属性が設定されていることを確認
 			expect(container.innerHTML).toContain('navigation="true"');
+		});
+
+		it('[pos] フリップエフェクトを適用するためのeffect属性が設定されている', () => {
+			// 仕様: フリップエフェクトを適用するためのeffect属性が設定されている
+			const { container } = render(Slider, {
+				props: {
+					slides: testSlides
+				}
+			});
+
+			// effect属性が設定されていることを確認
+			expect(container.innerHTML).toContain('effect="flip"');
 		});
 	});
 
@@ -329,23 +341,76 @@ describe('Slider.svelte', () => {
 		});
 	});
 
-	describe('パフォーマンス最適化', () => {
-		it('[pos] 最初のスライド以外はlazyロードが適用される', () => {
-			// 仕様: 最初のスライド以外はlazyロードが適用される
+	describe('アクセシビリティ対応', () => {
+		it('[pos] 各スライドの画像には適切なalt属性が設定され、スクリーンリーダーで認識できる', () => {
+			// 仕様: 各スライドの画像には適切なalt属性が設定され、スクリーンリーダーで認識できる
+			render(Slider, {
+				props: {
+					slides: testSlides
+				}
+			});
+
+			// 各スライドのFlyerコンポーネントに正しいalt属性が渡されていることを確認
+			testSlides.forEach((slide, index) => {
+				expect(flyerMock).toHaveBeenNthCalledWith(
+					index + 1,
+					expect.objectContaining({
+						alt: slide.alt
+					})
+				);
+			});
+		});
+
+		it('[pos] スライダーのナビゲーション機能が有効になっている', () => {
+			// 仕様: スライダーのナビゲーション機能が有効になっている
 			const { container } = render(Slider, {
 				props: {
 					slides: testSlides
 				}
 			});
 
-			// swiper-slideタグを取得
-			const html = container.innerHTML;
+			// navigation属性が設定されていることを確認
+			expect(container.innerHTML).toContain('navigation="true"');
+		});
+	});
+	describe('多言語対応', () => {
+		it('[pos] 異なる言語のalt属性を持つ画像でも正しく表示される', () => {
+			// 仕様: 異なる言語のalt属性を持つ画像でも正しく表示される
+			const multiLangSlides: Slide[] = [
+				{ src: '/test-image-1.jpg', alt: '日本語のテスト画像' },
+				{ src: '/test-image-2.jpg', alt: 'English test image' },
+				{ src: '/test-image-3.jpg', alt: '混合言語 Mixed language テスト test' }
+			];
 
-			// 最初のスライドにはlazy="false"属性が設定されていることを確認
-			expect(html).toContain('lazy="false"');
+			render(Slider, {
+				props: {
+					slides: multiLangSlides
+				}
+			});
 
-			// 2番目以降のスライドにはlazy="true"属性が設定されていることを確認
-			expect(html).toContain('lazy="true"');
+			// 各スライドのFlyerコンポーネントに正しいalt属性が渡されていることを確認
+			multiLangSlides.forEach((slide, index) => {
+				expect(flyerMock).toHaveBeenNthCalledWith(
+					index + 1,
+					expect.objectContaining({
+						alt: slide.alt
+					})
+				);
+			});
+		});
+	});
+
+	describe('ユーザーインタラクション', () => {
+		it('[pos] フリップエフェクトによりスライド切り替え時に視覚的フィードバックが提供される', () => {
+			// 仕様: フリップエフェクトによりスライド切り替え時に視覚的フィードバックが提供される
+			const { container } = render(Slider, {
+				props: {
+					slides: testSlides
+				}
+			});
+
+			// effect="flip"属性が設定されていることを確認
+			expect(container.innerHTML).toContain('effect="flip"');
 		});
 	});
 });
