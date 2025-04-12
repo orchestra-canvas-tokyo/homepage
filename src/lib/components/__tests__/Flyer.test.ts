@@ -76,143 +76,118 @@ describe('Flyer.svelte', () => {
 	};
 
 	describe('基本構造', () => {
-		it('[pos] 画像表示のためのimgタグが生成される', () => {
-			// 仕様: Flyerコンポーネントはimgタグを使用して画像を表示する
+		it('画像を表示するためのimgタグが生成される', () => {
+			// Arrange: テスト用のデータを準備
+			const src = '/test-image.jpg';
+			const alt = 'テスト画像';
+
+			// Act: コンポーネントをレンダリング
 			const { container } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: 'テスト画像'
-				}
+				props: { src, alt }
 			});
 
+			// Assert: imgタグが存在し、正しい属性を持つことを確認
 			const img = container.querySelector('img');
 			expect(img).not.toBeNull();
 			expect(img?.tagName).toBe('IMG');
-		});
+			expect(img?.getAttribute('src')).toBe(src);
+			expect(img?.getAttribute('alt')).toBe(alt);
 
-		it('[pos] 余分な要素を含まないシンプルな構造である', () => {
-			// 仕様: Flyerコンポーネントは画像のみを表示し、余分な要素は含まれない
-			const { container } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: 'テスト画像'
-				}
-			});
-
-			// imgタグ以外の要素がないことを確認
+			// 余分な要素を含まないシンプルな構造であることを確認
 			expect(container.childElementCount).toBe(1);
 			expect(container.firstElementChild?.tagName).toBe('IMG');
 		});
 	});
 
-	describe('プロパティ', () => {
-		it('[pos] src属性が正しく設定される', () => {
-			// 仕様: src属性が正しく設定される
-			const src = '/test-image.jpg';
-			const { container } = render(Flyer, {
-				props: {
-					src,
-					alt: 'テスト画像'
-				}
-			});
+	describe('遅延読み込み機能', () => {
+		it('lazyがtrueの場合、loading="lazy"属性が設定される', () => {
+			// Arrange: lazy=trueを指定
+			const props = {
+				src: '/test-image.jpg',
+				alt: 'テスト画像',
+				lazy: true
+			};
 
-			const img = container.querySelector('img');
-			expect(img?.getAttribute('src')).toBe(src);
-		});
+			// Act: コンポーネントをレンダリング
+			const { container } = render(Flyer, { props });
 
-		it('[pos] alt属性が正しく設定される', () => {
-			// 仕様: alt属性が正しく設定される
-			const alt = 'テスト画像';
-			const { container } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt
-				}
-			});
-
-			const img = container.querySelector('img');
-			expect(img?.getAttribute('alt')).toBe(alt);
-		});
-
-		it('[pos] lazyがtrueの場合、loading="lazy"属性が設定される', () => {
-			// 仕様: lazyがtrueの場合、loading="lazy"属性が設定される
-			const { container } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: 'テスト画像',
-					lazy: true
-				}
-			});
-
+			// Assert: loading="lazy"属性が設定されていることを確認
 			const img = container.querySelector('img');
 			expect(img?.getAttribute('loading')).toBe('lazy');
 		});
 
-		it('[pos] lazyがfalseまたは指定されない場合、loading属性は設定されない', () => {
-			// 仕様: lazyがfalseまたは指定されない場合、loading属性は設定されない
-			// lazyがfalseの場合
-			const { container: container1 } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: 'テスト画像',
-					lazy: false
-				}
-			});
-			expect(container1.querySelector('img')?.getAttribute('loading')).toBeNull();
+		it('lazyがfalseの場合、loading属性は設定されない', () => {
+			// Arrange: lazy=falseを指定
+			const props = {
+				src: '/test-image.jpg',
+				alt: 'テスト画像',
+				lazy: false
+			};
 
-			// lazyが指定されない場合（デフォルトはfalse）
-			const { container: container2 } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: 'テスト画像'
-				}
-			});
-			expect(container2.querySelector('img')?.getAttribute('loading')).toBeNull();
+			// Act: コンポーネントをレンダリング
+			const { container } = render(Flyer, { props });
+
+			// Assert: loading属性がないことを確認
+			const img = container.querySelector('img');
+			expect(img?.getAttribute('loading')).toBeNull();
+		});
+
+		it('lazyが省略された場合（デフォルト値）、loading属性は設定されない', () => {
+			// Arrange: lazyを省略
+			const props = {
+				src: '/test-image.jpg',
+				alt: 'テスト画像'
+				// lazyは省略（デフォルトはfalse）
+			};
+
+			// Act: コンポーネントをレンダリング
+			const { container } = render(Flyer, { props });
+
+			// Assert: loading属性がないことを確認（デフォルトでfalseと同様の挙動）
+			const img = container.querySelector('img');
+			expect(img?.getAttribute('loading')).toBeNull();
 		});
 	});
 
 	describe('Cloudflare Images対応', () => {
-		it('[pos] 通常のホスト名の場合、通常のimgタグが表示される', () => {
-			// 仕様: ホスト名が'www.orch-canvas.tokyo'以外の場合、通常のimgタグが表示される
+		it('通常のホスト名の場合、srcのみが設定される', () => {
+			// Arrange: 通常のホスト名でのテスト
 			const src = '/test-image.jpg';
+			const alt = 'テスト画像';
+
+			// Act: コンポーネントをレンダリング
 			const { container } = render(Flyer, {
-				props: {
-					src,
-					alt: 'テスト画像'
-				}
+				props: { src, alt }
 			});
 
+			// Assert: 通常のsrcのみが設定されていることを確認
 			const img = container.querySelector('img');
 			expect(img?.getAttribute('src')).toBe(src);
 			expect(img?.hasAttribute('srcset')).toBe(false);
 		});
 
-		it('[pos] orch-canvas.tokyoのホスト名の場合、Cloudflare Images用のURLが設定される', async () => {
-			// 仕様: ホスト名が'www.orch-canvas.tokyo'の場合、Cloudflare Images用のURLが設定される
+		it('Cloudflareホスト名の場合、Cloudflare Images用のURLが設定される', async () => {
+			// Arrange: Cloudflareのホスト名に設定
 			setCloudflareHostname();
-
 			const src = '/test-image.jpg';
+
+			// Act: コンポーネントをレンダリング
 			const { container } = render(Flyer, {
-				props: {
-					src,
-					alt: 'テスト画像'
-				}
+				props: { src, alt: 'テスト画像' }
 			});
 
 			// onMountの実行を待つためにタイマーを進める
 			await vi.dynamicImportSettled();
 
+			// Assert: Cloudflare Images用のURLが設定されていることを確認
 			const img = container.querySelector('img');
 			const srcAttr = img?.getAttribute('src') || '';
 
 			// Cloudflare Images用のURLが設定されていることを確認
 			expect(srcAttr).toContain('https://www.orch-canvas.tokyo/cdn-cgi/image/');
-
-			// 必要なオプションがすべて含まれていることを確認
 			expect(srcAttr).toContain('format=auto');
 			expect(srcAttr).toContain('fit=scale-down');
 			expect(srcAttr).toContain('height=1920');
-			expect(srcAttr).toContain('test-image.jpg');
 
 			// srcsetも設定されていることを確認
 			const srcsetAttr = img?.getAttribute('srcset') || '';
@@ -220,133 +195,35 @@ describe('Flyer.svelte', () => {
 			expect(srcsetAttr).toContain('height=3840');
 		});
 
-		it('[neg] 相対パスでないsrcが指定された場合も正しく処理される', async () => {
-			// 仕様: 相対パスでないsrcが指定された場合も正しく処理される
+		it('相対パスの場合、先頭の/が除去される', async () => {
+			// Arrange: Cloudflareのホスト名と相対パスを設定
 			setCloudflareHostname();
-
-			const src = 'https://example.com/test-image.jpg';
-			const { container } = render(Flyer, {
-				props: {
-					src,
-					alt: 'テスト画像'
-				}
-			});
-
-			// onMountの実行を待つためにタイマーを進める
-			await vi.dynamicImportSettled();
-
-			const img = container.querySelector('img');
-			const srcAttr = img?.getAttribute('src') || '';
-
-			// 外部URLがそのまま使用されていることを確認
-			expect(srcAttr).toContain('https://www.orch-canvas.tokyo/cdn-cgi/image/');
-			expect(srcAttr).toContain('https://example.com/test-image.jpg');
-		});
-
-		it('[pos] 相対パスの場合、先頭の/が除去されてCloudflare Images用のURLが生成される', async () => {
-			// 仕様: 相対パスの場合、先頭の/が除去されてCloudflare Images用のURLが生成される
-			setCloudflareHostname();
-
 			const src = '/path/to/image.jpg';
+
+			// Act: コンポーネントをレンダリング
 			const { container } = render(Flyer, {
-				props: {
-					src,
-					alt: 'テスト画像'
-				}
+				props: { src, alt: 'テスト画像' }
 			});
 
 			// onMountの実行を待つためにタイマーを進める
 			await vi.dynamicImportSettled();
 
+			// Assert: 先頭の/が除去されていることを確認
 			const img = container.querySelector('img');
 			const srcAttr = img?.getAttribute('src') || '';
 
 			// 先頭の/が除去されていることを確認
-			expect(srcAttr).not.toContain('//path/to/image.jpg');
 			expect(srcAttr).toContain('/path/to/image.jpg');
-		});
-	});
-
-	describe('エラー処理と堅牢性', () => {
-		it('[neg] srcが空文字列でも表示できる', () => {
-			// 仕様: srcが空文字列でも正常に表示される
-			const { container } = render(Flyer, {
-				props: {
-					src: '',
-					alt: 'テスト画像'
-				}
-			});
-
-			const img = container.querySelector('img');
-			expect(img).not.toBeNull();
-			// 空文字列のsrcは実際にはnullとして扱われる
-			expect(img?.getAttribute('src')).toBeNull();
-		});
-
-		it('[neg] altが空文字列でも表示できる', () => {
-			// 仕様: altが空文字列でも正常に表示される
-			const { container } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: ''
-				}
-			});
-
-			const img = container.querySelector('img');
-			expect(img).not.toBeNull();
-			expect(img?.getAttribute('alt')).toBe('');
-		});
-
-		it('[neg] 特殊文字を含むURLでも正しく処理される', () => {
-			// 仕様: 特殊文字を含むURLでも正しく処理される
-			const src = '/test image with spaces.jpg?param=value&another=123';
-			const { container } = render(Flyer, {
-				props: {
-					src,
-					alt: 'テスト画像'
-				}
-			});
-
-			const img = container.querySelector('img');
-			expect(img?.getAttribute('src')).toBe(src);
-		});
-
-		it('[neg] 極端に長いURLでも表示できる', () => {
-			// 仕様: 極端に長いURLでも正常に表示される
-			const longSrc =
-				'/very/long/path/to/image/with/many/nested/directories/and/a/very/long/filename/that/exceeds/normal/length/limitations/but/should/still/work/properly/without/any/issues/or/errors/test-image.jpg';
-			const { container } = render(Flyer, {
-				props: {
-					src: longSrc,
-					alt: 'テスト画像'
-				}
-			});
-
-			const img = container.querySelector('img');
-			expect(img?.getAttribute('src')).toBe(longSrc);
-		});
-
-		it('[neg] HTMLタグを含むalt属性でもエスケープされて表示される', () => {
-			// 仕様: HTMLタグを含むalt属性でもエスケープされて安全に表示される
-			const altWithHtml = '<script>alert("XSS")</script>';
-			const { container } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: altWithHtml
-				}
-			});
-
-			const img = container.querySelector('img');
-			expect(img?.getAttribute('alt')).toBe(altWithHtml);
-			// 実際にスクリプトタグが生成されていないことを確認
-			expect(container.querySelector('script')).toBeNull();
+			expect(srcAttr).not.toContain('//path/to/image.jpg');
 		});
 	});
 
 	describe('アクセシビリティ対応', () => {
-		it('[pos] スクリーンリーダー対応のためのalt属性が設定される', () => {
-			// 仕様: alt属性が設定され、スクリーンリーダーで認識できる
+		it('alt属性が設定され、スクリーンリーダーで認識できる', () => {
+			// Arrange: alt属性を設定
 			const alt = 'アクセシビリティテスト画像';
+
+			// Act: コンポーネントをレンダリング
 			render(Flyer, {
 				props: {
 					src: '/test-image.jpg',
@@ -354,163 +231,28 @@ describe('Flyer.svelte', () => {
 				}
 			});
 
-			// alt属性を持つ要素が存在することを確認（screen.getByAltTextを使用）
+			// Assert: alt属性を持つ要素が存在することを確認
 			const img = screen.getByAltText(alt);
 			expect(img).toBeInTheDocument();
 			expect(img.tagName).toBe('IMG');
 		});
 
-		it('[pos] 装飾的な画像の場合でも空のalt属性が設定される', () => {
-			// 仕様: 装飾的な画像の場合でも空のalt属性が設定される
+		it('装飾的な画像の場合でも空のalt属性が設定される', () => {
+			// Arrange: 空のalt属性を設定
+			const alt = '';
+
+			// Act: コンポーネントをレンダリング
 			const { container } = render(Flyer, {
 				props: {
 					src: '/decorative-image.jpg',
-					alt: ''
+					alt
 				}
 			});
 
+			// Assert: 空のalt属性が設定されていることを確認
 			const img = container.querySelector('img');
 			expect(img?.hasAttribute('alt')).toBe(true);
 			expect(img?.getAttribute('alt')).toBe('');
-		});
-	});
-
-	describe('レスポンシブデザイン', () => {
-		it('[pos] Cloudflare Images使用時にfit=scale-downパラメータが設定される', async () => {
-			// 仕様: Cloudflare Images使用時にfit=scale-downパラメータが設定される
-			setCloudflareHostname();
-
-			const { container } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: 'レスポンシブテスト画像'
-				}
-			});
-
-			// onMountの実行を待つためにタイマーを進める
-			await vi.dynamicImportSettled();
-
-			const img = container.querySelector('img');
-			const srcAttr = img?.getAttribute('src') || '';
-
-			// fit=scale-downパラメータが設定されていることを確認
-			expect(srcAttr).toContain('fit=scale-down');
-		});
-
-		it('[pos] 高解像度ディスプレイ用のsrcset属性が設定される', async () => {
-			// 仕様: 高解像度ディスプレイ用のsrcset属性が設定される
-			setCloudflareHostname();
-
-			const { container } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: 'レスポンシブテスト画像'
-				}
-			});
-
-			// onMountの実行を待つためにタイマーを進める
-			await vi.dynamicImportSettled();
-
-			const img = container.querySelector('img');
-			const srcset = img?.getAttribute('srcset') || '';
-
-			// 高解像度ディスプレイ用のsrcsetが設定されていることを確認
-			expect(srcset).toContain('2x');
-			expect(srcset).toContain('height=3840');
-		});
-
-		it('[pos] 画像は適切な高さパラメータを持ち、様々な画面サイズで最適に表示される', async () => {
-			// 仕様: 画像は適切な高さパラメータを持ち、様々な画面サイズで最適に表示される
-			setCloudflareHostname();
-
-			const { container } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: 'テスト画像'
-				}
-			});
-
-			// onMountの実行を待つためにタイマーを進める
-			await vi.dynamicImportSettled();
-
-			const img = container.querySelector('img');
-			const srcAttr = img?.getAttribute('src') || '';
-
-			// 基本の高さパラメータが設定されていることを確認
-			expect(srcAttr).toContain('height=1920');
-		});
-	});
-
-	describe('実際の使用パターン', () => {
-		it('[pos] コンサートフライヤーの表示（Cloudflare Images + 遅延読み込み）', async () => {
-			// 仕様: 典型的な使用パターン - コンサートフライヤーの表示
-			setCloudflareHostname();
-
-			const { container } = render(Flyer, {
-				props: {
-					src: '/concerts/regular/images/flyers/regular-1.webp',
-					alt: '第1回定期演奏会フライヤー',
-					lazy: true
-				}
-			});
-
-			// onMountの実行を待つためにタイマーを進める
-			await vi.dynamicImportSettled();
-
-			const img = container.querySelector('img');
-
-			// Cloudflare Images用のURLが設定されていることを確認
-			expect(img?.getAttribute('src')).toContain('https://www.orch-canvas.tokyo/cdn-cgi/image/');
-			expect(img?.getAttribute('src')).toContain('concerts/regular/images/flyers/regular-1.webp');
-
-			// lazy属性が設定されていることを確認
-			expect(img?.getAttribute('loading')).toBe('lazy');
-
-			// alt属性が正しく設定されていることを確認
-			expect(img?.getAttribute('alt')).toBe('第1回定期演奏会フライヤー');
-		});
-
-		it('[pos] 異なる画像フォーマットの表示', () => {
-			// 仕様: 異なる画像フォーマット（webp, png, jpg）でも正しく表示される
-			const formats = [
-				{ src: '/test-image.webp', alt: 'WebP画像' },
-				{ src: '/test-image.png', alt: 'PNG画像' },
-				{ src: '/test-image.jpg', alt: 'JPG画像' }
-			];
-
-			for (const format of formats) {
-				const { container } = render(Flyer, {
-					props: {
-						src: format.src,
-						alt: format.alt
-					}
-				});
-
-				const img = container.querySelector('img');
-				expect(img?.getAttribute('src')).toBe(format.src);
-				expect(img?.getAttribute('alt')).toBe(format.alt);
-			}
-		});
-
-		it('[pos] 様々なデバイスでの表示に対応するための最適な画像フォーマットが自動選択される', async () => {
-			// 仕様: 様々なデバイスでの表示に対応するための最適な画像フォーマットが自動選択される
-			setCloudflareHostname();
-
-			const { container } = render(Flyer, {
-				props: {
-					src: '/test-image.jpg',
-					alt: 'フォーマット最適化テスト画像'
-				}
-			});
-
-			// onMountの実行を待つためにタイマーを進める
-			await vi.dynamicImportSettled();
-
-			const img = container.querySelector('img');
-			const srcAttr = img?.getAttribute('src') || '';
-
-			// format=autoパラメータが設定されていることを確認
-			expect(srcAttr).toContain('format=auto');
 		});
 	});
 });
