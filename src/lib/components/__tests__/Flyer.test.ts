@@ -166,6 +166,26 @@ describe('Flyer.svelte', () => {
 			expect(img?.hasAttribute('srcset')).toBe(false);
 		});
 
+		it('Cloudflareホスト名で遅延読み込みが有効の場合、loading="lazy"属性が設定される', async () => {
+			// Arrange: Cloudflareのホスト名に設定し、lazy=trueを指定
+			setCloudflareHostname();
+			const props = {
+				src: '/test-image.jpg',
+				alt: 'テスト画像',
+				lazy: true
+			};
+
+			// Act: コンポーネントをレンダリング
+			const { container } = render(Flyer, { props });
+
+			// onMountの実行を待つ
+			await vi.dynamicImportSettled();
+
+			// Assert: loading="lazy"属性が設定されていることを確認
+			const img = container.querySelector('img');
+			expect(img?.getAttribute('loading')).toBe('lazy');
+		});
+
 		it('Cloudflareホスト名の場合、Cloudflare Images用のURLが設定される', async () => {
 			// Arrange: Cloudflareのホスト名に設定
 			setCloudflareHostname();
@@ -199,6 +219,8 @@ describe('Flyer.svelte', () => {
 			// Arrange: Cloudflareのホスト名と相対パスを設定
 			setCloudflareHostname();
 			const src = '/path/to/image.jpg';
+			const expectedSrc =
+				'https://www.orch-canvas.tokyo/cdn-cgi/image/format=auto,fit=scale-down,height=1920/path/to/image.jpg';
 
 			// Act: コンポーネントをレンダリング
 			const { container } = render(Flyer, {
@@ -208,13 +230,31 @@ describe('Flyer.svelte', () => {
 			// onMountの実行を待つためにタイマーを進める
 			await vi.dynamicImportSettled();
 
-			// Assert: 先頭の/が除去されていることを確認
+			// Assert: 先頭の/が除去された正確なURLが設定されていることを確認
 			const img = container.querySelector('img');
 			const srcAttr = img?.getAttribute('src') || '';
+			expect(srcAttr).toBe(expectedSrc);
+		});
 
-			// 先頭の/が除去されていることを確認
-			expect(srcAttr).toContain('/path/to/image.jpg');
-			expect(srcAttr).not.toContain('//path/to/image.jpg');
+		it('スラッシュで始まらない相対パスも適切に処理される', async () => {
+			// Arrange: Cloudflareのホスト名と先頭にスラッシュがない相対パスを設定
+			setCloudflareHostname();
+			const src = 'path/to/image.jpg';
+			const expectedSrc =
+				'https://www.orch-canvas.tokyo/cdn-cgi/image/format=auto,fit=scale-down,height=1920/path/to/image.jpg';
+
+			// Act: コンポーネントをレンダリング
+			const { container } = render(Flyer, {
+				props: { src, alt: 'テスト画像' }
+			});
+
+			// onMountの実行を待つためにタイマーを進める
+			await vi.dynamicImportSettled();
+
+			// Assert: 正確なURLが設定されていることを確認
+			const img = container.querySelector('img');
+			const srcAttr = img?.getAttribute('src') || '';
+			expect(srcAttr).toBe(expectedSrc);
 		});
 	});
 
