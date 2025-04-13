@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
 import '@testing-library/jest-dom';
 import Meta from '../Meta.svelte';
@@ -32,69 +32,12 @@ import Meta from '../Meta.svelte';
  *   - ソーシャルメディア共有のための最適化
  */
 
-// グローバルなモック関数を定義
-const { mockMetaTagClass, MetaTagsMock } = vi.hoisted(() => {
-	const metatagsConstructor = vi.fn();
-	return {
-		MetaTagsMock: metatagsConstructor,
-		// @ts-expect-error 無理やりMockしているので型指定なし
-		mockMetaTagClass: function MetaTags(options) {
-			metatagsConstructor(options.props);
-			return {
-				$$: {
-					props: options.props,
-					fragment: { c: vi.fn(), m: vi.fn(), d: vi.fn() },
-					on_mount: [],
-					on_destroy: [],
-					after_update: []
-				}
-			};
-		}
-	};
-});
-
-// svelte-meta-tagsのモックを作成
-vi.mock('svelte-meta-tags', () => {
-	return {
-		MetaTags: mockMetaTagClass
-	};
-});
-
 describe('Meta.svelte', () => {
 	// テスト用のデフォルトプロパティ
 	const defaultProps = {
 		title: 'テストページ',
 		canonical: '/test'
 	};
-
-	// 各テスト前にモックをリセット
-	beforeEach(() => {
-		vi.clearAllMocks();
-	});
-
-	afterEach(() => {
-		vi.resetAllMocks();
-	});
-
-	describe('基本機能', () => {
-		it('MetaTagsコンポーネントを使用し、必要な属性が正しく設定される', () => {
-			// Arrange: テスト用のプロパティを準備
-			const props = defaultProps;
-
-			// Act: コンポーネントをレンダリング
-			render(Meta, { props });
-
-			// Assert: コンポーネントが使用され、基本的な属性が正しく設定されている
-			expect(MetaTagsMock).toHaveBeenCalled();
-			expect(MetaTagsMock).toHaveBeenCalledWith(
-				expect.objectContaining({
-					title: 'テストページ - Orchestra Canvas Tokyo',
-					canonical: 'https://www.orch-canvas.tokyo/test',
-					twitter: expect.any(Object)
-				})
-			);
-		});
-	});
 
 	describe('タイトル生成', () => {
 		it('タイトルが空でない場合、「{title} - Orchestra Canvas Tokyo」形式のタイトルが生成される', () => {
@@ -106,11 +49,7 @@ describe('Meta.svelte', () => {
 			render(Meta, { props });
 
 			// Assert: 正しいタイトルが生成されることを確認
-			expect(MetaTagsMock).toHaveBeenCalledWith(
-				expect.objectContaining({
-					title: expected
-				})
-			);
+			expect(document.title).toBe(expected);
 		});
 
 		it('タイトルが空の場合、「Orchestra Canvas Tokyo」のみが表示される', () => {
@@ -122,11 +61,7 @@ describe('Meta.svelte', () => {
 			render(Meta, { props });
 
 			// Assert: デフォルトのタイトルのみが表示されることを確認
-			expect(MetaTagsMock).toHaveBeenCalledWith(
-				expect.objectContaining({
-					title: expected
-				})
-			);
+			expect(document.title).toBe(expected);
 		});
 	});
 
@@ -140,11 +75,8 @@ describe('Meta.svelte', () => {
 			render(Meta, { props });
 
 			// Assert: 正しい正規URLが生成されることを確認
-			expect(MetaTagsMock).toHaveBeenCalledWith(
-				expect.objectContaining({
-					canonical: expected
-				})
-			);
+			const canonicalLink = document.querySelector('link[rel="canonical"]');
+			expect(canonicalLink?.getAttribute('href')).toBe(expected);
 		});
 
 		it('相対パスが/なしの場合、自動的に/が追加される', () => {
@@ -156,11 +88,8 @@ describe('Meta.svelte', () => {
 			render(Meta, { props });
 
 			// Assert: /が自動的に追加されることを確認
-			expect(MetaTagsMock).toHaveBeenCalledWith(
-				expect.objectContaining({
-					canonical: expected
-				})
-			);
+			const canonicalLink = document.querySelector('link[rel="canonical"]');
+			expect(canonicalLink?.getAttribute('href')).toBe(expected);
 		});
 
 		it('canonicalが空の場合はベースURLのみとなる', () => {
@@ -172,33 +101,36 @@ describe('Meta.svelte', () => {
 			render(Meta, { props });
 
 			// Assert: ベースURLのみが設定されることを確認
-			expect(MetaTagsMock).toHaveBeenCalledWith(
-				expect.objectContaining({
-					canonical: expected
-				})
-			);
+			const canonicalLink = document.querySelector('link[rel="canonical"]');
+			expect(canonicalLink?.getAttribute('href')).toBe(expected);
 		});
 	});
 
 	describe('Twitter Card設定', () => {
-		it('Twitter Cardに所定の固定値が設定される', () => {
+		it('Twitter Cardのサイト名に固定値「@Orch_canvas」が設定される', () => {
 			// Arrange: テスト用のプロパティ
 			const props = defaultProps;
 
 			// Act: コンポーネントをレンダリング
 			render(Meta, { props });
 
-			// Assert: Twitter Cardに所定の固定値が設定されていることを確認
-			expect(MetaTagsMock).toHaveBeenCalledWith(
-				expect.objectContaining({
-					twitter: expect.objectContaining({
-						site: '@Orch_canvas',
-						cardType: 'summary',
-						image: 'https://www.orch-canvas.tokyo/web-app-manifest-512x512.png',
-						imageAlt: 'Orchestra Canvas Tokyoのロゴ'
-					})
-				})
-			);
+			// Assert: Twitter Cardのサイト名に固定値が設定されていることを確認
+			const twitterSite = document.querySelector('meta[name="twitter:site"]');
+			expect(twitterSite).not.toBeNull();
+			expect(twitterSite?.getAttribute('content')).toBe('@Orch_canvas');
+		});
+
+		it('Twitter Cardのカードタイプに固定値「summary」が設定される', () => {
+			// Arrange: テスト用のプロパティ
+			const props = defaultProps;
+
+			// Act: コンポーネントをレンダリング
+			render(Meta, { props });
+
+			// Assert: Twitter Cardのカードタイプに固定値が設定されていることを確認
+			const twitterCard = document.querySelector('meta[name="twitter:card"]');
+			expect(twitterCard).not.toBeNull();
+			expect(twitterCard?.getAttribute('content')).toBe('summary');
 		});
 
 		it('Twitter CardのタイトルにはfullTitleと同じ値が設定される', () => {
@@ -211,13 +143,37 @@ describe('Meta.svelte', () => {
 			render(Meta, { props });
 
 			// Assert: Twitter Cardのタイトルが正しく設定されていることを確認
-			expect(MetaTagsMock).toHaveBeenCalledWith(
-				expect.objectContaining({
-					twitter: expect.objectContaining({
-						title: expectedTitle
-					})
-				})
-			);
+			const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+			expect(twitterTitle).not.toBeNull();
+			expect(twitterTitle?.getAttribute('content')).toBe(expectedTitle);
+		});
+
+		it('Twitter Cardの画像URLに固定値が設定される', () => {
+			// Arrange: テスト用のプロパティ
+			const props = defaultProps;
+			const expectedImage = 'https://www.orch-canvas.tokyo/web-app-manifest-512x512.png';
+
+			// Act: コンポーネントをレンダリング
+			render(Meta, { props });
+
+			// Assert: Twitter Cardの画像URLに固定値が設定されていることを確認
+			const twitterImage = document.querySelector('meta[name="twitter:image"]');
+			expect(twitterImage).not.toBeNull();
+			expect(twitterImage?.getAttribute('content')).toBe(expectedImage);
+		});
+
+		it('Twitter Cardの画像代替テキストに固定値が設定される', () => {
+			// Arrange: テスト用のプロパティ
+			const props = defaultProps;
+			const expectedAlt = 'Orchestra Canvas Tokyoのロゴ';
+
+			// Act: コンポーネントをレンダリング
+			render(Meta, { props });
+
+			// Assert: Twitter Cardの画像代替テキストに固定値が設定されていることを確認
+			const twitterImageAlt = document.querySelector('meta[name="twitter:image:alt"]');
+			expect(twitterImageAlt).not.toBeNull();
+			expect(twitterImageAlt?.getAttribute('content')).toBe(expectedAlt);
 		});
 	});
 });
