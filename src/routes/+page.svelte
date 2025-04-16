@@ -7,6 +7,7 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import { afterNavigate } from '$app/navigation';
 
 	export let data: PageServerData;
 
@@ -72,6 +73,21 @@
 			}
 		});
 	};
+
+	// Splideインスタンスへの参照
+	let splideInstance: {
+		refresh: () => void;
+		go: (index: number) => void;
+	} | null = null;
+
+	// 画面遷移後にSplideを更新
+	afterNavigate(() => {
+		setTimeout(() => {
+			if (splideInstance) {
+				splideInstance.refresh();
+			}
+		}, 50);
+	});
 </script>
 
 <Meta title="" canonical="/" />
@@ -88,6 +104,10 @@
 			trimSpace: false
 		}}
 		on:move={updatePaginationColor}
+		on:mounted={(e) => {
+			// Splideインスタンスを保存
+			splideInstance = e.detail.splide;
+		}}
 	>
 		<SplideTrack>
 			{#each slideshowItems as { title, flyers, slug, isNew }, index}
