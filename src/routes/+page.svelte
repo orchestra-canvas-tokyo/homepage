@@ -4,6 +4,7 @@
 	import '@splidejs/svelte-splide/css/core';
 	import dayjs from 'dayjs';
 	import type { MoveEventDetail } from '@splidejs/svelte-splide/types';
+	import type { Splide as SplideInstance } from '@splidejs/splide';
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
@@ -74,17 +75,14 @@
 		});
 	};
 
-	// Splideインスタンスへの参照
-	let splideInstance: {
-		refresh: () => void;
-		go: (index: number) => void;
-	} | null = null;
+	// Splideコンポーネントへの参照
+	let splideComponent: { splide: SplideInstance } | null = null;
 
 	// 画面遷移後にSplideを更新
 	afterNavigate(() => {
 		setTimeout(() => {
-			if (splideInstance) {
-				splideInstance.refresh();
+			if (splideComponent?.splide) {
+				splideComponent.splide.refresh();
 			}
 		}, 50);
 	});
@@ -103,11 +101,8 @@
 			focus: 'center',
 			trimSpace: false
 		}}
+		bind:this={splideComponent}
 		on:move={updatePaginationColor}
-		on:mounted={(e) => {
-			// Splideインスタンスを保存
-			splideInstance = e.detail.splide;
-		}}
 	>
 		<SplideTrack>
 			{#each slideshowItems as { title, flyers, slug, isNew }, index}
