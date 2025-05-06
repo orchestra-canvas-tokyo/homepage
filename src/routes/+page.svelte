@@ -4,13 +4,16 @@
 	import '@splidejs/svelte-splide/css/core';
 	import dayjs from 'dayjs';
 	import type { MoveEventDetail } from '@splidejs/svelte-splide/types';
+	import type { Splide as SplideInstance } from '@splidejs/splide';
 	import Meta from '$lib/components/Meta.svelte';
+	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import { afterNavigate } from '$app/navigation';
 
 	export let data: PageServerData;
 
 	const nonRegularDisplayingConcerts: string[] = [];
-	const newConcerts: string[] = ['regular-13'];
+	const newConcerts: string[] = ['regular-14'];
 	const nonNewSlideshowItems = data.concerts
 		.filter((concert) => {
 			// 定期演奏会と直接指定した室内楽演奏会を抽出
@@ -34,22 +37,32 @@
 			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
 		});
 	const slideshowItems = [...newSlideshowItems, ...nonNewSlideshowItems]
-		.filter((concert) => {
-			return concert.flyer;
-		})
 		.map((concert) => {
 			return {
 				title: concert.title,
-				flyer: concert.flyer,
+				flyers: concert.flyers,
 				slug: concert.slug,
 				isNew: newConcerts.includes(concert.slug)
 			};
-		});
+		})
+		.filter(
+			(
+				concert
+			): concert is {
+				title: string;
+				flyers: FlyerType[];
+				slug: string;
+				isNew: boolean;
+			} => {
+				// フライヤーがないものは表示しない
+				return concert.flyers !== undefined;
+			}
+		);
 
 	const updatePaginationColor = (e: CustomEvent<MoveEventDetail> | undefined) => {
 		if (!e) return;
-		const paginations = document.querySelectorAll('.splide__pagination button');
-		paginations.forEach((pagination, index) => {
+		const paginationButtons = document.querySelectorAll('.splide__pagination button');
+		paginationButtons.forEach((pagination, index) => {
 			if (index === e.detail.index) {
 				(pagination as HTMLButtonElement).style.backgroundColor = 'var(--primary-color)';
 			} else if (Math.abs(index - e.detail.index) === 1) {
@@ -61,6 +74,18 @@
 			}
 		});
 	};
+
+	// Splideコンポーネントへの参照
+	let splideComponent: { splide: SplideInstance } | null = null;
+
+	// 画面遷移後にSplideを更新
+	afterNavigate(() => {
+		setTimeout(() => {
+			if (splideComponent?.splide) {
+				splideComponent.splide.refresh();
+			}
+		}, 50);
+	});
 </script>
 
 <Meta title="" canonical="/" />
@@ -76,15 +101,21 @@
 			focus: 'center',
 			trimSpace: false
 		}}
+		bind:this={splideComponent}
 		on:move={updatePaginationColor}
 	>
 		<SplideTrack>
-			{#each slideshowItems as { title, flyer, slug, isNew }}
-				{#if flyer}
+			{#each slideshowItems as { title, flyers, slug, isNew }, index}
+				{#if flyers}
+					{@const expectedToBeInFirstView = index <= 2}
 					<SplideSlide>
 						<a href={`/concerts/${slug}`} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
-							<Flyer src={flyer} alt="{title}のフライヤー" />
+							<Flyer
+								src={flyers[0].src}
+								alt="{title}のフライヤー"
+								lazy={!expectedToBeInFirstView}
+							/>
 						</a>
 					</SplideSlide>
 				{/if}
@@ -113,6 +144,10 @@
 			);
 			--slideshow-width: calc(100dvw);
 		}
+	}
+
+	:global(swiper-slide) {
+		height: var(--slideshow-height);
 	}
 
 	.slideshow a {
@@ -189,13 +224,18 @@
 
 	:global(.splide__pagination) {
 		margin-top: 10px;
+		padding: 0 10px;
+		gap: 10px;
+	}
+	:global(.splide__pagination li) {
+		flex-basis: 60px;
+		flex-shrink: 1;
 	}
 	:global(.splide__pagination button) {
 		padding: 0;
 		border: 0;
 		margin: 0;
-		margin-right: 10px;
-		width: 60px;
+		width: 100%;
 		height: 4px;
 		border-radius: 2px;
 		transition: 0.3s;

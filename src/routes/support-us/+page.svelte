@@ -4,6 +4,11 @@
 	import hollyWoodLatte from './hollywood-latte.png';
 	import mizuya from './mizuya.png';
 	import pdf from './ご支援のお願い.pdf';
+
+	import youTubeTotalViewCount from './youtube_total_view_count.txt?raw';
+	const displayingYouTubeTotalViewCount = `${
+		Math.floor(parseInt(youTubeTotalViewCount) / 100000) * 10
+	}万回`;
 </script>
 
 <Meta title="ご支援のお願い" canonical="/support-us" />
@@ -26,9 +31,7 @@
 	<h1>ご支援のお願い</h1>
 	<p>平素より、Orchestra Canvas Tokyo へのご厚情を賜りまして、誠にありがとうございます。</p>
 	<p>
-		当団は、2020 年に発足して以降、定期演奏会や室内楽演奏会を開催し、累計4,000
-		名を超えるお客様にご来場をいただきました。また、時間や場所の制約を超えて演奏をお届けしたいとの思いから、演奏会の様子をYouTube
-		にて公開し、合計 400,000 回を超える再生回数をいただいております。
+		当団は、2020年に発足して以降、定期演奏会や室内楽演奏会を開催し、累計7,000名を超えるお客様にご来場をいただきました。また、時間や場所の制約を超えて演奏をお届けしたいとの思いから、演奏会の様子をYouTubeにて公開し、合計{displayingYouTubeTotalViewCount}を超える再生回数をいただいております。
 	</p>
 	<p>
 		他方、活動規模の拡大に伴って演奏会開催に要する費用も増加をしており、奏者の負担を原資とする現在の財政においては、活動規模の上限を迎えつつあります。また、財政面を理由とする活動規模の上限は他団体さまも直面をする問題であり、このことがアマチュアオーケストラ界の企画の同質化を招いています。
@@ -54,6 +57,7 @@
 			<span>柿沼　威司　様</span>
 			<span>神山　和子　様</span>
 			<span>神山　　怜　様</span>
+			<span>鈴木　辰生　様</span>
 			<span>螺良　修一　様</span>
 			<span>吉田　裕之　様</span>
 		</div>
@@ -61,9 +65,10 @@
 			<span>和田　　愛　様</span>
 			<span>和田　　究　様</span>
 			<span>渡邉　信也　様</span>
+			<span>H. H.　様</span>
 			<span>S. N.　様</span>
 		</div>
-		<div class="fullwidth-supporters">（他匿名6名様）</div>
+		<div class="fullwidth-supporters">（他匿名7名様）</div>
 	</div>
 
 	<h2>ご寄付のお願い・ご返礼</h2>

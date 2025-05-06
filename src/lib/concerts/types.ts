@@ -1,6 +1,12 @@
 /** 演奏会種別(ソースコード上で指定されるslug)の定義 */
 export type ConcertType = 'regular' | 'chamber';
 
+/** フライヤーに関する情報 */
+export interface Flyer {
+	src: string;
+	alt: string;
+}
+
 /** 人に関する情報 */
 export interface People {
 	name: string;
@@ -21,7 +27,7 @@ export interface Concert {
 	number: number;
 	slug: string;
 	title: string;
-	flyer?: string;
+	flyers?: Flyer[];
 	dateTime: {
 		date: string;
 		day?: string; // "月祝"など特別な曜日表記を要する場合に使用

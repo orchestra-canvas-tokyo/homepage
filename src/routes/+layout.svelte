@@ -84,7 +84,18 @@
 		{
 			title: 'blog',
 			lang: 'en',
-			url: 'https://blog.orch-canvas.tokyo/'
+			children: [
+				{
+					title: 'music',
+					url: 'https://blog.orch-canvas.tokyo/',
+					lang: 'en'
+				},
+				{
+					title: 'tech',
+					url: 'https://zenn.dev/p/orch_canvas',
+					lang: 'en'
+				}
+			]
 		},
 		{
 			title: 'contact',
@@ -180,6 +191,11 @@
 					{/if}
 				</li>
 			{/each}
+			<li class="hamburger-sns-container">
+				{#each snsMenuItems as sns}
+					<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+				{/each}
+			</li>
 		</ul>
 	</nav>
 </header>
@@ -229,6 +245,16 @@
 </main>
 
 <style>
+	/* Nyanvas用 */
+	:global(canvas) {
+		position: fixed;
+		top: 0;
+		left: 0;
+	}
+	main {
+		z-index: 100;
+	}
+
 	:global(body) {
 		display: grid;
 		grid-template-areas:
@@ -285,6 +311,9 @@
 	#hamburger-menu-button {
 		display: none;
 	}
+	.hamburger-sns-container {
+		display: none;
+	}
 	@media (max-width: 950px) {
 		#hamburger-menu-button {
 			display: flex;
@@ -312,6 +341,11 @@
 		}
 		#hamburger-menu-check:checked ~ #hamburger-menu-button span:nth-of-type(3) {
 			transform: translateY(calc(-1 * var(--distance))) rotate(-30deg);
+		}
+
+		.hamburger-sns-container {
+			display: flex;
+			justify-content: space-between;
 		}
 	}
 
@@ -517,10 +551,6 @@
 		font-size: 0.9em;
 		line-height: 1.25;
 		/* word-break: auto-phrase; */
-	}
-
-	aside img {
-		filter: invert(1);
 	}
 
 	main {
