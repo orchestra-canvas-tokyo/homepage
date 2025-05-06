@@ -240,5 +240,10 @@ export const newsItems: {
 		url: '/concerts/regular-14',
 		date: '2025/2/24',
 		content: '第14回定期演奏会のチケットを発売しました。'
+	},
+	{
+		url: '/accounting',
+		date: '2025/5/6',
+		content: '第4回 決算報告書を公開しました。'
 	}
 ];
