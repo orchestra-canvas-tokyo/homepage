@@ -168,7 +168,7 @@
 	data.ticket && data.ticket.url && (dayjs(data.dateTime.date).isAfter(dayjs()) || dayjs(data.dateTime.date).isSame(dayjs(), 'day'))}
 		<div class="spacer" />
 		<a href={data.ticket.url} class="full-width-button">
-			<img src="/teket-logo-v-white.svg" alt="teketロゴ" class="teket-logo" />
+			<img alt="teketロゴ" class="teket-logo" />
 		</a>
 	{/if}
 
@@ -294,11 +294,12 @@
 		background-color: var(--main-color);
 	}
 
-	.full-width-button:hover .teket-logo {
-		content: url('/teket-logo-v-dark.svg');
+	.teket-logo {
+		content: url('./teket-logo-v-white.svg');
+		height: 60px;
 	}
 
-	.teket-logo {
-		height: 60px;
+	.full-width-button:hover .teket-logo {
+		content: url('./teket-logo-v-dark.svg');
 	}
 </style>
