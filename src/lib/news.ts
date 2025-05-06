@@ -242,7 +242,7 @@ export const newsItems: {
 		content: '第14回定期演奏会のチケットを発売しました。'
 	},
 	{
-		url: '/accounting',
+		url: '/about/accounting',
 		date: '2025/5/6',
 		content: '第4回 決算報告書を公開しました。'
 	}
