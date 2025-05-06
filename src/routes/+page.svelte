@@ -4,9 +4,11 @@
 	import '@splidejs/svelte-splide/css/core';
 	import dayjs from 'dayjs';
 	import type { MoveEventDetail } from '@splidejs/svelte-splide/types';
+	import type { Splide as SplideInstance } from '@splidejs/splide';
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import { afterNavigate } from '$app/navigation';
 
 	export let data: PageServerData;
 
@@ -72,6 +74,18 @@
 			}
 		});
 	};
+
+	// Splideコンポーネントへの参照
+	let splideComponent: { splide: SplideInstance } | null = null;
+
+	// 画面遷移後にSplideを更新
+	afterNavigate(() => {
+		setTimeout(() => {
+			if (splideComponent?.splide) {
+				splideComponent.splide.refresh();
+			}
+		}, 50);
+	});
 </script>
 
 <Meta title="" canonical="/" />
@@ -87,6 +101,7 @@
 			focus: 'center',
 			trimSpace: false
 		}}
+		bind:this={splideComponent}
 		on:move={updatePaginationColor}
 	>
 		<SplideTrack>

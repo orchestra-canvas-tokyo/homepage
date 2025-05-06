@@ -4,6 +4,8 @@ import term2Pdf from './documents/第2期 決算報告書.pdf';
 import term2Image from './documents/第2期 決算報告書.png';
 import term3Pdf from './documents/第3期 決算報告書.pdf';
 import term3Image from './documents/第3期 決算報告書.png';
+import term4Pdf from './documents/第4期 決算報告書.pdf';
+import term4Image from './documents/第4期 決算報告書.png';
 
 /** 決算報告書情報をまとめた配列 */
 export const reports: {
@@ -25,5 +27,10 @@ export const reports: {
 		duration: '2023/4/1～2024/3/31',
 		pdf: term3Pdf,
 		image: term3Image
+	},
+	{
+		duration: '2024/4/1～2025/3/31',
+		pdf: term4Pdf,
+		image: term4Image
 	}
 ];
