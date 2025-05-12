@@ -244,6 +244,6 @@ export const newsItems: {
 	{
 		url: '/about/accounting',
 		date: '2025/5/6',
-		content: '第4回 決算報告書を公開しました。'
+		content: '第4期 決算報告書を公開しました。'
 	}
 ];

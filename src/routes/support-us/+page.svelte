@@ -68,7 +68,7 @@
 			<span>H. H.　様</span>
 			<span>S. N.　様</span>
 		</div>
-		<div class="fullwidth-supporters">（他匿名7名様）</div>
+		<div class="fullwidth-supporters">（他匿名8名様）</div>
 	</div>
 
 	<h2>ご寄付のお願い・ご返礼</h2>
