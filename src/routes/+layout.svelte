@@ -13,6 +13,7 @@
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
+	import CookieConcent from '$lib/components/CookieConcent.svelte';
 
 	export let data: LayoutData;
 
@@ -148,6 +149,10 @@
 	afterNavigate(() => {
 		isOpen = false;
 	});
+
+	// CookieConcent Toastの表示制御
+	let showToast: boolean;
+	$: showToast = false;
 </script>
 
 <header>
@@ -196,6 +201,18 @@
 					<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
 				{/each}
 			</li>
+
+			<section class="cookie-container hamburger-cookie-container">
+				<button
+					on:click={function () {
+						showToast = true;
+					}}
+					class="text-link"
+				>
+					Cookieの設定を変更
+				</button>
+				<a class="secondary-link" href="/cookie-policy">Cookieポリシー</a>
+			</section>
 		</ul>
 	</nav>
 </header>
@@ -226,6 +243,18 @@
 			{/each}
 		</ul>
 	</nav>
+
+	<section class="cookie-container">
+		<button
+			on:click={function () {
+				showToast = true;
+			}}
+			class="text-link"
+		>
+			Cookieの設定を変更
+		</button>
+		<a class="secondary-link" href="/cookie-policy">Cookieポリシー</a>
+	</section>
 </aside>
 
 <main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
@@ -243,6 +272,8 @@
 		</aside>
 	{/if}
 </main>
+
+<CookieConcent bind:showToast />
 
 <style>
 	/* Nyanvas用 */
@@ -438,10 +469,10 @@
 	@media (max-width: 950px) {
 		header nav > ul {
 			position: fixed;
-			top: 110px;
+			top: 90px;
 			right: 0;
 			padding: 0 30px 30px;
-			height: calc(100dvh - 110px);
+			height: calc(100dvh - 90px);
 			background-color: var(--background-color);
 			overflow: auto;
 			transform: translateX(var(--translate-x));
@@ -598,5 +629,43 @@
 			margin: 0;
 			padding: 0;
 		}
+	}
+
+	/* Cookieへのリンク */
+	.cookie-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 30px;
+		font-size: 0.6em;
+	}
+
+	.cookie-container a {
+		border-bottom: 1px solid;
+	}
+
+	.hamburger-cookie-container {
+		display: none;
+	}
+	@media (max-width: 950px) {
+		.hamburger-cookie-container {
+			display: flex;
+		}
+	}
+
+	button {
+		padding: 0;
+		border: none;
+		outline: none;
+		font: inherit;
+		color: inherit;
+		background: none;
+		cursor: pointer;
+	}
+
+	.text-link {
+		letter-spacing: var(--letter-spacing);
+		border-bottom: 1px solid;
 	}
 </style>
