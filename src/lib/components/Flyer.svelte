@@ -4,6 +4,8 @@
 	export let src: string;
 	export let alt: string;
 	export let lazy: boolean = false;
+	export let width: number | undefined = undefined;
+	export let height: number | undefined = undefined;
 
 	const commonOptions = [
 		['format', 'auto'],
@@ -30,7 +32,9 @@
 		srcset={`${getCloudflareSrc(src, [...commonOptions, ['height', (defaultHeight * 2).toString()]])} 2x`}
 		{alt}
 		loading={lazy ? 'lazy' : null}
+		{width}
+		{height}
 	/>
 {:else if useCloudflareImages === false}
-	<img {src} {alt} loading={lazy ? 'lazy' : null} />
+	<img {src} {alt} loading={lazy ? 'lazy' : null} {width} {height} />
 {/if}

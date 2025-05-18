@@ -4,11 +4,9 @@
 	import '@splidejs/svelte-splide/css/core';
 	import dayjs from 'dayjs';
 	import type { MoveEventDetail } from '@splidejs/svelte-splide/types';
-	import type { Splide as SplideInstance } from '@splidejs/splide';
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
-	import { afterNavigate } from '$app/navigation';
 
 	export let data: PageServerData;
 
@@ -74,18 +72,6 @@
 			}
 		});
 	};
-
-	// Splideコンポーネントへの参照
-	let splideComponent: { splide: SplideInstance } | null = null;
-
-	// 画面遷移後にSplideを更新
-	afterNavigate(() => {
-		setTimeout(() => {
-			if (splideComponent?.splide) {
-				splideComponent.splide.refresh();
-			}
-		}, 50);
-	});
 </script>
 
 <Meta title="" canonical="/" />
@@ -95,13 +81,10 @@
 		hasTrack={false}
 		options={{
 			rewind: true,
-			autoWidth: true,
-			autoHeight: true,
 			gap: '5rem',
 			focus: 'center',
 			trimSpace: false
 		}}
-		bind:this={splideComponent}
 		on:move={updatePaginationColor}
 	>
 		<SplideTrack>
@@ -115,6 +98,8 @@
 								src={flyers[0].src}
 								alt="{title}のフライヤー"
 								lazy={!expectedToBeInFirstView}
+								width={595}
+								height={842}
 							/>
 						</a>
 					</SplideSlide>
@@ -146,6 +131,11 @@
 		}
 	}
 
+	.slideshow :global(.splide) {
+		height: var(--slideshow-height);
+		width: var(--slideshow-width);
+	}
+
 	:global(swiper-slide) {
 		height: var(--slideshow-height);
 	}
@@ -170,8 +160,10 @@
 	.slide-link :global(img) {
 		max-height: calc(var(--image-height));
 		max-width: calc(var(--slideshow-width));
-		height: auto;
-		width: auto;
+		/* heightとwidthはFlyerコンポーネントで設定するので、ここでは不要になる可能性が高いニャン */
+		/* height: auto; */
+		/* width: auto; */
+		object-fit: contain; /* または cover */
 	}
 
 	:global(.splide__slide) {
