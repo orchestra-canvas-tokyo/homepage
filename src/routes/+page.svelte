@@ -88,16 +88,16 @@
 		on:move={updatePaginationColor}
 	>
 		<SplideTrack>
-			{#each slideshowItems as { title, flyers, slug, isNew }, index}
+			{#each slideshowItems as { title, flyers, slug, isNew }}
 				{#if flyers}
-					{@const expectedToBeInFirstView = index <= 2}
+					<!-- {@const expectedToBeInFirstView = index <= 2} -->
 					<SplideSlide>
 						<a href={`/concerts/${slug}`} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
 							<Flyer
 								src={flyers[0].src}
 								alt="{title}のフライヤー"
-								lazy={!expectedToBeInFirstView}
+								lazy={true}
 								width={595}
 								height={842}
 							/>
