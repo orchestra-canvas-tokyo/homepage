@@ -4,11 +4,9 @@
 	import '@splidejs/svelte-splide/css/core';
 	import dayjs from 'dayjs';
 	import type { MoveEventDetail } from '@splidejs/svelte-splide/types';
-	import type { Splide as SplideInstance } from '@splidejs/splide';
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
-	import { afterNavigate } from '$app/navigation';
 
 	export let data: PageServerData;
 
@@ -74,18 +72,6 @@
 			}
 		});
 	};
-
-	// Splideコンポーネントへの参照
-	let splideComponent: { splide: SplideInstance } | null = null;
-
-	// 画面遷移後にSplideを更新
-	afterNavigate(() => {
-		setTimeout(() => {
-			if (splideComponent?.splide) {
-				splideComponent.splide.refresh();
-			}
-		}, 50);
-	});
 </script>
 
 <Meta title="" canonical="/" />
@@ -95,27 +81,22 @@
 		hasTrack={false}
 		options={{
 			rewind: true,
-			autoWidth: true,
-			autoHeight: true,
 			gap: '5rem',
 			focus: 'center',
 			trimSpace: false
 		}}
-		bind:this={splideComponent}
 		on:move={updatePaginationColor}
 	>
 		<SplideTrack>
-			{#each slideshowItems as { title, flyers, slug, isNew }, index}
+			{#each slideshowItems as { title, flyers, slug, isNew }}
 				{#if flyers}
-					{@const expectedToBeInFirstView = index <= 2}
+					<!-- A版のサイズのみを想定 -->
+					{@const width = 595}
+					{@const height = 842}
 					<SplideSlide>
 						<a href={`/concerts/${slug}`} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
-							<Flyer
-								src={flyers[0].src}
-								alt="{title}のフライヤー"
-								lazy={!expectedToBeInFirstView}
-							/>
+							<Flyer src={flyers[0].src} alt="{title}のフライヤー" lazy={true} {width} {height} />
 						</a>
 					</SplideSlide>
 				{/if}
@@ -146,6 +127,11 @@
 		}
 	}
 
+	.slideshow :global(.splide) {
+		height: var(--slideshow-height);
+		width: var(--slideshow-width);
+	}
+
 	:global(swiper-slide) {
 		height: var(--slideshow-height);
 	}
@@ -170,8 +156,7 @@
 	.slide-link :global(img) {
 		max-height: calc(var(--image-height));
 		max-width: calc(var(--slideshow-width));
-		height: auto;
-		width: auto;
+		object-fit: contain;
 	}
 
 	:global(.splide__slide) {

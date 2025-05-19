@@ -94,7 +94,7 @@ describe('基本構造', () => {
 
 		// 余分な要素を含まないシンプルな構造であることを確認
 		expect(container.childElementCount).toBe(1);
-		expect(container.firstElementChild?.tagName).toBe('IMG');
+		expect(container.firstElementChild?.tagName).toBe('DIV');
 	});
 });
 
