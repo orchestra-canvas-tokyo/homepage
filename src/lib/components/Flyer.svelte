@@ -52,13 +52,16 @@
 
 	.spinner {
 		position: absolute;
-		border: 4px solid rgba(0, 0, 0, 0.1); /* 薄いボーダー */
-		border-top: 4px solid var(--secondary-color); /* 回転する部分の色 */
-		border-radius: 50%; /* 円形にする */
-		width: 30px; /* スピナーのサイズ */
-		height: 30px; /* スピナーのサイズ */
-		animation: spin 1s linear infinite; /* 1秒で1回転、無限に繰り返す */
 		margin: calc((var(--slideshow-height) - 30px) / 2) 0;
+		border: 4px solid rgba(0, 0, 0, 0.1);
+		border-top: 4px solid var(--secondary-color);
+		border-radius: 50%;
+
+		--size: 30px;
+		width: var(--size);
+		height: var(--size);
+
+		animation: spin 1s linear infinite;
 	}
 
 	@keyframes spin {

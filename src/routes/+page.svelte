@@ -90,17 +90,13 @@
 		<SplideTrack>
 			{#each slideshowItems as { title, flyers, slug, isNew }}
 				{#if flyers}
-					<!-- {@const expectedToBeInFirstView = index <= 2} -->
+					<!-- A版のサイズのみを想定 -->
+					{@const width = 595}
+					{@const height = 842}
 					<SplideSlide>
 						<a href={`/concerts/${slug}`} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
-							<Flyer
-								src={flyers[0].src}
-								alt="{title}のフライヤー"
-								lazy={true}
-								width={595}
-								height={842}
-							/>
+							<Flyer src={flyers[0].src} alt="{title}のフライヤー" lazy={true} {width} {height} />
 						</a>
 					</SplideSlide>
 				{/if}
@@ -160,10 +156,7 @@
 	.slide-link :global(img) {
 		max-height: calc(var(--image-height));
 		max-width: calc(var(--slideshow-width));
-		/* heightとwidthはFlyerコンポーネントで設定するので、ここでは不要になる可能性が高いニャン */
-		/* height: auto; */
-		/* width: auto; */
-		object-fit: contain; /* または cover */
+		object-fit: contain;
 	}
 
 	:global(.splide__slide) {
