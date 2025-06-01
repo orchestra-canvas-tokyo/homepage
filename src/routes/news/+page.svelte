@@ -3,6 +3,7 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import dayjs from 'dayjs';
 	import Meta from '$lib/components/Meta.svelte';
+	import { externalLink } from '$lib/actions/externalLink';
 
 	export let data: PageServerData;
 	const sliceNumber = 10; //１ページに表示するnewsの数
@@ -39,7 +40,7 @@
 	<ul class="news-list">
 		{#each separatedNewsItems[page] as news}
 			<li class="news-item">
-				<a href={news.url} class="news-box">
+				<a href={news.url} class="news-box" use:externalLink>
 					<div class="news-date">{news.date}</div>
 					<div class="news-content">{news.content}</div>
 				</a>

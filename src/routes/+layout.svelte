@@ -13,6 +13,7 @@
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
+	import { externalLink } from '$lib/actions/externalLink';
 
 	export let data: LayoutData;
 
@@ -181,7 +182,7 @@
 							{#each menuItem.children as child}
 								<li>
 									{#if child.url}
-										<a href={child.url} class={child.lang}>{child.title}</a>
+										<a href={child.url} class={child.lang} use:externalLink>{child.title}</a>
 									{:else}
 										<span class={child.lang}>{child.title}</span>
 									{/if}
@@ -193,7 +194,7 @@
 			{/each}
 			<li class="hamburger-sns-container">
 				{#each snsMenuItems as sns}
-					<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+					<a href={sns.url} use:externalLink><img src={sns.icon} alt={sns.alt} width="25px" /></a>
 				{/each}
 			</li>
 		</ul>
@@ -221,7 +222,7 @@
 		<ul>
 			{#each snsMenuItems as item}
 				<li>
-					<a href={item.url}><img src={item.icon} alt={item.alt} width="25px" /></a>
+					<a href={item.url} use:externalLink><img src={item.icon} alt={item.alt} width="25px" /></a>
 				</li>
 			{/each}
 		</ul>
