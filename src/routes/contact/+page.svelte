@@ -2,27 +2,14 @@
 	import type { PageServerData } from './$types';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
-	import FlyerInsertionClosedNotice from '$lib/components/FlyerInsertionClosedNotice.svelte';
 
 	export let data: PageServerData;
 
-	let showNotice = data.shouldShowFlyerInsertionClosedNotice;
-
-	const handleCloseNotice = () => {
-		showNotice = false;
-	};
+	// dataプロパティを明示的に参照してESLintエラーを回避
+	$: void data;
 </script>
 
 <Meta title="Contact" canonical="/contact" />
-
-<!-- 挟み込み募集終了通知 -->
-{#if data.nextConcert && showNotice}
-	<FlyerInsertionClosedNotice
-		concertTitle={data.nextConcert.title}
-		show={showNotice}
-		onClose={handleCloseNotice}
-	/>
-{/if}
 
 <Breadcrumb
 	segments={[
@@ -45,21 +32,11 @@
 		フォーム送信後、確認メールを送信のうえ、必要に応じてメールにてご返答いたします。<br />
 		なお、メールアドレスが正しく入力されていない場合、返答いたしかねますのでご注意ください。
 	</p>
-	{#if !(data.nextConcert && data.shouldShowFlyerInsertionClosedNotice)}
-		<p>
-			また、当団演奏会にて配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
-			/>
-			詳しくは当フォームよりお問い合わせください。
-		</p>
-	{/if}
-
-	{#if data.nextConcert && data.shouldShowFlyerInsertionClosedNotice}
-		<p>
-			<strong>挟み込み募集終了のお知らせ</strong><br />
-			「{data.nextConcert.title}」の挟み込み募集は終了いたしました。<br />
-			ご応募いただき、ありがとうございました。
-		</p>
-	{/if}
+	<p>
+		また、当団演奏会にて配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
+		/>
+		詳しくは当フォームよりお問い合わせください。
+	</p>
 
 	<iframe
 		src="https://contact.orch-canvas.tokyo/"
