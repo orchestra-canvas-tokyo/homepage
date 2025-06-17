@@ -51,6 +51,14 @@
 		詳しくは当フォームよりお問い合わせください。
 	</p>
 
+	{#if data.nextConcert && data.shouldShowFlyerInsertionClosedNotice}
+		<div class="flyer-insertion-notice-text">
+			<strong>挟み込み募集終了のお知らせ</strong><br />
+			「{data.nextConcert.title}」の挟み込み募集は終了いたしました。<br />
+			ご応募いただき、ありがとうございました。
+		</div>
+	{/if}
+
 	<iframe
 		src="https://contact.orch-canvas.tokyo/"
 		width="100%"
@@ -78,6 +86,16 @@
 
 	p {
 		margin: 30px 0;
+	}
+
+	.flyer-insertion-notice-text {
+		background-color: #fff3cd;
+		border: 1px solid #ffeaa7;
+		border-radius: 8px;
+		padding: 20px;
+		margin: 30px 0;
+		color: #856404;
+		line-height: 1.6;
 	}
 
 	@media (min-width: 878px) {

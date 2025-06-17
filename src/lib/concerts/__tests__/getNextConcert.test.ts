@@ -12,7 +12,8 @@ vi.mock('../index', () => ({
 			dateTime: { date: '2023-01-01', time: '14:00開演' },
 			type: 'regular',
 			number: 1,
-			place: { name: 'テストホール' }
+			place: { name: 'テストホール' },
+			flyerInsertionClosed: false
 		},
 		{
 			slug: 'today-concert',
@@ -20,7 +21,8 @@ vi.mock('../index', () => ({
 			dateTime: { date: dayjs().format('YYYY-MM-DD'), time: '14:00開演' },
 			type: 'regular',
 			number: 2,
-			place: { name: 'テストホール' }
+			place: { name: 'テストホール' },
+			flyerInsertionClosed: true
 		},
 		{
 			slug: 'future-concert-1',
@@ -28,7 +30,8 @@ vi.mock('../index', () => ({
 			dateTime: { date: dayjs().add(7, 'day').format('YYYY-MM-DD'), time: '14:00開演' },
 			type: 'regular',
 			number: 3,
-			place: { name: 'テストホール' }
+			place: { name: 'テストホール' },
+			flyerInsertionClosed: false
 		},
 		{
 			slug: 'future-concert-2',
@@ -36,7 +39,8 @@ vi.mock('../index', () => ({
 			dateTime: { date: dayjs().add(14, 'day').format('YYYY-MM-DD'), time: '14:00開演' },
 			type: 'chamber',
 			number: 1,
-			place: { name: 'テストホール' }
+			place: { name: 'テストホール' },
+			flyerInsertionClosed: true
 		}
 	] as Concert[]
 }));

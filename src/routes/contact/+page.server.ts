@@ -1,6 +1,5 @@
 import type { PageServerLoad } from './$types';
 import { getNextConcert, isConcertDatePassed } from '$lib/concerts/getNextConcert';
-import { flyerInsertionClosedConcerts } from '$lib/constants/flyerInsertionSettings';
 
 export const load: PageServerLoad = async () => {
 	const nextConcert = getNextConcert();
@@ -10,7 +9,7 @@ export const load: PageServerLoad = async () => {
 
 	if (nextConcert) {
 		const isDatePassed = isConcertDatePassed(nextConcert);
-		const isInsertionClosed = flyerInsertionClosedConcerts[nextConcert.slug] === true;
+		const isInsertionClosed = nextConcert.flyerInsertionClosed === true;
 
 		// 演奏会当日以降の場合は通知を表示しない
 		shouldShowFlyerInsertionClosedNotice = !isDatePassed && isInsertionClosed;

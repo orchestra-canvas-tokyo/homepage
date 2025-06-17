@@ -50,9 +50,9 @@
 		--spacing-unit: 4px;
 
 		position: fixed;
-		top: calc(var(--header-height) + var(--header-padding) + 20px);
+		top: 50%;
 		left: 50%;
-		transform: translateX(-50%);
+		transform: translate(-50%, -50%);
 
 		z-index: 9999;
 
@@ -64,15 +64,15 @@
 		background-color: var(--background-color);
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
-		animation: slideDown 0.5s ease-out 0s forwards;
+		animation: fadeIn 0.5s ease-out 0s forwards;
 		opacity: 0;
-		transform: translateX(-50%) translateY(-20px);
+		transform: translate(-50%, -50%) scale(0.95);
 	}
 
 	.show {
-		animation: slideDown 0.5s ease-out 0s forwards;
+		animation: fadeIn 0.5s ease-out 0s forwards;
 		opacity: 1;
-		transform: translateX(-50%) translateY(0);
+		transform: translate(-50%, -50%) scale(1);
 	}
 
 	.notice-content {
@@ -100,8 +100,8 @@
 
 	.close-button {
 		position: absolute;
-		top: calc(var(--spacing-unit) * 3);
-		right: calc(var(--spacing-unit) * 3);
+		top: calc(var(--spacing-unit) * 4);
+		right: calc(var(--spacing-unit) * 4);
 
 		-webkit-appearance: none;
 		appearance: none;
@@ -113,7 +113,7 @@
 		background-color: var(--secondary-color);
 		color: var(--background-color);
 
-		font-size: 16px;
+		font-size: 14px;
 		font-weight: bold;
 		line-height: 1;
 
@@ -123,6 +123,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		padding: 0;
 	}
 
 	.close-button:hover {
@@ -134,20 +135,19 @@
 		outline-offset: 2px;
 	}
 
-	@keyframes slideDown {
+	@keyframes fadeIn {
 		0% {
 			opacity: 0;
-			transform: translateX(-50%) translateY(-20px);
+			transform: translate(-50%, -50%) scale(0.95);
 		}
 		100% {
 			opacity: 1;
-			transform: translateX(-50%) translateY(0);
+			transform: translate(-50%, -50%) scale(1);
 		}
 	}
 
 	@media (max-width: 768px) {
 		.flyer-insertion-notice {
-			top: calc(var(--header-height) + var(--header-padding) + 10px);
 			width: calc(100vw - 20px);
 		}
 
