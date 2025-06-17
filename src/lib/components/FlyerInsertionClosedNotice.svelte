@@ -35,8 +35,6 @@
 </script>
 
 {#if show}
-	<!-- グレースケールのオーバーレイ -->
-	<div class="overlay" class:show class:closing={isClosing}></div>
 	<div
 		bind:this={noticeElement}
 		class="flyer-insertion-notice"
@@ -57,28 +55,6 @@
 {/if}
 
 <style>
-	.overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
-		background-color: rgba(0, 0, 0, 0.5);
-		z-index: 9998;
-
-		animation: fadeIn 0.5s ease-out 0s forwards;
-		opacity: 0;
-	}
-
-	.overlay.show {
-		opacity: 1;
-	}
-
-	.overlay.closing {
-		animation: fadeOut 0.3s ease-out 0s forwards;
-		opacity: 0;
-	}
-
 	.flyer-insertion-notice {
 		--spacing-unit: 4px;
 
