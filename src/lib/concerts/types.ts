@@ -65,4 +65,5 @@ export interface Concert {
 	};
 	showLinkToProgramNote?: boolean; // blogへのリンクを表示するかどうか
 	youtubePlaylistId?: string;
+	flyerInsertionClosed?: boolean; // 挟み込み募集が終了している場合true
 }
