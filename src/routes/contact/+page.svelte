@@ -1,9 +1,28 @@
 <script lang="ts">
+	import type { PageServerData } from './$types';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
+	import FlyerInsertionClosedNotice from '$lib/components/FlyerInsertionClosedNotice.svelte';
+
+	export let data: PageServerData;
+
+	let showNotice = data.shouldShowFlyerInsertionClosedNotice;
+
+	const handleCloseNotice = () => {
+		showNotice = false;
+	};
 </script>
 
 <Meta title="Contact" canonical="/contact" />
+
+<!-- 挟み込み募集終了通知 -->
+{#if data.nextConcert && showNotice}
+	<FlyerInsertionClosedNotice
+		concertTitle={data.nextConcert.title}
+		show={showNotice}
+		onClose={handleCloseNotice}
+	/>
+{/if}
 
 <Breadcrumb
 	segments={[
