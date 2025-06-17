@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 
 	/** 演奏会名 */
 	export let concertTitle: string;
@@ -12,9 +12,13 @@
 
 	let noticeElement: HTMLDivElement;
 	let isClosing = false;
+	let overlayElement: HTMLDivElement | null = null;
 
 	onMount(() => {
 		if (show) {
+			// オーバーレイをbodyに追加
+			createOverlay();
+
 			// アニメーション開始後、自動で閉じるタイマーを設定
 			setTimeout(() => {
 				handleClose();
@@ -22,21 +26,72 @@
 		}
 	});
 
+	onDestroy(() => {
+		removeOverlay();
+	});
+
+	const createOverlay = () => {
+		if (overlayElement) return;
+
+		overlayElement = document.createElement('div');
+		overlayElement.className = 'flyer-overlay';
+		overlayElement.style.cssText = `
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			width: 100vw;
+			height: 100vh;
+			background-color: rgba(0, 0, 0, 0.5);
+			z-index: 9998;
+			opacity: 0;
+			transition: opacity 0.5s ease-out;
+		`;
+
+		document.body.appendChild(overlayElement);
+
+		// フェードイン
+		requestAnimationFrame(() => {
+			if (overlayElement) {
+				overlayElement.style.opacity = '1';
+			}
+		});
+	};
+
+	const removeOverlay = () => {
+		if (overlayElement && overlayElement.parentNode) {
+			overlayElement.style.opacity = '0';
+			setTimeout(() => {
+				if (overlayElement && overlayElement.parentNode) {
+					overlayElement.parentNode.removeChild(overlayElement);
+				}
+				overlayElement = null;
+			}, 300);
+		}
+	};
+
 	const handleClose = () => {
 		if (isClosing) return; // 既に閉じる処理中の場合は何もしない
 
 		isClosing = true;
+		removeOverlay();
 
 		// フェードアウトアニメーション後にコールバックを呼ぶ
 		setTimeout(() => {
 			onClose();
 		}, 300); // アニメーション時間に合わせて調整
 	};
+
+	// showプロパティの変化を監視
+	$: if (show && !overlayElement) {
+		createOverlay();
+	} else if (!show && overlayElement) {
+		removeOverlay();
+	}
 </script>
 
 {#if show}
-	<!-- グレースケールのオーバーレイ -->
-	<div class="overlay" class:show class:closing={isClosing}></div>
 	<div
 		bind:this={noticeElement}
 		class="flyer-insertion-notice"
@@ -57,30 +112,6 @@
 {/if}
 
 <style>
-	.overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(0, 0, 0, 0.5);
-		z-index: 9998;
-
-		animation: fadeIn 0.5s ease-out 0s forwards;
-		opacity: 0;
-	}
-
-	.overlay.show {
-		opacity: 1;
-	}
-
-	.overlay.closing {
-		animation: fadeOut 0.3s ease-out 0s forwards;
-		opacity: 0;
-	}
-
 	.flyer-insertion-notice {
 		--spacing-unit: 4px;
 
