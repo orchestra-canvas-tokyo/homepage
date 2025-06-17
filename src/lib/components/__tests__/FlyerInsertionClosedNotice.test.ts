@@ -30,6 +30,7 @@ describe('FlyerInsertionClosedNotice', () => {
 	});
 
 	it('閉じるボタンをクリックするとonCloseコールバックが呼ばれる', async () => {
+		vi.useFakeTimers();
 		const onCloseMock = vi.fn();
 
 		render(FlyerInsertionClosedNotice, {
@@ -43,7 +44,12 @@ describe('FlyerInsertionClosedNotice', () => {
 		const closeButton = screen.getByLabelText('通知を閉じる');
 		await fireEvent.click(closeButton);
 
+		// フェードアウトアニメーション分の時間を進める
+		vi.advanceTimersByTime(300);
+
 		expect(onCloseMock).toHaveBeenCalledOnce();
+
+		vi.useRealTimers();
 	});
 
 	it('適切なaria属性が設定されている', () => {

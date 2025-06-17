@@ -11,18 +11,26 @@
 	export let onClose: () => void = () => {};
 
 	let noticeElement: HTMLDivElement;
+	let isClosing = false;
 
 	onMount(() => {
 		if (show) {
 			// アニメーション開始後、自動で閉じるタイマーを設定
 			setTimeout(() => {
-				onClose();
+				handleClose();
 			}, 8000); // 8秒後に自動で閉じる
 		}
 	});
 
 	const handleClose = () => {
-		onClose();
+		if (isClosing) return; // 既に閉じる処理中の場合は何もしない
+
+		isClosing = true;
+
+		// フェードアウトアニメーション後にコールバックを呼ぶ
+		setTimeout(() => {
+			onClose();
+		}, 300); // アニメーション時間に合わせて調整
 	};
 </script>
 
@@ -31,6 +39,7 @@
 		bind:this={noticeElement}
 		class="flyer-insertion-notice"
 		class:show
+		class:closing={isClosing}
 		role="alert"
 		aria-live="polite"
 	>
@@ -73,6 +82,12 @@
 		animation: fadeIn 0.5s ease-out 0s forwards;
 		opacity: 1;
 		transform: translate(-50%, -50%) scale(1);
+	}
+
+	.closing {
+		animation: fadeOut 0.3s ease-out 0s forwards;
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(0.95);
 	}
 
 	.notice-content {
@@ -143,6 +158,17 @@
 		100% {
 			opacity: 1;
 			transform: translate(-50%, -50%) scale(1);
+		}
+	}
+
+	@keyframes fadeOut {
+		0% {
+			opacity: 1;
+			transform: translate(-50%, -50%) scale(1);
+		}
+		100% {
+			opacity: 0;
+			transform: translate(-50%, -50%) scale(0.95);
 		}
 	}
 
