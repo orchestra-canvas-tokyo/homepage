@@ -51,13 +51,7 @@
 		詳しくは当フォームよりお問い合わせください。
 	</p>
 
-	{#if data.nextConcert && data.shouldShowFlyerInsertionClosedNotice}
-		<p>
-			<strong>挟み込み募集終了のお知らせ</strong><br />
-			「{data.nextConcert.title}」の挟み込み募集は終了いたしました。<br />
-			ご応募いただき、ありがとうございました。
-		</p>
-	{/if}
+	<!-- 挟み込み募集終了時は案内を表示しない -->
 
 	<iframe
 		src="https://contact.orch-canvas.tokyo/"

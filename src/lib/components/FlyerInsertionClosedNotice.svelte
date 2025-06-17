@@ -35,6 +35,8 @@
 </script>
 
 {#if show}
+	<!-- グレースケールのオーバーレイ -->
+	<div class="overlay" class:show class:closing={isClosing}></div>
 	<div
 		bind:this={noticeElement}
 		class="flyer-insertion-notice"
@@ -55,6 +57,28 @@
 {/if}
 
 <style>
+	.overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		background-color: rgba(0, 0, 0, 0.5);
+		z-index: 9998;
+
+		animation: fadeIn 0.5s ease-out 0s forwards;
+		opacity: 0;
+	}
+
+	.overlay.show {
+		opacity: 1;
+	}
+
+	.overlay.closing {
+		animation: fadeOut 0.3s ease-out 0s forwards;
+		opacity: 0;
+	}
+
 	.flyer-insertion-notice {
 		--spacing-unit: 4px;
 
@@ -115,20 +139,20 @@
 
 	.close-button {
 		position: absolute;
-		top: calc(var(--spacing-unit) * 4);
-		right: calc(var(--spacing-unit) * 4);
+		top: calc(var(--spacing-unit) * 3);
+		right: calc(var(--spacing-unit) * 3);
 
 		-webkit-appearance: none;
 		appearance: none;
 
-		width: 24px;
-		height: 24px;
+		width: 28px;
+		height: 28px;
 		border: none;
 		border-radius: 50%;
 		background-color: var(--secondary-color);
 		color: var(--background-color);
 
-		font-size: 14px;
+		font-size: 16px;
 		font-weight: bold;
 		line-height: 1;
 
@@ -139,6 +163,7 @@
 		align-items: center;
 		justify-content: center;
 		padding: 0;
+		z-index: 1;
 	}
 
 	.close-button:hover {
