@@ -1,4 +1,3 @@
-
 <script lang="ts">
 	import type { LayoutData } from './$types';
 	import { newsItems } from '$lib/news';
@@ -16,7 +15,10 @@
 	import { afterNavigate } from '$app/navigation';
 	import CookieConcent from '$lib/components/CookieConcent.svelte';
 	import { cookieConsent } from '$lib/stores/cookieConsent';
-	import { injectThirdPartyScripts, removeThirdPartyScripts } from '$lib/services/thirdPartyScripts';
+	import {
+		injectThirdPartyScripts,
+		removeThirdPartyScripts
+	} from '$lib/services/thirdPartyScripts';
 
 	export let data: LayoutData;
 
@@ -163,7 +165,6 @@
 		isOpen = false;
 	});
 </script>
-
 
 <header>
 	<a href="/">
@@ -615,43 +616,5 @@
 			margin: 0;
 			padding: 0;
 		}
-	}
-
-	/* Cookieへのリンク */
-	.cookie-container {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 8px;
-		margin-bottom: 30px;
-		font-size: 0.6em;
-	}
-
-	.cookie-container a {
-		border-bottom: 1px solid;
-	}
-
-	.hamburger-cookie-container {
-		display: none;
-	}
-	@media (max-width: 950px) {
-		.hamburger-cookie-container {
-			display: flex;
-		}
-	}
-
-	button {
-		padding: 0;
-		border: none;
-		outline: none;
-		font: inherit;
-		color: inherit;
-		background: none;
-		cursor: pointer;
-	}
-
-	.text-link {
-		letter-spacing: var(--letter-spacing);
-		border-bottom: 1px solid;
 	}
 </style>

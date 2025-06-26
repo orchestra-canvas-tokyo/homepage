@@ -1,4 +1,3 @@
-
 export const thirdPartyScripts = {
 	gtag: {
 		id: 'G-DLWL51EKQM'

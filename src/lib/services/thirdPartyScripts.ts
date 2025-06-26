@@ -1,4 +1,3 @@
-
 import { thirdPartyScripts } from '../config/thirdPartyScripts';
 
 const gtagId = thirdPartyScripts.gtag.id;
