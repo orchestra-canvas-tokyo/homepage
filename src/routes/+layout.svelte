@@ -1,3 +1,4 @@
+
 <script lang="ts">
 	import type { LayoutData } from './$types';
 	import { newsItems } from '$lib/news';
@@ -8,14 +9,26 @@
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
 	import CookieConcent from '$lib/components/CookieConcent.svelte';
+	import { cookieConsent } from '$lib/stores/cookieConsent';
+	import { injectThirdPartyScripts, removeThirdPartyScripts } from '$lib/services/thirdPartyScripts';
 
 	export let data: LayoutData;
+
+	onMount(() => {
+		cookieConsent.subscribe((value) => {
+			if (value) {
+				injectThirdPartyScripts();
+			} else if (value === false) {
+				removeThirdPartyScripts();
+			}
+		});
+	});
 
 	const upcomingConcerts = data.concerts
 		.filter((concert) => {
@@ -149,11 +162,8 @@
 	afterNavigate(() => {
 		isOpen = false;
 	});
-
-	// CookieConcent Toastの表示制御
-	let showToast: boolean;
-	$: showToast = false;
 </script>
+
 
 <header>
 	<a href="/">
@@ -201,18 +211,6 @@
 					<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
 				{/each}
 			</li>
-
-			<section class="cookie-container hamburger-cookie-container">
-				<button
-					on:click={function () {
-						showToast = true;
-					}}
-					class="text-link"
-				>
-					Cookieの設定を変更
-				</button>
-				<a class="secondary-link" href="/cookie-policy">Cookieポリシー</a>
-			</section>
 		</ul>
 	</nav>
 </header>
@@ -243,18 +241,6 @@
 			{/each}
 		</ul>
 	</nav>
-
-	<section class="cookie-container">
-		<button
-			on:click={function () {
-				showToast = true;
-			}}
-			class="text-link"
-		>
-			Cookieの設定を変更
-		</button>
-		<a class="secondary-link" href="/cookie-policy">Cookieポリシー</a>
-	</section>
 </aside>
 
 <main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
@@ -273,7 +259,7 @@
 	{/if}
 </main>
 
-<CookieConcent bind:showToast />
+<CookieConcent />
 
 <style>
 	/* Nyanvas用 */
