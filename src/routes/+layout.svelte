@@ -8,11 +8,15 @@
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
+	import cookieSettingsIcon from './cookie-settings.svg';
+	import privacyPolicyIcon from './privacy-policy.svg';
 	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
+	import CookieConsentToast from '$lib/components/CookieConsentToast.svelte';
+	import { cookieConsent } from '$lib/stores/cookieConsent';
 
 	export let data: LayoutData;
 
@@ -105,9 +109,10 @@
 	];
 
 	const snsMenuItems: {
-		url: string;
+		url?: string;
 		icon: string;
 		alt: string;
+		onClick?: () => void;
 	}[] = [
 		{
 			url: 'https://www.instagram.com/orchestracanvastokyo/',
@@ -128,6 +133,16 @@
 			url: 'https://www.youtube.com/channel/UCX2SZ5NViwsaOza3biDNjIw',
 			icon: youtubeIcon,
 			alt: 'YouTube'
+		},
+		{
+			icon: cookieSettingsIcon,
+			alt: 'Cookie設定',
+			onClick: () => cookieConsent.showSettings()
+		},
+		{
+			url: '/privacy',
+			icon: privacyPolicyIcon,
+			alt: 'プライバシーポリシー'
 		}
 	];
 
@@ -193,7 +208,13 @@
 			{/each}
 			<li class="hamburger-sns-container">
 				{#each snsMenuItems as sns}
-					<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+					{#if sns.onClick}
+						<button on:click={sns.onClick} class="sns-button">
+							<img src={sns.icon} alt={sns.alt} width="25px" />
+						</button>
+					{:else}
+						<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+					{/if}
 				{/each}
 			</li>
 		</ul>
@@ -221,7 +242,13 @@
 		<ul>
 			{#each snsMenuItems as item}
 				<li>
-					<a href={item.url}><img src={item.icon} alt={item.alt} width="25px" /></a>
+					{#if item.onClick}
+						<button on:click={item.onClick} class="sns-button">
+							<img src={item.icon} alt={item.alt} width="25px" />
+						</button>
+					{:else}
+						<a href={item.url}><img src={item.icon} alt={item.alt} width="25px" /></a>
+					{/if}
 				</li>
 			{/each}
 		</ul>
@@ -243,6 +270,9 @@
 		</aside>
 	{/if}
 </main>
+
+<!-- Cookie consent toast -->
+<CookieConsentToast />
 
 <style>
 	/* Nyanvas用 */
@@ -598,5 +628,27 @@
 			margin: 0;
 			padding: 0;
 		}
+	}
+
+	/* SNS button styling to match links */
+	.sns-button {
+		-webkit-appearance: none;
+		appearance: none;
+		background: none;
+		border: none;
+		padding: 0;
+		margin: 0;
+		cursor: pointer;
+		display: inline-block;
+		transition: opacity 0.2s ease;
+	}
+
+	.sns-button:hover {
+		opacity: 0.7;
+	}
+
+	.sns-button:focus {
+		outline: 2px solid var(--main-color);
+		outline-offset: 2px;
 	}
 </style>
