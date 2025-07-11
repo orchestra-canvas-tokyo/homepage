@@ -246,7 +246,7 @@ export const newsItems: {
 		date: '2025/5/6',
 		content: '第4期 決算報告書を公開しました。'
 	},
-	
+
 	{
 		url: '/concerts/regular-15',
 		date: '2025/7/12',
