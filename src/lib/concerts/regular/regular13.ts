@@ -36,7 +36,7 @@ export const concert: Concert = {
 		description: '全席指定 1,000円',
 		url: 'https://teket.jp/1776/39057'
 	},
-	showLinkToProgramNote: true
+	showLinkToProgramNote: true,
 	// cspell: disable-next-line
-	// youtubePlaylistId: '●'
+	youtubePlaylistId: 'PLlsZL5V_BM_EgMbMmI4AEKGQ_XqltbNyd'
 };
