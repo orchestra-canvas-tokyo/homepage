@@ -14,5 +14,6 @@
 		"markdown",
 		"svelte"
 	],
-	"eslint.validate": ["eslint"]
+	"eslint.validate": ["eslint"],
+	"vitest.disableWorkspaceWarning": true
 }
