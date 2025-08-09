@@ -16,7 +16,7 @@ export const concert: Concert = {
 		url: 'https://www.mizkie-hall.com/access/'
 	},
 	programs: [
-		{ composer: 'シューマン', title: '弦楽四重奏曲第1番より第1, 2楽章' },
+		{ composer: 'シューマン', title: '弦楽四重奏曲第1番より第1楽章' },
 		{ composer: 'フランツ・シュトラウス', title: 'ノクターン' },
 		{ composer: 'クーツィール', title: 'ホルンとピアノのための変奏曲' },
 		{
