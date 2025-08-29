@@ -59,6 +59,7 @@
 			<span>神山　　怜　様</span>
 			<span>鈴木　辰生　様</span>
 			<span>螺良　修一　様</span>
+			<span>半田　翔希　様</span>
 			<span>山田　千尋　様</span>
 		</div>
 		<div class="halfwidth-supporters-right">
