@@ -32,20 +32,21 @@
 		フォーム送信後、確認メールを送信のうえ、必要に応じてメールにてご返答いたします。<br />
 		なお、メールアドレスが正しく入力されていない場合、返答いたしかねますのでご注意ください。
 	</p>
-	{#if !(data.nextConcert && data.shouldShowFlyerInsertionClosedNotice)}
-		<p>
-			また、当団演奏会にて配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
-			/>
-			詳しくは当フォームよりお問い合わせください。
-		</p>
-	{/if}
-
-	{#if data.nextConcert && data.shouldShowFlyerInsertionClosedNotice}
-		<p>
-			<strong>挟み込み募集終了のお知らせ</strong><br />
-			「{data.nextConcert.title}」の挟み込み募集は終了いたしました。<br />
-			ご応募いただき、ありがとうございました。
-		</p>
+	{#if data.nextConcert}
+		{#if data.shouldShowFlyerInsertionClosedNotice}
+			<p>
+				「{data.nextConcert.title}」にフライヤーを挟み込みいただけます。<br />
+				また、演奏会にて配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
+				/>
+				詳しくは当フォームよりお問い合わせください。
+			</p>
+		{:else}
+			<p>
+				<strong>挟み込み募集終了のお知らせ</strong><br />
+				「{data.nextConcert.title}」の挟み込み募集は終了いたしました。<br />
+				ご応募いただき、ありがとうございました。
+			</p>
+		{/if}
 	{/if}
 
 	<iframe
