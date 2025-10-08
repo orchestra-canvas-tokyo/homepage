@@ -33,7 +33,7 @@
 		なお、メールアドレスが正しく入力されていない場合、返答いたしかねますのでご注意ください。
 	</p>
 	{#if data.nextConcert}
-		{#if data.shouldShowFlyerInsertionClosedNotice}
+		{#if data.shouldShowFlyerInsertionClosedNotice !== data.nextConcert.slug}
 			<p>
 				「{data.nextConcert.title}」にフライヤーを挟み込みいただけます。<br />
 				また、演奏会にて配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
