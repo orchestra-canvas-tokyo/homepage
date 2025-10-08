@@ -4,8 +4,8 @@ import { getNextConcert, isConcertDatePassed } from '$lib/concerts/getNextConcer
 export const load: PageServerLoad = async () => {
 	const nextConcert = getNextConcert();
 
-	// 直近の演奏会があり、演奏会当日以前で、かつ挟み込み募集が終了している場合
-	let shouldShowFlyerInsertionClosedNotice = false;
+	// 直近の挟み込み終了している演奏会
+	let shouldShowFlyerInsertionClosedNotice = 'regular-14';
 
 	if (nextConcert) {
 		const isDatePassed = isConcertDatePassed(nextConcert);
