@@ -4,9 +4,6 @@
 	import Meta from '$lib/components/Meta.svelte';
 
 	export let data: PageServerData;
-
-	// dataプロパティを明示的に参照してESLintエラーを回避
-	$: void data;
 </script>
 
 <Meta title="Contact" canonical="/contact" />
@@ -32,21 +29,21 @@
 		フォーム送信後、確認メールを送信のうえ、必要に応じてメールにてご返答いたします。<br />
 		なお、メールアドレスが正しく入力されていない場合、返答いたしかねますのでご注意ください。
 	</p>
-	{#if data.nextConcert}
-		{#if data.shouldShowFlyerInsertionClosedNotice !== data.nextConcert.slug}
-			<p>
-				「{data.nextConcert.title}」にフライヤーを挟み込みいただけます。<br />
-				また、演奏会にて配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
-				/>
-				詳しくは当フォームよりお問い合わせください。
-			</p>
-		{:else}
-			<p>
-				<strong>挟み込み募集終了のお知らせ</strong><br />
-				「{data.nextConcert.title}」の挟み込み募集は終了いたしました。<br />
-				ご応募いただき、ありがとうございました。
-			</p>
-		{/if}
+	{#if data.flyerInsertionStatus.status === 'recruiting'}
+		<p>
+			<strong>挟み込み募集のお知らせ</strong><br />
+			次回演奏会（{data.flyerInsertionStatus
+				.concertTitle}）にて、フライヤーの挟み込みが可能です。<br />
+			また、演奏会にて配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
+			/>
+			詳しくは当フォームよりお問い合わせください。
+		</p>
+	{:else if data.flyerInsertionStatus.status === 'recruitmentClosed'}
+		<p>
+			<strong>挟み込み募集終了のお知らせ</strong><br />
+			{data.flyerInsertionStatus.concertTitle}での挟み込み募集は終了いたしました。<br />
+			ご応募いただき、ありがとうございました。
+		</p>
 	{/if}
 
 	<iframe

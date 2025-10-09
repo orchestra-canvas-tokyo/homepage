@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import dayjs from 'dayjs';
-import { getNextConcert, isConcertDatePassed } from '../getNextConcert';
+import { isFinished } from '../getConcertBySlug';
 import type { Concert } from '../types';
 
 // concertsモジュールをモック
@@ -45,30 +45,7 @@ vi.mock('../index', () => ({
 	] as Concert[]
 }));
 
-describe('getNextConcert', () => {
-	it('今日以降で最も近い演奏会を取得する', () => {
-		const nextConcert = getNextConcert();
-
-		expect(nextConcert).toBeDefined();
-		expect(nextConcert?.slug).toBe('today-concert');
-	});
-
-	// Note: このテストはモックが正しく動作しないため、スキップ
-	// 実際の環境では期待通りに動作する
-	it.skip('演奏会がない場合はundefinedを返す', async () => {
-		// 空の配列をモック
-		vi.doMock('../index', () => ({
-			concerts: []
-		}));
-
-		// モジュールを再インポート
-		const { getNextConcert: getNextConcertEmpty } = await import('../getNextConcert');
-		const nextConcert = getNextConcertEmpty();
-		expect(nextConcert).toBeUndefined();
-	});
-});
-
-describe('isConcertDatePassed', () => {
+describe('isFinished', () => {
 	const pastConcert: Concert = {
 		slug: 'past-test',
 		title: 'テスト過去演奏会',
@@ -97,14 +74,14 @@ describe('isConcertDatePassed', () => {
 	};
 
 	it('過去の演奏会の場合はtrueを返す', () => {
-		expect(isConcertDatePassed(pastConcert)).toBe(true);
+		expect(isFinished(pastConcert)).toBe(true);
 	});
 
-	it('今日の演奏会の場合はtrueを返す', () => {
-		expect(isConcertDatePassed(todayConcert)).toBe(true);
+	it('今日の演奏会の場合はfalseを返す', () => {
+		expect(isFinished(todayConcert)).toBe(false);
 	});
 
 	it('未来の演奏会の場合はfalseを返す', () => {
-		expect(isConcertDatePassed(futureConcert)).toBe(false);
+		expect(isFinished(futureConcert)).toBe(false);
 	});
 });
