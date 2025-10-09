@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { getConcertBySlug, isFinished } from '$lib/concerts/getConcertBySlug';
+import { getConcertBySlug, isFinished } from '$lib/concerts/utils';
 
 export const load: PageServerLoad = async () => {
 	const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [

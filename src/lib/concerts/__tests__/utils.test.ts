@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import dayjs from 'dayjs';
-import { isFinished } from '../getConcertBySlug';
+import { getConcertBySlug, isFinished } from '../utils';
 import type { Concert } from '../types';
 
 // concertsモジュールをモック
@@ -44,6 +44,23 @@ vi.mock('../index', () => ({
 		}
 	] as Concert[]
 }));
+
+describe('getConcertBySlug', () => {
+	it('指定したslugの演奏会を返す', () => {
+		const concert = getConcertBySlug('today-concert');
+
+		expect(concert).toEqual(
+			expect.objectContaining({
+				slug: 'today-concert',
+				title: '今日の演奏会'
+			})
+		);
+	});
+
+	it('一致するslugがない場合はundefinedを返す', () => {
+		expect(getConcertBySlug('missing-concert')).toBeUndefined();
+	});
+});
 
 describe('isFinished', () => {
 	const pastConcert: Concert = {
