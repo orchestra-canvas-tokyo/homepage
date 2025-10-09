@@ -13,11 +13,11 @@
 | CD                | Cloudflare PagesのGitHub連携                    | デプロイ条件は後述            |
 | アクセス分析      | Cloudflare Web Analytics, Google Search Console |                               |
 
-| 環境       | URL                              | デプロイ条件                                      |
-| ---------- | -------------------------------- | ------------------------------------------------- |
-| 本番       | [https://www.orch-canvas.tokyo/] | `production`ブランチへのプッシュ                  |
-| プレビュー | ブランチごとに発行               | `main`、`develop/*`ブランチへのプッシュ           |
-| 開発       | コンソールに表示                 | `npm run dev`, `npm run build && npm run preview` |
+| 環境       | URL                                                              | デプロイ条件                                      |
+| ---------- | ---------------------------------------------------------------- | ------------------------------------------------- |
+| 本番       | [https://www.orch-canvas.tokyo/](https://www.orch-canvas.tokyo/) | `production`ブランチへのプッシュ                  |
+| プレビュー | ブランチごとに発行                                               | `main`、`develop/*`ブランチへのプッシュ           |
+| 開発       | コンソールに表示                                                 | `npm run dev`, `npm run build && npm run preview` |
 
 その他、各コミットやブランチに対するプレビューURLが発行されます。
 詳細は[Cloudflare ダッシュボード](https://dash.cloudflare.com/940baf35dc60e6a39b351d032b853543/pages/view/homepage)を参照。
@@ -27,35 +27,6 @@
 ```shell
 npm install # 依存関係をインストール
 npm run dev # 開発環境を立ち上げ
-```
-
-### 環境変数ファイルを作成
-
-`.env.local.example`を参考に、`.env.local`をルートディレクトリに作成してください。
-
-実際の環境変数は @horn553 などに聞いてください！
-
-### ローカル環境のD1を作成する
-
-```shell
-npx wrangler d1 create DB
-npx wrangler d1 migrations apply DB
-```
-
-### スキーマ変更時
-
-マイグレーションファイルを作成する
-
-```shell
-npx drizzle-kit generate
-```
-
-各種DBをマイグレートする
-
-```shell
-npx wrangler d1 migrations apply DB
-npx wrangler d1 migrations apply DB --remote --env preview
-npx wrangler d1 migrations apply DB --remote --env production
 ```
 
 ### npm Script一覧
@@ -127,6 +98,30 @@ $ npm run add:concert -- --type regular|chamber --number 999
 
 スライドショーの順序は、演奏会開催日降順となります。
 
+### 挟み込み募集の開始・終了
+
+`/src/routes/contact/+page.server.ts` の変数 `flyerInsertionData` を更新します。
+
+```ts
+// 挟み込み募集開始時
+const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
+	{
+		concertSlug: 'regular-99',
+		status: 'recruiting'
+	}
+];
+
+// 挟み込み募集終了時
+const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
+	{
+		concertSlug: 'regular-99',
+		status: 'recruitmentClosed'
+	}
+];
+```
+
+詳細な仕様は同ファイル内に記載してあります。
+
 ### パッケージの更新
 
 [npm-check-updates](https://www.npmjs.com/package/npm-check-updates)を使うのがよさそうです。
@@ -139,11 +134,7 @@ npm install
 
 ## Contactの仕様
 
-- セッション管理：Cloudflare KV
-- reCAPTCHA v3（[Admin Console](https://www.google.com/recaptcha/admin/site/642565602)）
-- ログ保存：Cloudflare D1
-- メール送信：Resend
-- メール用画像配信：Cloudflare R2
+iframeでお手製のconctactアプリケーションを埋め込んでいます。
 
 ## FAQ
 
