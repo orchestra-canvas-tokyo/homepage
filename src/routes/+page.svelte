@@ -11,7 +11,7 @@
 	export let data: PageServerData;
 
 	const nonRegularDisplayingConcerts: string[] = [];
-	const newConcerts: string[] = [];
+	const newConcerts: string[] = ['regular-15'];
 	const nonNewSlideshowItems = data.concerts
 		.filter((concert) => {
 			// 定期演奏会と直接指定した室内楽演奏会を抽出
