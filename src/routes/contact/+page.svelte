@@ -31,11 +31,13 @@
 	</p>
 	{#if data.flyerInsertionStatus.status === 'recruiting'}
 		<p>
-			<strong>挟み込み募集のお知らせ</strong><br />
+			<strong>パンフレットへの広告刷り込み・フライヤー挟み込み募集のお知らせ</strong><br />
 			次回演奏会（{data.flyerInsertionStatus
-				.concertTitle}）にて、フライヤーの挟み込みが可能です。<br />
-			また、演奏会にて配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
+				.concertTitle}）に配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
 			/>
+        </p>
+        <p>
+            また、フライヤーの挟み込みも行っております。<br />
 			詳しくは当フォームよりお問い合わせください。
 		</p>
 	{:else if data.flyerInsertionStatus.status === 'recruitmentClosed'}
