@@ -30,20 +30,19 @@
 		なお、メールアドレスが正しく入力されていない場合、返答いたしかねますのでご注意ください。
 	</p>
 	{#if data.flyerInsertionStatus.status === 'recruiting'}
+		{@const concertTitle = data.flyerInsertionStatus.concertTitle}
 		<p>
 			<strong>パンフレットへの広告刷り込み・フライヤー挟み込み募集のお知らせ</strong><br />
-			次回演奏会（{data.flyerInsertionStatus
-				.concertTitle}）に配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
+			次回演奏会（{concertTitle}）に配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・1,000円～)。<br
 			/>
-        </p>
-        <p>
-            また、フライヤーの挟み込みも行っております。<br />
+			また、フライヤーの挟み込みも行っております。<br />
 			詳しくは当フォームよりお問い合わせください。
 		</p>
 	{:else if data.flyerInsertionStatus.status === 'recruitmentClosed'}
+		{@const concertTitle = data.flyerInsertionStatus.concertTitle}
 		<p>
 			<strong>挟み込み募集終了のお知らせ</strong><br />
-			{data.flyerInsertionStatus.concertTitle}での挟み込み募集は終了いたしました。<br />
+			次回演奏会（{concertTitle}）での挟み込み募集は終了いたしました。<br />
 			ご応募いただき、ありがとうございました。
 		</p>
 	{/if}
