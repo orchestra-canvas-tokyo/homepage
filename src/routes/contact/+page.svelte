@@ -4,9 +4,6 @@
 	import Meta from '$lib/components/Meta.svelte';
 
 	export let data: PageServerData;
-
-	// dataプロパティを明示的に参照してESLintエラーを回避
-	$: void data;
 </script>
 
 <Meta title="Contact" canonical="/contact" />
@@ -32,18 +29,20 @@
 		フォーム送信後、確認メールを送信のうえ、必要に応じてメールにてご返答いたします。<br />
 		なお、メールアドレスが正しく入力されていない場合、返答いたしかねますのでご注意ください。
 	</p>
-	{#if !(data.nextConcert && data.shouldShowFlyerInsertionClosedNotice)}
+	{#if data.flyerInsertionStatus.status === 'recruiting'}
+		{@const concertTitle = data.flyerInsertionStatus.concertTitle}
 		<p>
-			また、当団演奏会にて配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・〜5,000円)。<br
+			<strong>パンフレットへの広告刷り込み・フライヤー挟み込み募集のお知らせ</strong><br />
+			次回演奏会（{concertTitle}）に配布するプログラムに、広告の刷り込み掲載が可能です(〜A5版・カラー・1,000円～)。<br
 			/>
+			また、フライヤーの挟み込みも行っております。<br />
 			詳しくは当フォームよりお問い合わせください。
 		</p>
-	{/if}
-
-	{#if data.nextConcert && data.shouldShowFlyerInsertionClosedNotice}
+	{:else if data.flyerInsertionStatus.status === 'recruitmentClosed'}
+		{@const concertTitle = data.flyerInsertionStatus.concertTitle}
 		<p>
 			<strong>挟み込み募集終了のお知らせ</strong><br />
-			「{data.nextConcert.title}」の挟み込み募集は終了いたしました。<br />
+			次回演奏会（{concertTitle}）での挟み込み募集は終了いたしました。<br />
 			ご応募いただき、ありがとうございました。
 		</p>
 	{/if}
