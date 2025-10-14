@@ -14,7 +14,12 @@
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
 
-	export let data: LayoutData;
+	interface Props {
+		data: LayoutData;
+		children?: import('svelte').Snippet;
+	}
+
+	let { data, children }: Props = $props();
 
 	const upcomingConcerts = data.concerts
 		.filter((concert) => {
@@ -132,11 +137,13 @@
 	];
 
 	// ハンバーガーメニュー
-	let isOpen: boolean = false;
-	$: transformX = isOpen ? '0' : '300px';
-	$: if (browser) {
-		document.body.style.overflow = isOpen ? 'hidden' : '';
-	}
+	let isOpen = $state(false);
+	let transformX = $derived(isOpen ? '0' : '300px');
+	$effect(() => {
+		if (browser) {
+			document.body.style.overflow = isOpen ? 'hidden' : '';
+		}
+	});
 
 	// ハンバーガーメニューオープン時はスクロールしないように
 	const unsubscribe = page.subscribe(() => {
@@ -229,7 +236,7 @@
 </aside>
 
 <main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
-	<slot />
+	{@render children?.()}
 
 	{#if data.isRoot}
 		<aside class="mobile-news">

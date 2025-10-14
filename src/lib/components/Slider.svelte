@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	export type Slide = {
 		src: string;
 		alt: string;
@@ -10,7 +10,11 @@
 	import Flyer from './Flyer.svelte';
 
 	register();
-	export let slides: Slide[];
+	interface Props {
+		slides: Slide[];
+	}
+
+	let { slides }: Props = $props();
 </script>
 
 <swiper-container centered-slides={true} navigation={true} effect="flip">

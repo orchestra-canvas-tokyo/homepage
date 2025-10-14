@@ -8,10 +8,14 @@
 	import type { YearlyFirstConcerts } from './YearAnchors';
 	import youtubeLogo from './yt_logo_mono_dark.png';
 
-	/** このコンポーネントが表示する演奏会 */
-	export let concert: Concert;
-	/** アンカーリンクを張る、各年最初の演奏会の情報をまとめたオブジェクト */
-	export let yearlyFirstConcert: YearlyFirstConcerts;
+	interface Props {
+		/** このコンポーネントが表示する演奏会 */
+		concert: Concert;
+		/** アンカーリンクを張る、各年最初の演奏会の情報をまとめたオブジェクト */
+		yearlyFirstConcert: YearlyFirstConcerts;
+	}
+
+	let { concert, yearlyFirstConcert }: Props = $props();
 </script>
 
 <!--
@@ -178,7 +182,7 @@
 			letter-spacing: 0.1em;
 		}
 
-		a:has(.youtube-logo) {
+		a:has(:global(.youtube-logo)) {
 			line-height: initial;
 		}
 
@@ -199,10 +203,6 @@
 			height: auto;
 			width: 35vw;
 		}
-	}
-
-	:is(picture):has(.flyer) {
-		line-height: 0;
 	}
 
 	.show-on-mobile {

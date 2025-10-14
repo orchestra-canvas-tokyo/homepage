@@ -8,7 +8,11 @@
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
 
-	export let data: PageServerData;
+	interface Props {
+		data: PageServerData;
+	}
+
+	let { data }: Props = $props();
 
 	const nonRegularDisplayingConcerts: string[] = [];
 	const newConcerts: string[] = ['regular-15'];
@@ -104,8 +108,8 @@
 		</SplideTrack>
 
 		<div class="splide__arrows">
-			<button class="splide__arrow splide__arrow--prev"></button>
-			<button class="splide__arrow splide__arrow--next"></button>
+			<button class="splide__arrow splide__arrow--prev" aria-label="前のスライド"></button>
+			<button class="splide__arrow splide__arrow--next" aria-label="次のスライド"></button>
 		</div>
 	</Splide>
 </div>

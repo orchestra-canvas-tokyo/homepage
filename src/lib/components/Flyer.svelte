@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	export let src: string;
-	export let alt: string;
-	export let lazy: boolean = false;
-	export let width: number | undefined = undefined;
-	export let height: number | undefined = undefined;
+	interface Props {
+		src: string;
+		alt: string;
+		lazy?: boolean;
+		width?: number | undefined;
+		height?: number | undefined;
+	}
+
+	let { src, alt, lazy = false, width = undefined, height = undefined }: Props = $props();
 
 	const commonOptions = [
 		['format', 'auto'],
@@ -13,7 +17,8 @@
 	] satisfies [string, string][];
 	const defaultHeight = 1920;
 
-	$: useCloudflareImages = false;
+	let useCloudflareImages = $state(false);
+
 	onMount(() => {
 		useCloudflareImages = new URL(window.location.href).hostname === 'www.orch-canvas.tokyo';
 	});

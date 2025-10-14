@@ -453,8 +453,7 @@
 	thead {
 		border-bottom: 2px solid;
 	}
-	thead tr th:first-child,
-	thead tr td:first-child {
+	thead tr th:first-child {
 		border-right: 2px solid;
 	}
 	table ul {
