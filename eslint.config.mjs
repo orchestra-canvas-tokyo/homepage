@@ -2,6 +2,7 @@ import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import globals from 'globals';
 import tsParser from '@typescript-eslint/parser';
 import parser from 'svelte-eslint-parser';
+import sveltePlugin from 'eslint-plugin-svelte';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
@@ -32,11 +33,9 @@ export default [
 			'.wrangler'
 		]
 	},
-	...compat.extends(
-		'eslint:recommended',
-		'plugin:@typescript-eslint/recommended',
-		'plugin:svelte/recommended',
-		'prettier'
+	...compat.extends('eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'),
+	...sveltePlugin.configs['flat/recommended'].map((config, index) =>
+		index === 2 ? { ...config, files: ['**/*.svelte'] } : config
 	),
 	{
 		plugins: {
@@ -59,7 +58,16 @@ export default [
 		},
 
 		rules: {
-			'no-irregular-whitespace': ['off']
+			'no-irregular-whitespace': ['off'],
+			'@typescript-eslint/no-unused-expressions': ['off'],
+			'no-unused-expressions': [
+				'error',
+				{
+					allowShortCircuit: true,
+					allowTernary: true,
+					allowTaggedTemplates: true
+				}
+			]
 		}
 	},
 	{
@@ -73,6 +81,10 @@ export default [
 			parserOptions: {
 				parser: '@typescript-eslint/parser'
 			}
+		},
+
+		rules: {
+			'svelte/no-inner-declarations': ['error', 'functions', { blockScopedFunctions: 'allow' }]
 		}
 	}
 ];
