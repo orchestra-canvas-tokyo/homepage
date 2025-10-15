@@ -2,7 +2,7 @@
 	import type { PageServerData } from './$types';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
-	import { resolve } from '$app/paths';
+	import { resolveHref } from '$lib/utils/resolveHref';
 
 	interface Props {
 		data: PageServerData;
@@ -46,7 +46,7 @@
 		<p>
 			>
 			{#if item.url.startsWith('/')}
-				<a href={resolve(item.url)}>{item.title}</a>
+				<a href={resolveHref(item.url)}>{item.title}</a>
 			{:else}
 				<a href={item.url} rel="external">{item.title}</a>
 			{/if}

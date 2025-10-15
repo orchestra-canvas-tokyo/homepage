@@ -2,7 +2,7 @@
 	import type { PageServerData } from './$types';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
-	import { resolve } from '$app/paths';
+	import { resolveHref } from '$lib/utils/resolveHref';
 
 	interface Props {
 		data: PageServerData;
@@ -44,7 +44,7 @@
 	<p>第{data.fiscalYearNumber}期（{data.duration}）につき、次のとおり報告いたします。</p>
 	<p>
 		{#if data.pdf.startsWith('/')}
-			<a href={resolve(data.pdf)}>PDFファイル</a>
+			<a href={resolveHref(data.pdf)}>PDFファイル</a>
 		{:else}
 			<a href={data.pdf} rel="external">PDFファイル</a>
 		{/if}

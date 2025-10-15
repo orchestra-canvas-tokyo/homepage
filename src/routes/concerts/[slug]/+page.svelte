@@ -4,7 +4,8 @@
 	import dayjs from 'dayjs';
 	import 'dayjs/locale/ja';
 	import { getConcertShortName, getEncoreName } from '$lib/concerts/generateContentsToDisplay';
-	import { resolve } from '$app/paths';
+	import { getProgramKey } from '$lib/concerts/getProgramKey';
+	import { resolveHref } from '$lib/utils/resolveHref';
 	import Meta from '$lib/components/Meta.svelte';
 	import Slider from '$lib/components/Slider.svelte';
 	import Flyer from '$lib/components/Flyer.svelte';
@@ -65,13 +66,15 @@
 		<dt>場所</dt>
 		<dd>
 			<p>{data.place.name}</p>
-			<p>
-				{#if data.place.url.startsWith('/')}
-					<a href={resolve(data.place.url)}>交通アクセス</a>
-				{:else}
-					<a href={data.place.url} rel="external">交通アクセス</a>
-				{/if}
-			</p>
+			{#if data.place.url}
+				<p>
+					{#if data.place.url.startsWith('/')}
+						<a href={resolveHref(data.place.url)}>交通アクセス</a>
+					{:else}
+						<a href={data.place.url} rel="external">交通アクセス</a>
+					{/if}
+				</p>
+			{/if}
 		</dd>
 		{#if data.conductor}
 			<dt>指揮</dt>
@@ -79,7 +82,7 @@
 				{#if data.conductor.url}
 					<p>
 						{#if data.conductor.url.startsWith('/')}
-							<a href={resolve(data.conductor.url)}>{data.conductor.name}</a>
+							<a href={resolveHref(data.conductor.url)}>{data.conductor.name}</a>
 						{:else}
 							<a href={data.conductor.url} rel="external">{data.conductor.name}</a>
 						{/if}
@@ -95,7 +98,7 @@
 				{#if data.soloist.url}
 					<p>
 						{#if data.soloist.url.startsWith('/')}
-							<a href={resolve(data.soloist.url)}>{data.soloist.name}</a>
+							<a href={resolveHref(data.soloist.url)}>{data.soloist.name}</a>
 						{:else}
 							<a href={data.soloist.url} rel="external">{data.soloist.name}</a>
 						{/if}
@@ -111,7 +114,7 @@
 				<p>未定</p>
 			{:else if data.type === 'regular'}
 				<dl class="programs">
-					{#each data.programs as program (program.id ?? program.title ?? program.composer)}
+					{#each data.programs as program, programIndex (getProgramKey(program, programIndex))}
 						<dt>
 							<p>{program.composer}</p>
 							{#if program.arranger}
@@ -129,7 +132,7 @@
 			{:else}
 				<!-- 室内楽演奏会 -->
 				<div class="programs chamber-programs">
-					{#each data.programs as program (program.id ?? program.title ?? program.composer)}
+					{#each data.programs as program, programIndex (getProgramKey(program, programIndex))}
 						{#if program.arranger}
 							<p>{program.composer}（{program.arranger}編） / {program.title}</p>
 						{:else}
@@ -146,7 +149,7 @@
 					{#if credit.image}
 						{#if credit.url}
 							{#if credit.url.startsWith('/')}
-								<a href={resolve(credit.url)} class="credit-image-link">
+								<a href={resolveHref(credit.url)} class="credit-image-link">
 									<span>{credit.name}</span>
 									<img
 										class="inline-icon"
@@ -179,7 +182,7 @@
 						{/if}
 					{:else if credit.url}
 						{#if credit.url.startsWith('/')}
-							<a href={resolve(credit.url)}>{credit.name}</a>
+							<a href={resolveHref(credit.url)}>{credit.name}</a>
 						{:else}
 							<a href={credit.url} rel="external">{credit.name}</a>
 						{/if}
@@ -195,7 +198,7 @@
 				<dd>{data.ticket.description}</dd>
 			{:else}
 				<dd>
-					{#each data.ticket.description as line, index (index)}
+					{#each data.ticket.description as line, index (`${line}-${index}`)}
 						{line}<br />
 					{/each}
 				</dd>
@@ -221,7 +224,7 @@
 	data.ticket && data.ticket.url && (dayjs(data.dateTime.date).isAfter(dayjs()) || dayjs(data.dateTime.date).isSame(dayjs(), 'day'))}
 		<div class="spacer"></div>
 		{#if data.ticket.url.startsWith('/')}
-			<a href={resolve(data.ticket.url)} class="full-width-button">
+			<a href={resolveHref(data.ticket.url)} class="full-width-button">
 				<img alt="teketロゴ" class="teket-logo" />でチケット購入
 			</a>
 		{:else}

@@ -7,7 +7,8 @@
 	import type { Concert } from '$lib/concerts/types';
 	import type { YearlyFirstConcerts } from './YearAnchors';
 	import youtubeLogo from './yt_logo_mono_dark.png';
-	import { resolve } from '$app/paths';
+	import { resolveHref } from '$lib/utils/resolveHref';
+	import { getProgramKey } from '$lib/concerts/getProgramKey';
 
 	interface Props {
 		/** このコンポーネントが表示する演奏会 */
@@ -35,7 +36,7 @@
 			<p class="hide-on-mobile">
 				{getConcertDateDayToDisplay(concert)}
 			</p>
-			<h2><a href={resolve(`/concerts/${concert.slug}`)}>{concert.title}</a></h2>
+			<h2><a href={resolveHref(`/concerts/${concert.slug}`)}>{concert.title}</a></h2>
 			<p class="hide-on-mobile">{concert.place.name}</p>
 			{#if concert.conductor}
 				<p>指揮：{concert.conductor?.name}</p>
@@ -56,7 +57,7 @@
 			{#if !concert.programs}
 				<p>未定</p>
 			{:else}
-				{#each concert.programs as program (program.id ?? program.title ?? program.composer)}
+				{#each concert.programs as program, programIndex (getProgramKey(program, programIndex))}
 					<p class="hide-on-mobile">
 						{#if program.composer}
 							{program.composer}
@@ -97,7 +98,7 @@
 	</div>
 
 	{#if concert.flyers}
-		<a href={resolve(`/concerts/${concert.slug}`)}>
+		<a href={resolveHref(`/concerts/${concert.slug}`)}>
 			<div class="flyer-container">
 				<Flyer src={concert.flyers[0].src} alt="{concert.title}のフライヤー" />
 			</div>

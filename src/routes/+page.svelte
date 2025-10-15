@@ -7,7 +7,7 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
-	import { resolve } from '$app/paths';
+	import { resolveHref } from '$lib/utils/resolveHref';
 
 	interface Props {
 		data: PageServerData;
@@ -99,7 +99,7 @@
 					{@const width = 595}
 					{@const height = 842}
 					<SplideSlide>
-						<a href={resolve(`/concerts/${slug}`)} class="slide-link">
+						<a href={resolveHref(`/concerts/${slug}`)} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
 							<Flyer src={flyers[0].src} alt="{title}のフライヤー" lazy={true} {width} {height} />
 						</a>

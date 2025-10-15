@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { resolveHref } from '$lib/utils/resolveHref';
 
 	interface Props {
 		/** パンくずの各要素を定義する配列 */
@@ -35,7 +35,7 @@
 			<li>
 				{#if segment.url}
 					{#if segment.url.startsWith('/')}
-						<a href={resolve(segment.url)} class={segment.lang}>{segment.title}</a>
+						<a href={resolveHref(segment.url)} class={segment.lang}>{segment.title}</a>
 					{:else}
 						<a href={segment.url} class={segment.lang} rel="external">{segment.title}</a>
 					{/if}

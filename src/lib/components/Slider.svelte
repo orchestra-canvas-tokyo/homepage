@@ -8,13 +8,12 @@
 </script>
 
 <script lang="ts">
-	import { register } from 'swiper/element';
-	import { Navigation, EffectFlip, Lazy } from 'swiper/modules';
+	import { register } from 'swiper/element/bundle';
 	import { browser } from '$app/environment';
 	import Flyer from './Flyer.svelte';
 
 	if (browser) {
-		register({ modules: [Navigation, EffectFlip, Lazy] });
+		register();
 	}
 	interface Props {
 		slides: Slide[];

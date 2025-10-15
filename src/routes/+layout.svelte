@@ -13,7 +13,7 @@
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
-	import { resolve } from '$app/paths';
+	import { resolveHref } from '$lib/utils/resolveHref';
 
 	interface Props {
 		data: LayoutData;
@@ -154,6 +154,8 @@
 		}
 	];
 
+	const latestNewsItem = newsItems.length > 0 ? newsItems[newsItems.length - 1] : null;
+
 	// ハンバーガーメニュー
 	let isOpen = $state(false);
 	let transformX = $derived(isOpen ? '0' : '300px');
@@ -176,7 +178,7 @@
 </script>
 
 <header>
-	<a href={resolve('/')}>
+	<a href={resolveHref('/')}>
 		<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
 		<img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
 	</a>
@@ -198,7 +200,7 @@
 				<li>
 					{#if menuItem.url}
 						{#if menuItem.url.startsWith('/')}
-							<a href={resolve(menuItem.url)} class={menuItem.lang}>{menuItem.title}</a>
+							<a href={resolveHref(menuItem.url)} class={menuItem.lang}>{menuItem.title}</a>
 						{:else}
 							<a href={menuItem.url} class={menuItem.lang} rel="external">{menuItem.title}</a>
 						{/if}
@@ -207,11 +209,11 @@
 					{/if}
 					{#if menuItem.children}
 						<ul>
-							{#each menuItem.children as child, childIndex (`${menuItem.title}-${childIndex}`)}
+							{#each menuItem.children as child (child.url ?? `${menuItem.title}-${child.title}`)}
 								<li>
 									{#if child.url}
 										{#if child.url.startsWith('/')}
-											<a href={resolve(child.url)} class={child.lang}>{child.title}</a>
+											<a href={resolveHref(child.url)} class={child.lang}>{child.title}</a>
 										{:else}
 											<a href={child.url} class={child.lang} rel="external">{child.title}</a>
 										{/if}
@@ -227,7 +229,7 @@
 			<li class="hamburger-sns-container">
 				{#each snsMenuItems as sns (sns.url)}
 					{#if sns.url.startsWith('/')}
-						<a href={resolve(sns.url)}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+						<a href={resolveHref(sns.url)}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
 					{:else}
 						<a href={sns.url} rel="external"><img src={sns.icon} alt={sns.alt} width="25px" /></a>
 					{/if}
@@ -240,12 +242,12 @@
 <aside class="sidebar">
 	{#if data.isRoot}
 		<div class="news">
-			<h2 class="en"><a href={resolve('/news')}>news!</a></h2>
+			<h2 class="en"><a href={resolveHref('/news')}>news!</a></h2>
 			<ul>
 				{#each newsItems.slice(-2).reverse() as item, index (`${item.url ?? item.date}-${index}`)}
 					<li>
 						{#if item.url.startsWith('/')}
-							<a href={resolve(item.url)}>
+							<a href={resolveHref(item.url)}>
 								<span class="date">{item.date}</span>
 								<p>{item.content}</p>
 							</a>
@@ -266,7 +268,7 @@
 			{#each snsMenuItems as item (item.url)}
 				<li>
 					{#if item.url.startsWith('/')}
-						<a href={resolve(item.url)}><img src={item.icon} alt={item.alt} width="25px" /></a>
+						<a href={resolveHref(item.url)}><img src={item.icon} alt={item.alt} width="25px" /></a>
 					{:else}
 						<a href={item.url} rel="external"><img src={item.icon} alt={item.alt} width="25px" /></a
 						>
@@ -284,16 +286,18 @@
 		<aside class="mobile-news">
 			<div class="news">
 				<h2 class="en">news!</h2>
-				{#if newsItems.slice(-1)[0].url.startsWith('/')}
-					<a href={resolve(newsItems.slice(-1)[0].url)}>
-						<span class="date">{newsItems.slice(-1)[0].date}</span>
-						<p>{newsItems.slice(-1)[0].content}</p>
-					</a>
-				{:else}
-					<a href={newsItems.slice(-1)[0].url} rel="external">
-						<span class="date">{newsItems.slice(-1)[0].date}</span>
-						<p>{newsItems.slice(-1)[0].content}</p>
-					</a>
+				{#if latestNewsItem}
+					{#if latestNewsItem.url.startsWith('/')}
+						<a href={resolveHref(latestNewsItem.url)}>
+							<span class="date">{latestNewsItem.date}</span>
+							<p>{latestNewsItem.content}</p>
+						</a>
+					{:else}
+						<a href={latestNewsItem.url} rel="external">
+							<span class="date">{latestNewsItem.date}</span>
+							<p>{latestNewsItem.content}</p>
+						</a>
+					{/if}
 				{/if}
 			</div>
 		</aside>
