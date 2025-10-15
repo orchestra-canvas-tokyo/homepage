@@ -44,12 +44,8 @@
 	<h2>決算報告</h2>
 	{#each items as item (item.url)}
 		<p>
-			>
-			{#if item.url.startsWith('/')}
-				<a href={resolveHref(item.url)}>{item.title}</a>
-			{:else}
-				<a href={item.url} rel="external">{item.title}</a>
-			{/if}
+			<a href={resolveHref(item.url)}>{item.title}</a>
+
 			（{item.duration}）
 		</p>
 	{/each}

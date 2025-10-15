@@ -212,11 +212,7 @@
 							{#each menuItem.children as child (child.url ?? `${menuItem.title}-${child.title}`)}
 								<li>
 									{#if child.url}
-										{#if child.url.startsWith('/')}
-											<a href={resolveHref(child.url)} class={child.lang}>{child.title}</a>
-										{:else}
-											<a href={child.url} class={child.lang} rel="external">{child.title}</a>
-										{/if}
+										<a href={resolveHref(child.url)} class={child.lang}>{child.title}</a>
 									{:else}
 										<span class={child.lang}>{child.title}</span>
 									{/if}
@@ -228,11 +224,7 @@
 			{/each}
 			<li class="hamburger-sns-container">
 				{#each snsMenuItems as sns (sns.url)}
-					{#if sns.url.startsWith('/')}
-						<a href={resolveHref(sns.url)}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
-					{:else}
-						<a href={sns.url} rel="external"><img src={sns.icon} alt={sns.alt} width="25px" /></a>
-					{/if}
+					<a href={resolveHref(sns.url)}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
 				{/each}
 			</li>
 		</ul>
@@ -246,17 +238,10 @@
 			<ul>
 				{#each newsItems.slice(-2).reverse() as item, index (`${item.url ?? item.date}-${index}`)}
 					<li>
-						{#if item.url.startsWith('/')}
-							<a href={resolveHref(item.url)}>
-								<span class="date">{item.date}</span>
-								<p>{item.content}</p>
-							</a>
-						{:else}
-							<a href={item.url} rel="external">
-								<span class="date">{item.date}</span>
-								<p>{item.content}</p>
-							</a>
-						{/if}
+						<a href={resolveHref(item.url)}>
+							<span class="date">{item.date}</span>
+							<p>{item.content}</p>
+						</a>
 					</li>
 				{/each}
 			</ul>
@@ -267,12 +252,7 @@
 		<ul>
 			{#each snsMenuItems as item (item.url)}
 				<li>
-					{#if item.url.startsWith('/')}
-						<a href={resolveHref(item.url)}><img src={item.icon} alt={item.alt} width="25px" /></a>
-					{:else}
-						<a href={item.url} rel="external"><img src={item.icon} alt={item.alt} width="25px" /></a
-						>
-					{/if}
+					<a href={resolveHref(item.url)}><img src={item.icon} alt={item.alt} width="25px" /></a>
 				</li>
 			{/each}
 		</ul>
@@ -287,17 +267,10 @@
 			<div class="news">
 				<h2 class="en">news!</h2>
 				{#if latestNewsItem}
-					{#if latestNewsItem.url.startsWith('/')}
-						<a href={resolveHref(latestNewsItem.url)}>
-							<span class="date">{latestNewsItem.date}</span>
-							<p>{latestNewsItem.content}</p>
-						</a>
-					{:else}
-						<a href={latestNewsItem.url} rel="external">
-							<span class="date">{latestNewsItem.date}</span>
-							<p>{latestNewsItem.content}</p>
-						</a>
-					{/if}
+					<a href={resolveHref(latestNewsItem.url)}>
+						<span class="date">{latestNewsItem.date}</span>
+						<p>{latestNewsItem.content}</p>
+					</a>
 				{/if}
 			</div>
 		</aside>

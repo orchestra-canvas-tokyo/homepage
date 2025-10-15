@@ -34,11 +34,7 @@
 		{#each segments as segment (segment.url ?? segment.title)}
 			<li>
 				{#if segment.url}
-					{#if segment.url.startsWith('/')}
-						<a href={resolveHref(segment.url)} class={segment.lang}>{segment.title}</a>
-					{:else}
-						<a href={segment.url} class={segment.lang} rel="external">{segment.title}</a>
-					{/if}
+					<a href={resolveHref(segment.url)} class={segment.lang}>{segment.title}</a>
 				{:else}
 					<span class={segment.lang}>{segment.title}</span>
 				{/if}

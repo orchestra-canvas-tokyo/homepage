@@ -15,8 +15,16 @@
 
 	let { data }: Props = $props();
 
+	// スライドショーの内容を準備する
+
+	// # 設定項目
+	// 定期演奏会はすべて自動抽出される
+
+	// 定期演奏会でないが、スライドショーに表示する演奏会(slug)
 	const nonRegularDisplayingConcerts: string[] = [];
+	// NEW! をつける演奏会(slug)
 	const newConcerts: string[] = ['regular-15'];
+
 	const nonNewSlideshowItems = data.concerts
 		.filter((concert) => {
 			// 定期演奏会と直接指定した室内楽演奏会を抽出
@@ -30,6 +38,7 @@
 			// 日付降順
 			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? 1 : -1;
 		});
+
 	const newSlideshowItems = data.concerts
 		.filter((concert) => {
 			// newをつける演奏会を抽出
@@ -39,6 +48,7 @@
 			// ここは開催日が近い順に：日付昇順
 			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
 		});
+
 	const slideshowItems = [...newSlideshowItems, ...nonNewSlideshowItems]
 		.map((concert) => {
 			return {

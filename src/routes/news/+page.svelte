@@ -44,17 +44,10 @@
 	<ul class="news-list">
 		{#each separatedNewsItems[page] as news, index (news.url ?? `${news.date}-${index}`)}
 			<li class="news-item">
-				{#if news.url.startsWith('/')}
-					<a href={resolveHref(news.url)} class="news-box">
-						<div class="news-date">{news.date}</div>
-						<div class="news-content">{news.content}</div>
-					</a>
-				{:else}
-					<a href={news.url} class="news-box" rel="external">
-						<div class="news-date">{news.date}</div>
-						<div class="news-content">{news.content}</div>
-					</a>
-				{/if}
+				<a href={resolveHref(news.url)} class="news-box">
+					<div class="news-date">{news.date}</div>
+					<div class="news-content">{news.content}</div>
+				</a>
 			</li>
 		{/each}
 	</ul>

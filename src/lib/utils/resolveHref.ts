@@ -1,4 +1,4 @@
-import { base } from '$app/paths';
+import { resolve } from 'path';
 
 /**
  * Resolve a possibly root-relative URL to include the configured base path.
@@ -6,7 +6,7 @@ import { base } from '$app/paths';
  */
 export function resolveHref(url: string): string {
 	if (url.startsWith('/')) {
-		return `${base}${url}`;
+		return resolve(url);
 	}
 
 	return url;

@@ -148,27 +148,15 @@
 				<dd>
 					{#if credit.image}
 						{#if credit.url}
-							{#if credit.url.startsWith('/')}
-								<a href={resolveHref(credit.url)} class="credit-image-link">
-									<span>{credit.name}</span>
-									<img
-										class="inline-icon"
-										style="max-height: {credit.image.maxHeight};"
-										src={credit.image.src}
-										alt=""
-									/>
-								</a>
-							{:else}
-								<a href={credit.url} class="credit-image-link" rel="external">
-									<span>{credit.name}</span>
-									<img
-										class="inline-icon"
-										style="max-height: {credit.image.maxHeight};"
-										src={credit.image.src}
-										alt=""
-									/>
-								</a>
-							{/if}
+							<a href={resolveHref(credit.url)} class="credit-image-link">
+								<span>{credit.name}</span>
+								<img
+									class="inline-icon"
+									style="max-height: {credit.image.maxHeight};"
+									src={credit.image.src}
+									alt=""
+								/>
+							</a>
 						{:else}
 							<span class="credit-image-link">
 								<span>{credit.name}</span>
@@ -181,11 +169,7 @@
 							</span>
 						{/if}
 					{:else if credit.url}
-						{#if credit.url.startsWith('/')}
-							<a href={resolveHref(credit.url)}>{credit.name}</a>
-						{:else}
-							<a href={credit.url} rel="external">{credit.name}</a>
-						{/if}
+						<a href={resolveHref(credit.url)}>{credit.name}</a>
 					{:else}
 						<span>{credit.name}</span>
 					{/if}
@@ -223,15 +207,9 @@
 	{#if // チケット情報があり、開催日が未来か今日だったら
 	data.ticket && data.ticket.url && (dayjs(data.dateTime.date).isAfter(dayjs()) || dayjs(data.dateTime.date).isSame(dayjs(), 'day'))}
 		<div class="spacer"></div>
-		{#if data.ticket.url.startsWith('/')}
-			<a href={resolveHref(data.ticket.url)} class="full-width-button">
-				<img alt="teketロゴ" class="teket-logo" />でチケット購入
-			</a>
-		{:else}
-			<a href={data.ticket.url} class="full-width-button">
-				<img alt="teketロゴ" class="teket-logo" />でチケット購入
-			</a>
-		{/if}
+		<a href={resolveHref(data.ticket.url)} class="full-width-button">
+			<img alt="teketロゴ" class="teket-logo" />でチケット購入
+		</a>
 	{/if}
 
 	{#if data.youtubePlaylistId}
