@@ -7,11 +7,24 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import { resolveHref } from '$lib/utils/resolveHref';
 
-	export let data: PageServerData;
+	interface Props {
+		data: PageServerData;
+	}
 
+	let { data }: Props = $props();
+
+	// スライドショーの内容を準備する
+
+	// # 設定項目
+	// 定期演奏会はすべて自動抽出される
+
+	// 定期演奏会でないが、スライドショーに表示する演奏会(slug)
 	const nonRegularDisplayingConcerts: string[] = [];
+	// NEW! をつける演奏会(slug)
 	const newConcerts: string[] = ['regular-15'];
+
 	const nonNewSlideshowItems = data.concerts
 		.filter((concert) => {
 			// 定期演奏会と直接指定した室内楽演奏会を抽出
@@ -25,6 +38,7 @@
 			// 日付降順
 			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? 1 : -1;
 		});
+
 	const newSlideshowItems = data.concerts
 		.filter((concert) => {
 			// newをつける演奏会を抽出
@@ -34,6 +48,7 @@
 			// ここは開催日が近い順に：日付昇順
 			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
 		});
+
 	const slideshowItems = [...newSlideshowItems, ...nonNewSlideshowItems]
 		.map((concert) => {
 			return {
@@ -88,13 +103,13 @@
 		on:move={updatePaginationColor}
 	>
 		<SplideTrack>
-			{#each slideshowItems as { title, flyers, slug, isNew }}
+			{#each slideshowItems as { title, flyers, slug, isNew } (slug ?? title)}
 				{#if flyers}
 					<!-- A版のサイズのみを想定 -->
 					{@const width = 595}
 					{@const height = 842}
 					<SplideSlide>
-						<a href={`/concerts/${slug}`} class="slide-link">
+						<a href={resolveHref(`/concerts/${slug}`)} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
 							<Flyer src={flyers[0].src} alt="{title}のフライヤー" lazy={true} {width} {height} />
 						</a>
@@ -104,8 +119,8 @@
 		</SplideTrack>
 
 		<div class="splide__arrows">
-			<button class="splide__arrow splide__arrow--prev"></button>
-			<button class="splide__arrow splide__arrow--next"></button>
+			<button class="splide__arrow splide__arrow--prev" aria-label="前のスライド"></button>
+			<button class="splide__arrow splide__arrow--next" aria-label="次のスライド"></button>
 		</div>
 	</Splide>
 </div>

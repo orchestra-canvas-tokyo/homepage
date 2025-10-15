@@ -3,8 +3,13 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import dayjs from 'dayjs';
 	import Meta from '$lib/components/Meta.svelte';
+	import { resolveHref } from '$lib/utils/resolveHref';
 
-	export let data: PageServerData;
+	interface Props {
+		data: PageServerData;
+	}
+
+	let { data }: Props = $props();
 	const sliceNumber = 10; //１ページに表示するnewsの数
 
 	const newsItems = data.newsItems
@@ -14,7 +19,7 @@
 	const separatedNewsItems = new Array(pageLength) // slice_number個ずつに切り分け
 		.fill(null)
 		.map((_, i) => newsItems.slice(i * sliceNumber, (i + 1) * sliceNumber));
-	let page = 0;
+	let page = $state(0);
 </script>
 
 <Meta title="News" canonical="/news" />
@@ -37,9 +42,9 @@
 
 <article>
 	<ul class="news-list">
-		{#each separatedNewsItems[page] as news}
+		{#each separatedNewsItems[page] as news, index (news.url ?? `${news.date}-${index}`)}
 			<li class="news-item">
-				<a href={news.url} class="news-box">
+				<a href={resolveHref(news.url)} class="news-box">
 					<div class="news-date">{news.date}</div>
 					<div class="news-content">{news.content}</div>
 				</a>
@@ -51,7 +56,7 @@
 		<div class="page-button">
 			{#if page != 0}
 				<button
-					on:click={() => {
+					onclick={() => {
 						if (page > 0) page -= 1;
 					}}
 				>
@@ -65,7 +70,7 @@
 		<div class="page-button right">
 			{#if page != pageLength - 1}
 				<button
-					on:click={() => {
+					onclick={() => {
 						if (page < pageLength - 1) page += 1;
 					}}
 				>

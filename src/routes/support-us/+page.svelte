@@ -4,6 +4,7 @@
 	import hollyWoodLatte from './hollywood-latte.png';
 	import mizuya from './mizuya.png';
 	import pdf from './ご支援のお願い.pdf';
+	import { resolveHref } from '$lib/utils/resolveHref';
 
 	import youTubeTotalViewCount from './youtube_total_view_count.txt?raw';
 	const displayingYouTubeTotalViewCount = `${
@@ -333,7 +334,11 @@
 	</div>
 
 	<p style="margin-top: 40px;">
-		<a href={pdf}> 当リリースのPDF版 </a>
+		{#if pdf.startsWith('/')}
+			<a href={resolveHref(pdf)}> 当リリースのPDF版 </a>
+		{:else}
+			<a href={pdf} rel="external"> 当リリースのPDF版 </a>
+		{/if}
 	</p>
 </article>
 
@@ -453,8 +458,7 @@
 	thead {
 		border-bottom: 2px solid;
 	}
-	thead tr th:first-child,
-	thead tr td:first-child {
+	thead tr th:first-child {
 		border-right: 2px solid;
 	}
 	table ul {

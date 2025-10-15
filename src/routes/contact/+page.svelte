@@ -3,7 +3,11 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
 
-	export let data: PageServerData;
+	interface Props {
+		data: PageServerData;
+	}
+
+	let { data }: Props = $props();
 </script>
 
 <Meta title="Contact" canonical="/contact" />
@@ -53,7 +57,7 @@
 		height="635"
 		frameborder="0"
 		title="お問い合わせフォーム"
-	/>
+	></iframe>
 </article>
 
 <style>

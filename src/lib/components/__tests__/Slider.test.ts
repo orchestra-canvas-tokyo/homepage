@@ -92,18 +92,15 @@ describe('lazyロード機能', () => {
 			}
 		});
 
-		// Assert: スライド要素のlazy属性を確認
-		const slideElements = container.querySelectorAll('swiper-slide');
+		// Assert: 各スライド内の画像のloading属性を確認
+		const flyerImages = container.querySelectorAll('swiper-slide img');
 
-		// 最初のスライドは lazy="false" または lazy 属性なし
-		const firstSlideHtml = slideElements[0].outerHTML;
-		expect(
-			firstSlideHtml.includes('lazy="false"') || !firstSlideHtml.includes('lazy=')
-		).toBeTruthy();
+		// 最初のスライドは即時ロード（loading属性なし）
+		expect(flyerImages[0].getAttribute('loading')).toBeNull();
 
-		// 2番目以降のスライドは lazy="true"
-		for (let i = 1; i < slideElements.length; i++) {
-			expect(slideElements[i].outerHTML).toContain('lazy="true"');
+		// 2番目以降のスライドは loading="lazy"
+		for (let i = 1; i < flyerImages.length; i++) {
+			expect(flyerImages[i].getAttribute('loading')).toBe('lazy');
 		}
 	});
 });

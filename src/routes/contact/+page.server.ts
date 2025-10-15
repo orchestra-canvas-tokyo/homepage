@@ -2,6 +2,7 @@ import type { PageServerLoad } from './$types';
 import { getConcertBySlug, isFinished } from '$lib/concerts/utils';
 
 export const load: PageServerLoad = async () => {
+	// 挟み込み募集・募集終了案内の表示設定
 	const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
 		{
 			concertSlug: 'regular-15',

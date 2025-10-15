@@ -2,10 +2,14 @@
 	import type { ConcertType } from '$lib/concerts/types';
 	import type { YearlyFirstConcerts } from './YearAnchors';
 
-	/** 年と対応する演奏会の一覧 */
-	export let yearlyFirstConcerts: YearlyFirstConcerts;
-	/** 演奏会種別 */
-	export let concertType: ConcertType;
+	interface Props {
+		/** 年と対応する演奏会の一覧 */
+		yearlyFirstConcerts: YearlyFirstConcerts;
+		/** 演奏会種別 */
+		concertType: ConcertType;
+	}
+
+	let { yearlyFirstConcerts, concertType }: Props = $props();
 </script>
 
 <!--
@@ -14,7 +18,7 @@
 -->
 
 <p class="year-anchors hide-on-mobile">
-	{#each Object.values(yearlyFirstConcerts) as year}
+	{#each Object.values(yearlyFirstConcerts) as year (year)}
 		<a href="#year-{year}-{concertType}">{year}</a>
 	{/each}
 </p>

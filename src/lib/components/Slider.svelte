@@ -1,23 +1,31 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	export type Slide = {
 		src: string;
 		alt: string;
 	};
+
+	export const ssr = false;
 </script>
 
 <script lang="ts">
 	import { register } from 'swiper/element/bundle';
+	import { browser } from '$app/environment';
 	import Flyer from './Flyer.svelte';
 
-	register();
-	export let slides: Slide[];
+	if (browser) {
+		register();
+	}
+	interface Props {
+		slides: Slide[];
+	}
+
+	let { slides }: Props = $props();
 </script>
 
 <swiper-container centered-slides={true} navigation={true} effect="flip">
-	{#each slides as slide, index}
-		{@const lazy = 0 < index}
-		<swiper-slide {lazy}>
-			<Flyer src={slide.src} alt={slide.alt} {lazy} />
+	{#each slides as slide, index (slide.src ?? index)}
+		<swiper-slide>
+			<Flyer src={slide.src} alt={slide.alt} lazy={index > 0} />
 		</swiper-slide>
 	{/each}
 </swiper-container>

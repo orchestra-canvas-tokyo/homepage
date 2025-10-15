@@ -1,6 +1,12 @@
 <script lang="ts">
-	/** パンくずの各要素を定義する配列 */
-	export let segments: { title: string; lang: 'en' | 'ja'; url?: string }[] = [];
+	import { resolveHref } from '$lib/utils/resolveHref';
+
+	interface Props {
+		/** パンくずの各要素を定義する配列 */
+		segments?: { title: string; lang: 'en' | 'ja'; url?: string }[];
+	}
+
+	let { segments = [] }: Props = $props();
 </script>
 
 <!--
@@ -25,10 +31,10 @@
 
 <nav aria-label="breadcrumb" class="hide-on-mobile">
 	<ol>
-		{#each segments as segment}
+		{#each segments as segment (segment.url ?? segment.title)}
 			<li>
 				{#if segment.url}
-					<a href={segment.url} class={segment.lang}>{segment.title}</a>
+					<a href={resolveHref(segment.url)} class={segment.lang}>{segment.title}</a>
 				{:else}
 					<span class={segment.lang}>{segment.title}</span>
 				{/if}

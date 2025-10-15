@@ -7,11 +7,17 @@
 	import type { Concert } from '$lib/concerts/types';
 	import type { YearlyFirstConcerts } from './YearAnchors';
 	import youtubeLogo from './yt_logo_mono_dark.png';
+	import { resolveHref } from '$lib/utils/resolveHref';
+	import { getProgramKey } from '$lib/concerts/getProgramKey';
 
-	/** このコンポーネントが表示する演奏会 */
-	export let concert: Concert;
-	/** アンカーリンクを張る、各年最初の演奏会の情報をまとめたオブジェクト */
-	export let yearlyFirstConcert: YearlyFirstConcerts;
+	interface Props {
+		/** このコンポーネントが表示する演奏会 */
+		concert: Concert;
+		/** アンカーリンクを張る、各年最初の演奏会の情報をまとめたオブジェクト */
+		yearlyFirstConcert: YearlyFirstConcerts;
+	}
+
+	let { concert, yearlyFirstConcert }: Props = $props();
 </script>
 
 <!--
@@ -30,7 +36,7 @@
 			<p class="hide-on-mobile">
 				{getConcertDateDayToDisplay(concert)}
 			</p>
-			<h2><a href="/concerts/{concert.slug}">{concert.title}</a></h2>
+			<h2><a href={resolveHref(`/concerts/${concert.slug}`)}>{concert.title}</a></h2>
 			<p class="hide-on-mobile">{concert.place.name}</p>
 			{#if concert.conductor}
 				<p>指揮：{concert.conductor?.name}</p>
@@ -51,7 +57,7 @@
 			{#if !concert.programs}
 				<p>未定</p>
 			{:else}
-				{#each concert.programs as program}
+				{#each concert.programs as program, programIndex (getProgramKey(program, programIndex))}
 					<p class="hide-on-mobile">
 						{#if program.composer}
 							{program.composer}
@@ -92,7 +98,7 @@
 	</div>
 
 	{#if concert.flyers}
-		<a href="/concerts/{concert.slug}">
+		<a href={resolveHref(`/concerts/${concert.slug}`)}>
 			<div class="flyer-container">
 				<Flyer src={concert.flyers[0].src} alt="{concert.title}のフライヤー" />
 			</div>
@@ -178,7 +184,7 @@
 			letter-spacing: 0.1em;
 		}
 
-		a:has(.youtube-logo) {
+		a:has(:global(.youtube-logo)) {
 			line-height: initial;
 		}
 
@@ -199,10 +205,6 @@
 			height: auto;
 			width: 35vw;
 		}
-	}
-
-	:is(picture):has(.flyer) {
-		line-height: 0;
 	}
 
 	.show-on-mobile {

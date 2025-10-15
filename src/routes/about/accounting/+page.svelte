@@ -2,8 +2,13 @@
 	import type { PageServerData } from './$types';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
+	import { resolveHref } from '$lib/utils/resolveHref';
 
-	export let data: PageServerData;
+	interface Props {
+		data: PageServerData;
+	}
+
+	let { data }: Props = $props();
 
 	const items: { title: string; duration: string; url: string }[] = data.reports.map(
 		(report, index) => ({
@@ -37,8 +42,12 @@
 <article>
 	<h1 class="en">accounting</h1>
 	<h2>決算報告</h2>
-	{#each items as item}
-		<p>> <a href={item.url}>{item.title}</a>（{item.duration}）</p>
+	{#each items as item (item.url)}
+		<p>
+			<a href={resolveHref(item.url)}>{item.title}</a>
+
+			（{item.duration}）
+		</p>
 	{/each}
 </article>
 
