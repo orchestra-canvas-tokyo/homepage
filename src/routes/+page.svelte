@@ -7,6 +7,7 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		data: PageServerData;
@@ -92,13 +93,13 @@
 		on:move={updatePaginationColor}
 	>
 		<SplideTrack>
-			{#each slideshowItems as { title, flyers, slug, isNew }}
+			{#each slideshowItems as { title, flyers, slug, isNew } (slug ?? title)}
 				{#if flyers}
 					<!-- A版のサイズのみを想定 -->
 					{@const width = 595}
 					{@const height = 842}
 					<SplideSlide>
-						<a href={`/concerts/${slug}`} class="slide-link">
+						<a href={resolve(`/concerts/${slug}`)} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
 							<Flyer src={flyers[0].src} alt="{title}のフライヤー" lazy={true} {width} {height} />
 						</a>

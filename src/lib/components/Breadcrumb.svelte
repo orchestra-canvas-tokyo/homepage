@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
 	interface Props {
 		/** パンくずの各要素を定義する配列 */
 		segments?: { title: string; lang: 'en' | 'ja'; url?: string }[];
@@ -29,10 +31,14 @@
 
 <nav aria-label="breadcrumb" class="hide-on-mobile">
 	<ol>
-		{#each segments as segment}
+		{#each segments as segment (segment.url ?? segment.title)}
 			<li>
 				{#if segment.url}
-					<a href={segment.url} class={segment.lang}>{segment.title}</a>
+					{#if segment.url.startsWith('/')}
+						<a href={resolve(segment.url)} class={segment.lang}>{segment.title}</a>
+					{:else}
+						<a href={segment.url} class={segment.lang} rel="external">{segment.title}</a>
+					{/if}
 				{:else}
 					<span class={segment.lang}>{segment.title}</span>
 				{/if}

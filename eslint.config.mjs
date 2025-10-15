@@ -84,7 +84,8 @@ export default [
 		},
 
 		rules: {
-			'svelte/no-inner-declarations': ['error', 'functions', { blockScopedFunctions: 'allow' }]
+			'svelte/no-inner-declarations': ['error', 'functions', { blockScopedFunctions: 'allow' }],
+			'svelte/no-navigation-without-resolve': ['error', { ignoreLinks: true }]
 		}
 	}
 ];

@@ -10,3 +10,4 @@ vite.config.ts.timestamp-*
 /.wrangler
 .dev.vars
 /coverage
+/.serena

@@ -18,7 +18,7 @@
 -->
 
 <p class="year-anchors hide-on-mobile">
-	{#each Object.values(yearlyFirstConcerts) as year}
+	{#each Object.values(yearlyFirstConcerts) as year (year)}
 		<a href="#year-{year}-{concertType}">{year}</a>
 	{/each}
 </p>

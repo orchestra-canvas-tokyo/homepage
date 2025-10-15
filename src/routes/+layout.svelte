@@ -13,6 +13,7 @@
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		data: LayoutData;
@@ -21,19 +22,40 @@
 
 	let { data, children }: Props = $props();
 
-	const upcomingConcerts = data.concerts
-		.filter((concert) => {
-			// 開催日が未来か今日
-			return (
-				dayjs(concert.dateTime.date).isAfter(dayjs()) ||
-				dayjs(concert.dateTime.date).isSame(dayjs(), 'day')
-			);
-		})
-		.sort((a, b) => {
-			// 日付昇順
-			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
-		});
+	const upcomingConcerts = (() => {
+		const filtered = data.concerts
+			.filter((concert) => {
+				// 開催日が未来か今日
+				return (
+					dayjs(concert.dateTime.date).isAfter(dayjs()) ||
+					dayjs(concert.dateTime.date).isSame(dayjs(), 'day')
+				);
+			})
+			.sort((a, b) => {
+				// 日付昇順
+				return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
+			});
 
+		const deduped: typeof filtered = [];
+		for (const concert of filtered) {
+			if (deduped.some((item) => item.slug === concert.slug)) continue;
+			deduped.push(concert);
+		}
+
+		return deduped;
+	})();
+	const upcomingConcertMenuItems = Array.from(
+		new Map(
+			upcomingConcerts.map((concert) => [
+				concert.slug,
+				{
+					title: concert.title,
+					url: `/concerts/${concert.slug}`,
+					lang: 'ja' as const
+				}
+			])
+		).values()
+	);
 	// メニュー項目の定義
 	interface MenuItem {
 		title: string;
@@ -64,11 +86,7 @@
 			title: 'concerts',
 			lang: 'en',
 			children: [
-				...upcomingConcerts.map((concert) => ({
-					title: concert.title,
-					url: `/concerts/${concert.slug}`,
-					lang: 'ja' as const
-				})),
+				...upcomingConcertMenuItems,
 				{
 					title: '過去の演奏会',
 					url: '/concerts/archives',
@@ -158,7 +176,7 @@
 </script>
 
 <header>
-	<a href="/">
+	<a href={resolve('/')}>
 		<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
 		<img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
 	</a>
@@ -176,19 +194,27 @@
 		</label>
 
 		<ul style="--translate-x: {transformX}">
-			{#each headerMenuItems as menuItem}
+			{#each headerMenuItems as menuItem (menuItem.url ?? menuItem.title)}
 				<li>
 					{#if menuItem.url}
-						<a href={menuItem.url} class={menuItem.lang}>{menuItem.title}</a>
+						{#if menuItem.url.startsWith('/')}
+							<a href={resolve(menuItem.url)} class={menuItem.lang}>{menuItem.title}</a>
+						{:else}
+							<a href={menuItem.url} class={menuItem.lang} rel="external">{menuItem.title}</a>
+						{/if}
 					{:else}
 						<span class={menuItem.lang}>{menuItem.title}</span>
 					{/if}
 					{#if menuItem.children}
 						<ul>
-							{#each menuItem.children as child}
+							{#each menuItem.children as child, childIndex (`${menuItem.title}-${childIndex}`)}
 								<li>
 									{#if child.url}
-										<a href={child.url} class={child.lang}>{child.title}</a>
+										{#if child.url.startsWith('/')}
+											<a href={resolve(child.url)} class={child.lang}>{child.title}</a>
+										{:else}
+											<a href={child.url} class={child.lang} rel="external">{child.title}</a>
+										{/if}
 									{:else}
 										<span class={child.lang}>{child.title}</span>
 									{/if}
@@ -199,8 +225,12 @@
 				</li>
 			{/each}
 			<li class="hamburger-sns-container">
-				{#each snsMenuItems as sns}
-					<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+				{#each snsMenuItems as sns (sns.url)}
+					{#if sns.url.startsWith('/')}
+						<a href={resolve(sns.url)}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+					{:else}
+						<a href={sns.url} rel="external"><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+					{/if}
 				{/each}
 			</li>
 		</ul>
@@ -210,14 +240,21 @@
 <aside class="sidebar">
 	{#if data.isRoot}
 		<div class="news">
-			<h2 class="en"><a href="/news">news!</a></h2>
+			<h2 class="en"><a href={resolve('/news')}>news!</a></h2>
 			<ul>
-				{#each newsItems.slice(-2).reverse() as item}
+				{#each newsItems.slice(-2).reverse() as item, index (`${item.url ?? item.date}-${index}`)}
 					<li>
-						<a href={item.url}>
-							<span class="date">{item.date}</span>
-							<p>{item.content}</p>
-						</a>
+						{#if item.url.startsWith('/')}
+							<a href={resolve(item.url)}>
+								<span class="date">{item.date}</span>
+								<p>{item.content}</p>
+							</a>
+						{:else}
+							<a href={item.url} rel="external">
+								<span class="date">{item.date}</span>
+								<p>{item.content}</p>
+							</a>
+						{/if}
 					</li>
 				{/each}
 			</ul>
@@ -226,9 +263,14 @@
 
 	<nav>
 		<ul>
-			{#each snsMenuItems as item}
+			{#each snsMenuItems as item (item.url)}
 				<li>
-					<a href={item.url}><img src={item.icon} alt={item.alt} width="25px" /></a>
+					{#if item.url.startsWith('/')}
+						<a href={resolve(item.url)}><img src={item.icon} alt={item.alt} width="25px" /></a>
+					{:else}
+						<a href={item.url} rel="external"><img src={item.icon} alt={item.alt} width="25px" /></a
+						>
+					{/if}
 				</li>
 			{/each}
 		</ul>
@@ -242,10 +284,17 @@
 		<aside class="mobile-news">
 			<div class="news">
 				<h2 class="en">news!</h2>
-				<a href={newsItems.slice(-1)[0].url}>
-					<span class="date">{newsItems.slice(-1)[0].date}</span>
-					<p>{newsItems.slice(-1)[0].content}</p>
-				</a>
+				{#if newsItems.slice(-1)[0].url.startsWith('/')}
+					<a href={resolve(newsItems.slice(-1)[0].url)}>
+						<span class="date">{newsItems.slice(-1)[0].date}</span>
+						<p>{newsItems.slice(-1)[0].content}</p>
+					</a>
+				{:else}
+					<a href={newsItems.slice(-1)[0].url} rel="external">
+						<span class="date">{newsItems.slice(-1)[0].date}</span>
+						<p>{newsItems.slice(-1)[0].content}</p>
+					</a>
+				{/if}
 			</div>
 		</aside>
 	{/if}

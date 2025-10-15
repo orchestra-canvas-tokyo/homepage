@@ -4,6 +4,7 @@
 	import hollyWoodLatte from './hollywood-latte.png';
 	import mizuya from './mizuya.png';
 	import pdf from './ご支援のお願い.pdf';
+	import { resolve } from '$app/paths';
 
 	import youTubeTotalViewCount from './youtube_total_view_count.txt?raw';
 	const displayingYouTubeTotalViewCount = `${
@@ -333,7 +334,11 @@
 	</div>
 
 	<p style="margin-top: 40px;">
-		<a href={pdf}> 当リリースのPDF版 </a>
+		{#if pdf.startsWith('/')}
+			<a href={resolve(pdf)}> 当リリースのPDF版 </a>
+		{:else}
+			<a href={pdf} rel="external"> 当リリースのPDF版 </a>
+		{/if}
 	</p>
 </article>
 

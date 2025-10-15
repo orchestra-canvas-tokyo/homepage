@@ -2,6 +2,7 @@
 	import type { PageServerData } from './$types';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		data: PageServerData;
@@ -41,8 +42,16 @@
 <article>
 	<h1 class="en">accounting</h1>
 	<h2>決算報告</h2>
-	{#each items as item}
-		<p>> <a href={item.url}>{item.title}</a>（{item.duration}）</p>
+	{#each items as item (item.url)}
+		<p>
+			>
+			{#if item.url.startsWith('/')}
+				<a href={resolve(item.url)}>{item.title}</a>
+			{:else}
+				<a href={item.url} rel="external">{item.title}</a>
+			{/if}
+			（{item.duration}）
+		</p>
 	{/each}
 </article>
 

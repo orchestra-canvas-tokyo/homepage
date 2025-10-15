@@ -130,10 +130,10 @@
 			id="tab-panel-regular"
 			class="tab-panel {checkedConcertType === 'regular' ? 'active' : ''}"
 		>
-			<YearAnchors yearlyFirstConcerts={yearlyFirstRegularConcerts} concertType={'regular'} />
+			<YearAnchors yearlyFirstConcerts={yearlyFirstRegularConcerts} concertType="regular" />
 			<div class="spacer"></div>
 
-			{#each regularConcerts as concert}
+			{#each regularConcerts as concert (concert.slug ?? concert.title)}
 				<Concert {concert} yearlyFirstConcert={yearlyFirstRegularConcerts} />
 			{/each}
 		</div>
@@ -141,10 +141,10 @@
 			id="tab-panel-chamber"
 			class="tab-panel {checkedConcertType === 'chamber' ? 'active' : ''}"
 		>
-			<YearAnchors yearlyFirstConcerts={yearlyFirstChamberConcerts} concertType={'chamber'} />
+			<YearAnchors yearlyFirstConcerts={yearlyFirstChamberConcerts} concertType="chamber" />
 			<div class="spacer"></div>
 
-			{#each chamberConcerts as concert}
+			{#each chamberConcerts as concert (concert.slug ?? concert.title)}
 				<Concert {concert} yearlyFirstConcert={yearlyFirstChamberConcerts} />
 			{/each}
 		</div>

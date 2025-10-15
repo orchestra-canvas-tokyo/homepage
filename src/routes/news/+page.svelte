@@ -3,6 +3,7 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import dayjs from 'dayjs';
 	import Meta from '$lib/components/Meta.svelte';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		data: PageServerData;
@@ -41,12 +42,19 @@
 
 <article>
 	<ul class="news-list">
-		{#each separatedNewsItems[page] as news}
+		{#each separatedNewsItems[page] as news, index (`news-${index}`)}
 			<li class="news-item">
-				<a href={news.url} class="news-box">
-					<div class="news-date">{news.date}</div>
-					<div class="news-content">{news.content}</div>
-				</a>
+				{#if news.url.startsWith('/')}
+					<a href={resolve(news.url)} class="news-box">
+						<div class="news-date">{news.date}</div>
+						<div class="news-content">{news.content}</div>
+					</a>
+				{:else}
+					<a href={news.url} class="news-box" rel="external">
+						<div class="news-date">{news.date}</div>
+						<div class="news-content">{news.content}</div>
+					</a>
+				{/if}
 			</li>
 		{/each}
 	</ul>
