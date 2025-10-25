@@ -38,7 +38,15 @@
 			また、フライヤーの挟み込みも行っております。<br />
 			詳しくは当フォームよりお問い合わせください。
 		</p>
-	{:else if data.flyerInsertionStatus.status === 'recruitmentClosed'}
+	{:else if data.flyerInsertionStatus.status === 'onlyRecruitmentClosed'}
+		{@const concertTitle = data.flyerInsertionStatus.concertTitle}
+		<p>
+			<strong>挟み込み募集終了のお知らせ</strong><br />
+			次回演奏会（{concertTitle}）での挟み込み募集は終了いたしました。<br />
+			置きチラシは引き続き募集しております。<br />
+			詳しくは当フォームよりお問い合わせください。
+		</p>
+	{:else if data.flyerInsertionStatus.status === 'allClosed'}
 		{@const concertTitle = data.flyerInsertionStatus.concertTitle}
 		<p>
 			<strong>挟み込み募集終了のお知らせ</strong><br />
