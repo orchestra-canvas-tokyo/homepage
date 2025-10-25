@@ -5,7 +5,7 @@ export const load: PageServerLoad = async () => {
 	const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
 		{
 			concertSlug: 'regular-15',
-			status: 'recruiting'
+			status: 'onlyRecruitmentClosed'
 		}
 	];
 	const flyerInsertionStatus = getFlyerInsertionStatus(...flyerInsertionData);
@@ -51,20 +51,20 @@ export const load: PageServerLoad = async () => {
  *   - 案内対象の演奏会の開催日を取得
  *
  * 2. 条件分岐
- * |                    | 案内状況：募集中 | 案内状況：募集終了 |
- * | ------------------ | ---------------- | ------------------ |
- * | ～指定の演奏会当日 | 募集案内を掲載   | 募集終了案内を掲載 |
- * | 指定の演奏会翌日～ | 掲載なし         | 掲載なし           |
+ * |                    | 案内状況：募集中 | 案内状況：募集終了（挟み込みのみ・すべて） |
+ * | ------------------ | ---------------- | ------------------------------------------ |
+ * | ～指定の演奏会当日 | 募集案内を掲載   | 募集終了案内を掲載                         |
+ * | 指定の演奏会翌日～ | 掲載なし         | 掲載なし                                   |
  */
 function getFlyerInsertionStatus(data: {
 	concertSlug: string;
-	status: 'recruiting' | 'recruitmentClosed';
+	status: 'recruiting' | 'onlyRecruitmentClosed' | 'allClosed';
 }):
 	| {
 			status: 'notAvailable';
 	  }
 	| {
-			status: 'recruiting' | 'recruitmentClosed';
+			status: 'recruiting' | 'onlyRecruitmentClosed' | 'allClosed';
 			concertTitle: string;
 	  } {
 	// 挟み込み案内対象演奏会に関する情報を取得
@@ -77,8 +77,5 @@ function getFlyerInsertionStatus(data: {
 	if (isFinished(targetConcert)) {
 		return { status: 'notAvailable' };
 	}
-	if (data.status === 'recruiting') {
-		return { status: 'recruiting', concertTitle: targetConcert.title };
-	}
-	return { status: 'recruitmentClosed', concertTitle: targetConcert.title };
+	return { status: data.status, concertTitle: targetConcert.title };
 }
