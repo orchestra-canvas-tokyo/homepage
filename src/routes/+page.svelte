@@ -7,6 +7,7 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import { onMount } from 'svelte';
 
 	export let data: PageServerData;
 
@@ -72,11 +73,50 @@
 			}
 		});
 	};
+
+	// imgタグの属性として指定するサイズを計算する
+	const A4_ASPECT_RATIO = 2 ^ (-1 / 2); // A4版のみを想定
+	let slideshowEl: HTMLDivElement | null = null;
+	let flyerHeight: number | undefined;
+	let flyerWidth: number | undefined;
+
+	const updateFlyerDimensions = () => {
+		if (!slideshowEl) return;
+		const slideImage = slideshowEl.querySelector('img');
+		if (!slideImage) return;
+		const maxHeightValue = getComputedStyle(slideImage).maxHeight;
+		const parsedHeight = parseFloat(maxHeightValue);
+		const resolvedHeight = Number.isFinite(parsedHeight)
+			? parsedHeight
+			: slideImage.getBoundingClientRect().height;
+		if (!resolvedHeight) return;
+		flyerHeight = Math.round(resolvedHeight);
+		flyerWidth = Math.round(resolvedHeight * A4_ASPECT_RATIO);
+	};
+
+	onMount(() => {
+		updateFlyerDimensions();
+		const resizeObserver =
+			typeof ResizeObserver !== 'undefined' && slideshowEl
+				? new ResizeObserver(() => updateFlyerDimensions())
+				: null;
+		if (resizeObserver && slideshowEl) {
+			resizeObserver.observe(slideshowEl);
+		}
+		const handleResize = () => updateFlyerDimensions();
+		window.addEventListener('resize', handleResize);
+		return () => {
+			if (resizeObserver) {
+				resizeObserver.disconnect();
+			}
+			window.removeEventListener('resize', handleResize);
+		};
+	});
 </script>
 
 <Meta title="" canonical="/" />
 
-<div class="slideshow">
+<div class="slideshow" bind:this={slideshowEl}>
 	<Splide
 		hasTrack={false}
 		options={{
@@ -90,13 +130,16 @@
 		<SplideTrack>
 			{#each slideshowItems as { title, flyers, slug, isNew }}
 				{#if flyers}
-					<!-- A版のサイズのみを想定 -->
-					{@const width = 595}
-					{@const height = 842}
 					<SplideSlide>
 						<a href={`/concerts/${slug}`} class="slide-link">
 							<span class="en">{isNew ? 'new!' : ''}</span>
-							<Flyer src={flyers[0].src} alt="{title}のフライヤー" lazy={true} {width} {height} />
+							<Flyer
+								src={flyers[0].src}
+								alt="{title}のフライヤー"
+								lazy={true}
+								width={flyerWidth}
+								height={flyerHeight}
+							/>
 						</a>
 					</SplideSlide>
 				{/if}
