@@ -255,7 +255,7 @@
 	}
 
 	.content {
-		max-width: 1920px;
+		width: min(100dvw, 1280px);
 	}
 
 	/* Nyanvas用 */
