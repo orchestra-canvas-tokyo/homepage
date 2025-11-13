@@ -508,7 +508,6 @@
 		flex-direction: column;
 		justify-content: flex-end;
 		gap: 45px;
-		background-color: var(--background-color);
 	}
 	.sidebar ul {
 		display: flex;
