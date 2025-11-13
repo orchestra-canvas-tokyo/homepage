@@ -557,8 +557,12 @@
 		margin-bottom: var(--window-padding);
 	}
 	@media (max-width: 950px) {
-		.non-root-main {
+		main {
 			margin-left: unset;
+			overflow-x: hidden;
+		}
+
+		.non-root-main {
 			padding: 0 var(--window-padding);
 		}
 	}

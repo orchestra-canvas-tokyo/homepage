@@ -202,6 +202,12 @@
 		object-fit: contain;
 	}
 
+	@media (max-width: 950px) {
+		.slide-link :global(img) {
+			max-width: calc(var(--slideshow-width) - 40px);
+		}
+	}
+
 	:global(.splide__slide) {
 		display: flex;
 		justify-content: center;
