@@ -258,17 +258,6 @@
 		width: min(100dvw, 1280px);
 	}
 
-	/* Nyanvas用 */
-	:global(canvas) {
-		position: fixed;
-		top: 0;
-		left: 0;
-	}
-	main {
-		z-index: 100;
-		overflow-y: hidden;
-	}
-
 	:global(body) {
 		color: var(--main-color);
 		background-color: var(--background-color);
