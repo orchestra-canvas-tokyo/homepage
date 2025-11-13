@@ -109,6 +109,16 @@
 </div>
 
 <style>
+	/* Nyanvas用 */
+	:global(canvas) {
+		position: fixed;
+		top: 0;
+		left: 0;
+	}
+	:global(main) {
+		z-index: 100;
+	}
+
 	.container {
 		display: flex;
 		justify-content: center;
