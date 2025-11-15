@@ -256,5 +256,10 @@ export const newsItems: {
 		url: '/concerts/regular-15',
 		date: '2025/9/19',
 		content: '第15回定期演奏会のフライヤーを公開しました。'
+	},
+	{
+		url: '/concerts/regular-15',
+		date: '2025/11/11',
+		content: '第15回定期演奏会の曲目解説を公開しました。'
 	}
 ];
