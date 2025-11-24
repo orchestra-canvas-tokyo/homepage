@@ -10,7 +10,7 @@ export const concert: Concert = {
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	// flyer: flyer,
-	dateTime: { date: '2026-3-15', time: '昼公演' },
+	dateTime: { date: '2026-3-15', time: '13:15開場 14:00開演' },
 	place: {
 		name: '府中の森芸術劇場 どりーむホール',
 		url: 'https://www.fuchu-cpf.or.jp/theater/access/index.html'
