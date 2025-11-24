@@ -18,15 +18,17 @@ export const concert: Concert = {
 	conductor: {
 		name: '神成 大輝'
 	},
-	// programs: [
-	// 	{
-	// 		composer: '●',
-	// 		title: '●'
-	// 	}
-	// ],
+	programs: [
+		{ composer: 'マルケス', title: 'ダンソン 第2番' },
+		{ composer: 'サン＝サーンス', title: '交響詩《死の舞踏》作品40' },
+		{ composer: 'バルトーク', title: 'ルーマニア民俗舞曲 Sz. 68' },
+		{ composer: 'リスト', title: 'メフィスト・ワルツ第1番「村の居酒屋での踊り」' },
+		{ composer: 'ヨハン・シュトラウス', title: '皇帝円舞曲' },
+		{ composer: 'バーンスタイン', title: '「ウェストサイドストーリー」よりシンフォニックダンス' }
+	],
 	ticket: {
-		description: '未定'
-		// url: '●?uid=hp'
+		description: '全席指定 1,000円',
+		url: 'https://teket.jp/1776/59938?uid=hp'
 	},
 	showLinkToProgramNote: false
 	// cspell: disable-next-line
