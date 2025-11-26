@@ -35,9 +35,19 @@ export const concert: Concert = {
 			composer: 'チャイコフスキー',
 			title: 'ヴァイオリン協奏曲 ニ長調 作品35'
 		},
+		// {
+		// 	composer: 'ピアソラ',
+		// 	title: 'タンゴ・エチュード 第3番',
+		// 	encoreType: 'soloist'
+		// },
 		{
 			composer: 'ストラヴィンスキー',
 			title: 'バレエ音楽『火の鳥』組曲（1945年版）'
+		},
+		{
+			composer: 'チャイコフスキー',
+			title: '歌劇『エフゲニー・オネーギン』より ポロネーズ',
+			encoreType: 'standard'
 		}
 	],
 	ticket: {
