@@ -112,7 +112,6 @@
 	}
 
 	.concert {
-		/* width: min(calc(100dvw - var(--aside-width) - var(--window-padding)), 900px); */
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
