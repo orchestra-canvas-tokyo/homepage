@@ -9,6 +9,29 @@
 	const displayingYouTubeTotalViewCount = `${
 		Math.floor(parseInt(youTubeTotalViewCount) / 100000) * 10
 	}万回`;
+
+	const supporters: string[] = [
+		'内田　明美子　様',
+		'柿沼　威司　様',
+		'上條　義昭　様',
+		'神山　和子　様',
+		'神山　　怜　様',
+		'鈴木　辰生　様',
+		'螺良　修一　様',
+		'半田　翔希　様',
+		'山田　千尋　様',
+		'吉田　裕之　様',
+		'和田　　愛　様',
+		'和田　　究　様',
+		'渡邉　信也　様',
+		'H. H.　様',
+		'S. N.　様'
+	];
+
+	// 半数ずつ左右に配置する
+	// 奇数件の場合は、左側を1件多くする
+	const supportersOnLeftSide = supporters.slice(0, (supporters.length + 1) / 2);
+	const supportersOnRightSide = supporters.slice((supporters.length + 1) / 2);
 </script>
 
 <Meta title="ご支援のお願い" canonical="/support-us" />
@@ -54,22 +77,14 @@
 			<a href="https://royal-marriage.shop/">西田ジュエリーデザイン</a>
 		</div>
 		<div class="halfwidth-supporters-left">
-			<span>柿沼　威司　様</span>
-			<span>上條　義昭　様</span>
-			<span>神山　和子　様</span>
-			<span>神山　　怜　様</span>
-			<span>鈴木　辰生　様</span>
-			<span>螺良　修一　様</span>
-			<span>半田　翔希　様</span>
+			{#each supportersOnLeftSide as supporter}
+				<span>{supporter}</span>
+			{/each}
 		</div>
 		<div class="halfwidth-supporters-right">
-			<span>山田　千尋　様</span>
-			<span>吉田　裕之　様</span>
-			<span>和田　　愛　様</span>
-			<span>和田　　究　様</span>
-			<span>渡邉　信也　様</span>
-			<span>H. H.　様</span>
-			<span>S. N.　様</span>
+			{#each supportersOnRightSide as supporter}
+				<span>{supporter}</span>
+			{/each}
 		</div>
 		<div class="fullwidth-supporters">（他匿名8名様）</div>
 	</div>
