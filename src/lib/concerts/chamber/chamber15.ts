@@ -12,12 +12,11 @@ export const concert: Concert = {
 	// flyer: flyer,
 	dateTime: { date: '2026-1-11', time: '13:30開場 14:00開演' },
 	place: {
-		name: '横浜市戸塚区民文化センター さくらホール',
+		name: '戸塚区民文化センターさくらプラザ・ホール (4階)',
 		url: 'https://totsuka.hall-info.jp/access/'
 	},
 	programs: [
 		{ composer: 'ポッパー', title: '2つのチェロのための組曲より第4曲' },
-		{ composer: 'ブラームス', title: '弦楽六重奏曲第1番より第4楽章' },
 		{ composer: 'イベール', title: '3つの小品' },
 		{
 			composer: 'ドヴォルザーク (ウォルター編)',
