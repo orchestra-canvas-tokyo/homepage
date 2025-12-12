@@ -12,7 +12,7 @@ export const concert: Concert = {
 	// flyer: flyer,
 	dateTime: { date: '2026-1-11', time: '13:30開場 14:00開演' },
 	place: {
-		name: '戸塚区民文化センターさくらプラザ・ホール (4階)',
+		name: '横浜市戸塚区民文化センターさくらプラザ・ホール（４階）',
 		url: 'https://totsuka.hall-info.jp/access/'
 	},
 	programs: [
@@ -27,8 +27,8 @@ export const concert: Concert = {
 		{ composer: 'ドホナーニ', title: 'ピアノ五重奏曲第2番' }
 	],
 	ticket: {
-		description: '未定'
-		// url: '●?uid=hp'
+		description: '入場無料',
+		url: 'https://teket.jp/1776/61699?uid=hp'
 	},
 	showLinkToProgramNote: false
 	// cspell: disable-next-line
