@@ -1,6 +1,6 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
-// import flyer from './images/flyers/regular-16.png';
+import flyer from './images/flyers/regular-16.png';
 
 const type = 'regular';
 const number = 16;
@@ -9,7 +9,7 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
-	// flyer: flyer,
+	flyers: [{ src: flyer, alt: 'フライヤー' }],
 	dateTime: { date: '2026-3-15', time: '13:15開場 14:00開演' },
 	place: {
 		name: '府中の森芸術劇場 どりーむホール',
