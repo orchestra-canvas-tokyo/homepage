@@ -27,6 +27,11 @@ export interface Concert {
 	number: number;
 	slug: string;
 	title: string;
+	// 演奏会に関する臨時のお知らせ（未指定なら表示しない）
+	message?: {
+		title: string;
+		body: string;
+	};
 	flyers?: Flyer[];
 	dateTime: {
 		date: string;

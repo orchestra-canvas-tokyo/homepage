@@ -35,6 +35,14 @@
 	<h1 class="en">concerts</h1>
 	<h2>{data.title}</h2>
 
+	{#if data.message}
+		<!-- 臨時のお知らせはタイトル直下に表示 -->
+		<section class="concert-message">
+			<h3>{data.message.title}</h3>
+			<p class="concert-message-body">{data.message.body}</p>
+		</section>
+	{/if}
+
 	{#if data.flyers}
 		<div class="flyer-container">
 			{#if data.flyers.length > 1}
@@ -44,8 +52,6 @@
 			{/if}
 		</div>
 	{/if}
-
-	<div class="spacer" />
 
 	<dl>
 		<dt>日時</dt>
@@ -201,6 +207,22 @@
 		font-size: 2em;
 		font-weight: normal;
 	}
+	.concert-message {
+		border: 1px solid var(--main-color);
+		border-radius: 12px;
+		padding: 18px 22px;
+		margin: 0 0 40px;
+	}
+	.concert-message h3 {
+		margin: 0 0 10px;
+		font-size: 1.25em;
+		font-weight: normal;
+	}
+	.concert-message-body {
+		/* 改行コードを反映して表示する */
+		white-space: pre-line;
+		margin: 0;
+	}
 
 	@media (max-width: 950px) {
 		h1 {
@@ -240,6 +262,7 @@
 	}
 
 	.flyer-container :global(img) {
+		margin-bottom: 40px;
 		max-width: min(100%, 700px);
 		height: auto;
 	}
