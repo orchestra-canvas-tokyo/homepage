@@ -9,6 +9,18 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
+	message: {
+		title: '【お知らせ】演奏曲目数の変更',
+		body: `本日演奏を予定しておりました曲目から、出演者の体調不良のため、演奏曲数が変更となります。
+以下の3曲にて演奏会を開催いたします。
+
+ドホナーニ / ピアノ五重奏曲第2番
+ブラームス / ピアノ四重奏曲第1番より第4楽章
+ハイドン / 弦楽四重奏曲第63番「日の出」より
+
+急な変更となり、大変申し訳ございません。
+短い時間とはなりますが、お楽しみいただければ幸いです。`
+	},
 	// flyer: flyer,
 	dateTime: { date: '2026-1-11', time: '13:30開場 14:00開演' },
 	place: {
