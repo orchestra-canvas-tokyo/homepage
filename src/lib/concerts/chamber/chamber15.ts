@@ -11,7 +11,7 @@ export const concert: Concert = {
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	message: {
 		title: '【お知らせ】演奏曲目数の変更',
-		body: `本日演奏を予定しておりました曲目から、出演者の体調不良のため、演奏曲数が変更となります。
+		body: `出演者の体調不良のため、演奏曲数が変更となります。
 以下の3曲にて演奏会を開催いたします。
 
 ドホナーニ / ピアノ五重奏曲第2番
