@@ -266,5 +266,10 @@ export const newsItems: {
 		url: '/concerts/regular-16',
 		date: '2025/11/24',
 		content: '第16回定期演奏会の詳細情報を公開しました。'
+	},
+	{
+		url: '/concerts/chamber-15',
+		date: '2026/1/11',
+		content: '第15回室内楽演奏会の演奏曲目数の変更について'
 	}
 ];
