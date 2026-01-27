@@ -55,11 +55,7 @@
 		font-size: 2.2em;
 		margin-bottom: 80px;
 	}
-	@media (max-width: 950px) {
-		h1 {
-			font-size: 2em;
-		}
-	}
+
 	@media (max-width: 950px) {
 		h1 {
 			font-size: 2em;
