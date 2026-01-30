@@ -74,7 +74,7 @@
 			<img class="supporter-logo" src={mizuya} alt="MC & Model Agency Hollywood Latte" />
 			<a href="http://spacephoto.c.ooco.jp/">(有)スタジオ・スペースフォト</a>
 			<span>あらいクリニック</span>
-			<a href="https://royal-marriage.shop/">西田ジュエリーデザイン</a>
+			<a href="https://royal-marriage.shop/">ロイヤルマリッジ銀座</a>
 		</div>
 		<div class="halfwidth-supporters-left">
 			{#each supportersOnLeftSide as supporter}
