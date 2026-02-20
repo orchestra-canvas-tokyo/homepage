@@ -8,13 +8,29 @@
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
+	import CookieConcent from '$lib/components/CookieConcent.svelte';
+	import { cookieConsent } from '$lib/stores/cookieConsent';
+	import {
+		injectThirdPartyScripts,
+		removeThirdPartyScripts
+	} from '$lib/services/thirdPartyScripts';
 
 	export let data: LayoutData;
+
+	onMount(() => {
+		cookieConsent.subscribe((value) => {
+			if (value) {
+				injectThirdPartyScripts();
+			} else if (value === false) {
+				removeThirdPartyScripts();
+			}
+		});
+	});
 
 	const upcomingConcerts = data.concerts
 		.filter((concert) => {
@@ -244,6 +260,8 @@
 	{/if}
 </main>
 
+<CookieConcent />
+
 <style>
 	/* Nyanvas用 */
 	:global(canvas) {
@@ -438,10 +456,10 @@
 	@media (max-width: 950px) {
 		header nav > ul {
 			position: fixed;
-			top: 110px;
+			top: 90px;
 			right: 0;
 			padding: 0 30px 30px;
-			height: calc(100dvh - 110px);
+			height: calc(100dvh - 90px);
 			background-color: var(--background-color);
 			overflow: auto;
 			transform: translateX(var(--translate-x));
