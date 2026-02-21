@@ -11,20 +11,41 @@
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
 	import { onDestroy } from 'svelte';
+	import type { ComponentType } from 'svelte';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
-	import NyanvasOverlay from './nyanvas/NyanvasOverlay.svelte';
 
 	export let data: LayoutData;
 
 	$: isNyanvasEvent = data.seasonalEvent?.id === 'nyanvas';
 	$: isNyanvasRoute = $page.url.pathname === '/nyanvas';
+	$: shouldShowNyanvasOverlay = isNyanvasEvent && !isNyanvasRoute;
 	$: headerHref = isNyanvasEvent ? (isNyanvasRoute ? '/' : '/nyanvas') : '/';
 	$: headerLogo = isNyanvasEvent ? nyanvasLogo : logo;
 	$: headerLogoSp = isNyanvasEvent ? nyanvasLogoSp : logoSp;
 	$: headerAlt = isNyanvasEvent ? 'Orchestra Nyanvas Tokyoのロゴ' : 'Orchestra Canvas Tokyoのロゴ';
+	let nyanvasOverlayComponent: ComponentType | null = null;
+	let isLoadingNyanvasOverlayComponent = false;
+
+	const loadNyanvasOverlay = async () => {
+		if (nyanvasOverlayComponent) return;
+		if (isLoadingNyanvasOverlayComponent) return;
+
+		isLoadingNyanvasOverlayComponent = true;
+
+		try {
+			const module = await import('./nyanvas/NyanvasOverlay.svelte');
+			nyanvasOverlayComponent = module.default;
+		} finally {
+			isLoadingNyanvasOverlayComponent = false;
+		}
+	};
+
+	$: if (browser && shouldShowNyanvasOverlay) {
+		void loadNyanvasOverlay();
+	}
 
 	const upcomingConcerts = data.concerts
 		.filter((concert) => {
@@ -160,8 +181,8 @@
 	});
 </script>
 
-{#if isNyanvasEvent && !isNyanvasRoute}
-	<NyanvasOverlay />
+{#if shouldShowNyanvasOverlay && nyanvasOverlayComponent}
+	<svelte:component this={nyanvasOverlayComponent} />
 {/if}
 
 <header>
