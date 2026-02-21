@@ -24,8 +24,8 @@ const clearOverrideValues = new Set(['0', 'off', 'false', 'clear']);
 
 // Update these explicit dates each year (YYYY-MM-DD, JST).
 export const SEASONAL_EVENT_SCHEDULE: Record<string, SeasonalEventId> = {
-	'2025-02-22': 'nyanvas',
-	'2025-04-01': 'nyanvas'
+	'2025-04-01': 'nyanvas',
+	'2026-02-22': 'nyanvas'
 };
 
 const findEventIdByQueryValue = (queryValue: string): SeasonalEventId | null => {
