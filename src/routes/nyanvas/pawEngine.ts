@@ -118,6 +118,7 @@ export class PawEngine {
 		const circleSize = 30;
 		const imageSize = 1000;
 		const mass = 75;
+		const initialSpeed = 1.2;
 
 		const scale = circleSize / (imageSize / 2);
 		const paw = Matter.Bodies.circle(x, y, circleSize, {
@@ -133,6 +134,18 @@ export class PawEngine {
 		});
 
 		Matter.World.add(this.engine.world, paw);
+
+		// 生成時に重力方向へ少し勢いを付ける
+		const gravityX = this.engine.gravity.x;
+		const gravityY = this.engine.gravity.y;
+		const gravityLength = Math.hypot(gravityX, gravityY);
+		if (gravityLength > 0) {
+			Matter.Body.setVelocity(paw, {
+				x: (gravityX / gravityLength) * initialSpeed,
+				y: (gravityY / gravityLength) * initialSpeed
+			});
+		}
+
 		this.paws.push(paw);
 	}
 
