@@ -94,7 +94,7 @@ $ npm run add:concert -- --type regular|chamber --number 999
 Nyanvasページ本体は日付付きURLで管理します。
 
 - `/nyanvas` は常に最新版への入口URLです（サーバーでリダイレクト）。
-- 版ごとの実体ページは `/nyanvas-YYYYMMDD` に配置します（例: `/nyanvas-20250401`）。
+- 版ごとの実体ページは `/nyanvas/YYYYMMDD` に配置します（例: `/nyanvas/20250401`）。
 - 新しい版を追加する際は `src/lib/nyanvasPaths.ts` の `NYANVAS_LATEST_PATH` を更新してください。
 
 ### スライドショー項目の編集
