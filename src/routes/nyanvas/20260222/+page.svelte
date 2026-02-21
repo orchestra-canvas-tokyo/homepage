@@ -60,7 +60,10 @@
 		</p>
 
 		<p>
-			<a href="/concerts/regular-16">演奏会について詳しくはこちら！</a><br />
+			<a href="/concerts/regular-16">演奏会について詳しくはこちら！</a>
+		</p>
+
+		<p>
 			皆さまのご来場をお待ちしております<img src={catStamp} class="cat-stamp" alt="" />
 		</p>
 	</article>
