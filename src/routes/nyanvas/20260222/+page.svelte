@@ -49,18 +49,18 @@
 		</p>
 
 		<p>
-			マルケスの"ニャン"ソンに始まり<br />
-			"ニャーン"スタンのシンフォニック"ニャ"ンスに終わるこの演奏会
+			マルケスの"ニャン"ソン 第2番に始まり<br />
+			"ニャーン"スタインのシンフォニック"ニャ"ンスに終わるこの演奏会
 		</p>
 
 		<p>
 			かニャらずや<br />
 			キャットう的に<br />
-			ニャンだフルな演奏をお届けします
+			ニャンだフルな演奏をお届けします！
 		</p>
 
 		<p>
-			<a href="/concerts/regular-16">演奏会について詳しくはこちら！</a>
+			<a href="/concerts/regular-16" class="button">演奏会について詳しくはこちら！</a>
 		</p>
 
 		<p>
@@ -124,5 +124,21 @@
 		width: 35px;
 		height: 35px;
 		transform: translateX(-7px);
+	}
+
+	.button {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border: 1px solid;
+		padding: 1em 1.618em;
+		color: var(--main-color);
+		background-color: var(--background-color);
+		transition: 0.3s;
+	}
+
+	.button:hover {
+		color: var(--background-color);
+		background-color: var(--main-color);
 	}
 </style>
