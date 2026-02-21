@@ -271,5 +271,10 @@ export const newsItems: {
 		url: '/concerts/chamber-15',
 		date: '2026/1/11',
 		content: '第15回室内楽演奏会の演奏曲目数の変更について'
+	},
+	{
+		url: '/nyanvas',
+		date: '2026/2/22',
+		content: '本日は猫の日。ホームページも猫たっぷりに！？'
 	}
 ];
