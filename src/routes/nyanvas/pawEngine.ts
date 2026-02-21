@@ -50,7 +50,7 @@ export class PawEngine {
 		Matter.World.add(this.engine.world, mouseConstraint);
 
 		// ランダムに10個生成する
-		const initialPawCount = 20;
+		const initialPawCount = 10;
 		for (let i = 0; i < initialPawCount; i++) {
 			this.addPaw(Math.random() * width, Math.random() * height);
 		}
