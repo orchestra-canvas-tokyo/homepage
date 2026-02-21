@@ -57,7 +57,7 @@ describe('getActiveSeasonalEvent', () => {
 	});
 
 	it('falls back to schedule when override is missing', () => {
-		const now = new Date('2025-02-21T15:00:00Z');
+		const now = new Date('2025-03-31T15:00:00Z');
 
 		expect(getActiveSeasonalEvent({ now })).toEqual({
 			id: 'nyanvas',

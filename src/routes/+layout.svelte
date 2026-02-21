@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
 	import { newsItems } from '$lib/news';
+	import { isNyanvasPath, NYANVAS_ENTRY_PATH } from '$lib/nyanvasPaths';
 
 	import logo from './logo.svg';
 	import logoSp from './canvas_symbol_white.png';
@@ -20,9 +21,9 @@
 	export let data: LayoutData;
 
 	$: isNyanvasEvent = data.seasonalEvent?.id === 'nyanvas';
-	$: isNyanvasRoute = $page.url.pathname === '/nyanvas';
+	$: isNyanvasRoute = isNyanvasPath($page.url.pathname);
 	$: shouldShowNyanvasOverlay = isNyanvasEvent && !isNyanvasRoute;
-	$: headerHref = isNyanvasEvent ? (isNyanvasRoute ? '/' : '/nyanvas') : '/';
+	$: headerHref = isNyanvasEvent ? (isNyanvasRoute ? '/' : NYANVAS_ENTRY_PATH) : '/';
 	$: headerLogo = isNyanvasEvent ? nyanvasLogo : logo;
 	$: headerLogoSp = isNyanvasEvent ? nyanvasLogoSp : logoSp;
 	$: headerAlt = isNyanvasEvent ? 'Orchestra Nyanvas Tokyoのロゴ' : 'Orchestra Canvas Tokyoのロゴ';

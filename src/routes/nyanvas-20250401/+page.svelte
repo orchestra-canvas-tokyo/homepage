@@ -1,12 +1,12 @@
 <script lang="ts">
 	import oldLogo from '../logo.svg';
-	import logo from './orchestra-nyanvas-tokyo.png';
-	import catStamp from './catStamp.png';
+	import logo from '../nyanvas/orchestra-nyanvas-tokyo.png';
+	import catStamp from '../nyanvas/catStamp.png';
 	import Meta from '$lib/components/Meta.svelte';
-	import NyanvasOverlay from './NyanvasOverlay.svelte';
+	import NyanvasOverlay from '../nyanvas/NyanvasOverlay.svelte';
 </script>
 
-<Meta title="&quot;Nyan&quot;vas" canonical="/nyanvas" />
+<Meta title="&quot;Nyan&quot;vas" canonical="/nyanvas-20250401" />
 
 <svelte:head>
 	<link rel="preconnect" href="https://fonts.googleapis.com" />

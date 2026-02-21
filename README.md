@@ -91,6 +91,12 @@ $ npm run add:concert -- --type regular|chamber --number 999
 非開発者向けに一時的に有効化したい場合は、URL に `?seasonal=nyan` を付けて確認できます。
 この上書きはCookieで保持されるため、ページ遷移後も有効です。解除したい場合は `?seasonal=0` を指定してください。
 
+Nyanvasページ本体は日付付きURLで管理します。
+
+- `/nyanvas` は常に最新版への入口URLです（サーバーでリダイレクト）。
+- 版ごとの実体ページは `/nyanvas-YYYYMMDD` に配置します（例: `/nyanvas-20250401`）。
+- 新しい版を追加する際は `src/lib/nyanvasPaths.ts` の `NYANVAS_LATEST_PATH` を更新してください。
+
 ### スライドショー項目の編集
 
 ルートで表示されるスライドショーの項目は、デフォルトでは「定期演奏会」のみです。
