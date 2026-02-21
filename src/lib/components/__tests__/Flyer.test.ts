@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import '@testing-library/jest-dom';
 import Flyer from '../Flyer.svelte';
@@ -177,9 +177,6 @@ describe('Cloudflare Images対応', () => {
 		// Act: コンポーネントをレンダリング
 		const { container } = render(Flyer, { props });
 
-		// onMountの実行を待つ
-		await vi.dynamicImportSettled();
-
 		// Assert: loading="lazy"属性が設定されていることを確認
 		const img = container.querySelector('img');
 		expect(img?.getAttribute('loading')).toBe('lazy');
@@ -194,9 +191,6 @@ describe('Cloudflare Images対応', () => {
 		const { container } = render(Flyer, {
 			props: { src, alt: 'テスト画像' }
 		});
-
-		// onMountの実行を待つためにタイマーを進める
-		await vi.dynamicImportSettled();
 
 		// Assert: Cloudflare Images用のURLが設定されていることを確認
 		const img = container.querySelector('img');
@@ -226,9 +220,6 @@ describe('Cloudflare Images対応', () => {
 			props: { src, alt: 'テスト画像' }
 		});
 
-		// onMountの実行を待つためにタイマーを進める
-		await vi.dynamicImportSettled();
-
 		// Assert: 先頭の/が除去された正確なURLが設定されていることを確認
 		const img = container.querySelector('img');
 		const srcAttr = img?.getAttribute('src') || '';
@@ -246,9 +237,6 @@ describe('Cloudflare Images対応', () => {
 		const { container } = render(Flyer, {
 			props: { src, alt: 'テスト画像' }
 		});
-
-		// onMountの実行を待つためにタイマーを進める
-		await vi.dynamicImportSettled();
 
 		// Assert: 正確なURLが設定されていることを確認
 		const img = container.querySelector('img');

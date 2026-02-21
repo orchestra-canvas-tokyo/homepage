@@ -85,6 +85,18 @@ $ npm run add:concert -- --type regular|chamber --number 999
 - `concerts`でエクスポートされた演奏会が、`/concerts/[slug]`で表示されます。
 - `concerts`でエクスポートされた演奏会のうち、開催日が昨日以前のものが`/concerts/archives`で表示されます。
 
+### 季節イベント（Nyanvas）
+
+`src/lib/seasonalEvents.ts` の `SEASONAL_EVENT_SCHEDULE` に `YYYY-MM-DD` (JST) を追加すると、該当日にロゴ・インタラクティブ演出が全ページで有効になります。
+非開発者向けに一時的に有効化したい場合は、URL に `?seasonal=nyan` を付けて確認できます。
+この上書きはCookieで保持されるため、ページ遷移後も有効です。解除したい場合は `?seasonal=0` を指定してください。
+
+Nyanvasページ本体は日付付きURLで管理します。
+
+- `/nyanvas` は常に最新版への入口URLです（サーバーでリダイレクト）。
+- 版ごとの実体ページは `/nyanvas/YYYYMMDD` に配置します（例: `/nyanvas/20250401`）。
+- 新しい版を追加する際は `src/lib/nyanvasPaths.ts` の `NYANVAS_LATEST_PATH` を更新してください。
+
 ### スライドショー項目の編集
 
 ルートで表示されるスライドショーの項目は、デフォルトでは「定期演奏会」のみです。

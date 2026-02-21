@@ -1,20 +1,52 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
 	import { newsItems } from '$lib/news';
+	import { isNyanvasPath, NYANVAS_ENTRY_PATH } from '$lib/nyanvasPaths';
 
 	import logo from './logo.svg';
 	import logoSp from './canvas_symbol_white.png';
+	import nyanvasLogo from './nyanvas/orchestra-nyanvas-tokyo.png';
+	import nyanvasLogoSp from './nyanvas/orchestra-nyanvas-tokyo-small.png';
 	import instagramIcon from './instagram-brands.svg';
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
 	import { onDestroy } from 'svelte';
+	import type { ComponentType } from 'svelte';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
 
 	export let data: LayoutData;
+
+	$: isNyanvasEvent = data.seasonalEvent?.id === 'nyanvas';
+	$: isNyanvasRoute = isNyanvasPath($page.url.pathname);
+	$: shouldShowNyanvasOverlay = isNyanvasEvent && !isNyanvasRoute;
+	$: headerHref = isNyanvasEvent ? (isNyanvasRoute ? '/' : NYANVAS_ENTRY_PATH) : '/';
+	$: headerLogo = isNyanvasEvent ? nyanvasLogo : logo;
+	$: headerLogoSp = isNyanvasEvent ? nyanvasLogoSp : logoSp;
+	$: headerAlt = isNyanvasEvent ? 'Orchestra Nyanvas Tokyoのロゴ' : 'Orchestra Canvas Tokyoのロゴ';
+	let nyanvasOverlayComponent: ComponentType | null = null;
+	let isLoadingNyanvasOverlayComponent = false;
+
+	const loadNyanvasOverlay = async () => {
+		if (nyanvasOverlayComponent) return;
+		if (isLoadingNyanvasOverlayComponent) return;
+
+		isLoadingNyanvasOverlayComponent = true;
+
+		try {
+			const module = await import('./nyanvas/NyanvasOverlay.svelte');
+			nyanvasOverlayComponent = module.default;
+		} finally {
+			isLoadingNyanvasOverlayComponent = false;
+		}
+	};
+
+	$: if (browser && shouldShowNyanvasOverlay) {
+		void loadNyanvasOverlay();
+	}
 
 	const upcomingConcerts = data.concerts
 		.filter((concert) => {
@@ -150,10 +182,14 @@
 	});
 </script>
 
+{#if shouldShowNyanvasOverlay && nyanvasOverlayComponent}
+	<svelte:component this={nyanvasOverlayComponent} />
+{/if}
+
 <header>
-	<a href="/">
-		<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
-		<img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
+	<a href={headerHref}>
+		<img src={headerLogo} alt={headerAlt} class="logo" />
+		<img src={headerLogoSp} alt={headerAlt} class="logo-sp" />
 	</a>
 	<nav>
 		<input
