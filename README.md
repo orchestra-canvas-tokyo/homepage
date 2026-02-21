@@ -87,8 +87,9 @@ $ npm run add:concert -- --type regular|chamber --number 999
 
 ### 季節イベント（Nyanvas）
 
-`src/lib/seasonalEvents.ts` の `dates` に `YYYY-MM-DD` (JST) を追加すると、該当日にロゴ・インタラクティブ演出が全ページで有効になります。
-非開発者向けに一時的に有効化したい場合は、URL に `?nyan=1` を付けて確認できます。
+`src/lib/seasonalEvents.ts` の `SEASONAL_EVENT_SCHEDULE` に `YYYY-MM-DD` (JST) を追加すると、該当日にロゴ・インタラクティブ演出が全ページで有効になります。
+非開発者向けに一時的に有効化したい場合は、URL に `?seasonal=nyan` を付けて確認できます。
+この上書きはCookieで保持されるため、ページ遷移後も有効です。解除したい場合は `?seasonal=0` を指定してください。
 
 ### スライドショー項目の編集
 

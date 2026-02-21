@@ -1,28 +1,42 @@
-export type SeasonalEventId = 'nyanvas';
+export const SEASONAL_COOKIE_NAME = 'seasonal_override';
 
-export type SeasonalEventConfig = {
-	id: SeasonalEventId;
-	label: string;
-	dates: string[];
-	queryParam: string;
-};
+export const SEASONAL_EVENT_DEFINITIONS = {
+	nyanvas: {
+		label: 'Nyanvas',
+		queryValue: 'nyan'
+	}
+} as const;
+
+export type SeasonalEventId = keyof typeof SEASONAL_EVENT_DEFINITIONS;
 
 export type SeasonalEvent = {
 	id: SeasonalEventId;
 	label: string;
 };
 
+export type SeasonalOverrideAction =
+	| { type: 'set'; eventId: SeasonalEventId }
+	| { type: 'clear' }
+	| { type: 'none' };
+
 const seasonalTimeZone = 'Asia/Tokyo';
+const clearOverrideValues = new Set(['0', 'off', 'false', 'clear']);
 
 // Update these explicit dates each year (YYYY-MM-DD, JST).
-const seasonalEvents: SeasonalEventConfig[] = [
-	{
-		id: 'nyanvas',
-		label: 'Nyanvas',
-		dates: ['2025-02-22', '2025-04-01'],
-		queryParam: 'nyan'
+export const SEASONAL_EVENT_SCHEDULE: Record<string, SeasonalEventId> = {
+	'2025-02-22': 'nyanvas',
+	'2025-04-01': 'nyanvas'
+};
+
+const findEventIdByQueryValue = (queryValue: string): SeasonalEventId | null => {
+	for (const [eventId, eventDefinition] of Object.entries(SEASONAL_EVENT_DEFINITIONS)) {
+		if (eventDefinition.queryValue === queryValue) {
+			return eventId as SeasonalEventId;
+		}
 	}
-];
+
+	return null;
+};
 
 const formatDateInTimeZone = (date: Date, timeZone: string): string => {
 	const parts = new Intl.DateTimeFormat('en-US', {
@@ -43,33 +57,59 @@ const formatDateInTimeZone = (date: Date, timeZone: string): string => {
 	return `${year}-${month}-${day}`;
 };
 
-const findEventByQuery = (url: URL): SeasonalEventConfig | null => {
-	const override = url.searchParams.get('seasonal');
-	if (override) {
-		const normalized = override.trim().toLowerCase();
-		const matched = seasonalEvents.find(
-			(event) => event.id === normalized || event.queryParam === normalized
-		);
-		if (matched) return matched;
+export const normalizeSeasonalOverride = (
+	value: string | null | undefined
+): SeasonalEventId | null => {
+	if (!value) return null;
+
+	const normalizedValue = value.trim().toLowerCase();
+	if (!normalizedValue) return null;
+
+	if (normalizedValue in SEASONAL_EVENT_DEFINITIONS) {
+		return normalizedValue as SeasonalEventId;
 	}
 
-	const directMatch = seasonalEvents.find((event) => url.searchParams.has(event.queryParam));
-	return directMatch ?? null;
+	return findEventIdByQueryValue(normalizedValue);
+};
+
+export const getSeasonalOverrideAction = (url: URL): SeasonalOverrideAction => {
+	const seasonalValues = url.searchParams.getAll('seasonal');
+	if (seasonalValues.length !== 1) return { type: 'none' };
+
+	const normalizedValue = seasonalValues[0].trim().toLowerCase();
+	if (!normalizedValue) return { type: 'none' };
+
+	if (clearOverrideValues.has(normalizedValue)) {
+		return { type: 'clear' };
+	}
+
+	const eventId = findEventIdByQueryValue(normalizedValue);
+	if (!eventId) return { type: 'none' };
+
+	return { type: 'set', eventId };
 };
 
 export const getActiveSeasonalEvent = ({
-	url,
+	overrideEventId,
 	now = new Date()
 }: {
-	url: URL;
+	overrideEventId?: SeasonalEventId | null;
 	now?: Date;
 }): SeasonalEvent | null => {
-	const queryMatch = findEventByQuery(url);
-	if (queryMatch) return { id: queryMatch.id, label: queryMatch.label };
+	const normalizedOverrideEventId = normalizeSeasonalOverride(overrideEventId);
+	if (normalizedOverrideEventId) {
+		return {
+			id: normalizedOverrideEventId,
+			label: SEASONAL_EVENT_DEFINITIONS[normalizedOverrideEventId].label
+		};
+	}
 
 	const today = formatDateInTimeZone(now, seasonalTimeZone);
-	const dateMatch = seasonalEvents.find((event) => event.dates.includes(today));
-	if (!dateMatch) return null;
+	const activeEventId = SEASONAL_EVENT_SCHEDULE[today];
+	if (!activeEventId) return null;
 
-	return { id: dateMatch.id, label: dateMatch.label };
+	return {
+		id: activeEventId,
+		label: SEASONAL_EVENT_DEFINITIONS[activeEventId].label
+	};
 };
