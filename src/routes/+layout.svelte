@@ -12,7 +12,7 @@
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
 	import { onDestroy } from 'svelte';
-	import type { ComponentType } from 'svelte';
+	import type { Component } from 'svelte';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
@@ -27,7 +27,7 @@
 	$: headerLogo = isNyanvasEvent ? nyanvasLogo : logo;
 	$: headerLogoSp = isNyanvasEvent ? nyanvasLogoSp : logoSp;
 	$: headerAlt = isNyanvasEvent ? 'Orchestra Nyanvas Tokyoのロゴ' : 'Orchestra Canvas Tokyoのロゴ';
-	let nyanvasOverlayComponent: ComponentType | null = null;
+	let nyanvasOverlayComponent: Component<Record<string, unknown>> | null = null;
 	let isLoadingNyanvasOverlayComponent = false;
 
 	const loadNyanvasOverlay = async () => {

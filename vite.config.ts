@@ -15,7 +15,8 @@ export default defineConfig({
 	},
 	resolve: process.env.VITEST
 		? {
-				conditions: ['browser']
+				// Svelte 5 以降の export condition を優先しつつ既存のブラウザ条件も維持
+				conditions: ['svelte', 'browser']
 			}
 		: undefined
 });
