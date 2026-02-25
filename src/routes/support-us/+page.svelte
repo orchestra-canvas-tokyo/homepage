@@ -321,7 +321,7 @@
 						<a
 							href="https://docs.google.com/forms/d/e/1FAIpQLScyb3TBOqP0PLQFmmm4QO5sEmfTAEcorq9aqe2IEz9ZetBFAQ/viewform"
 						>
-							ご支援　受付フォーム
+							ご支援 受付フォーム
 						</a>
 					</td>
 				</tr>
@@ -331,7 +331,7 @@
 						<a
 							href="https://docs.google.com/forms/d/e/1FAIpQLSf8VnIPzitpbt-QujtXnqQ4XsiFfxaoIS4cG606euRx9RktAg/viewform"
 						>
-							練習会場　受付フォーム
+							練習会場 受付フォーム
 						</a>
 					</td>
 				</tr>
