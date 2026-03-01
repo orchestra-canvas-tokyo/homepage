@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
-import '@testing-library/jest-dom';
 import Flyer from '../Flyer.svelte';
 
 /**

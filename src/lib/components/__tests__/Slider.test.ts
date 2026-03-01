@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/svelte';
-import '@testing-library/jest-dom';
 import Slider from '../Slider.svelte';
 import type { Slide } from '../Slider.svelte';
 

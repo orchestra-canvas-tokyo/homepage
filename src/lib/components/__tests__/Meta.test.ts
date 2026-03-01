@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
-import '@testing-library/jest-dom';
 import Meta from '../Meta.svelte';
 
 /**
