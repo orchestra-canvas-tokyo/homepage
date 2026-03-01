@@ -3,7 +3,7 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import hollyWoodLatte from './hollywood-latte.png';
 	import mizuya from './mizuya.png';
-	import pdf from './ご支援のお願い.pdf';
+	// import pdf from './ご支援のお願い.pdf';
 
 	import youTubeTotalViewCount from './youtube_total_view_count.txt?raw';
 	const displayingYouTubeTotalViewCount = `${
@@ -321,7 +321,7 @@
 						<a
 							href="https://docs.google.com/forms/d/e/1FAIpQLScyb3TBOqP0PLQFmmm4QO5sEmfTAEcorq9aqe2IEz9ZetBFAQ/viewform"
 						>
-							ご支援　受付フォーム
+							ご支援 受付フォーム
 						</a>
 					</td>
 				</tr>
@@ -331,7 +331,7 @@
 						<a
 							href="https://docs.google.com/forms/d/e/1FAIpQLSf8VnIPzitpbt-QujtXnqQ4XsiFfxaoIS4cG606euRx9RktAg/viewform"
 						>
-							練習会場　受付フォーム
+							練習会場 受付フォーム
 						</a>
 					</td>
 				</tr>
@@ -348,9 +348,10 @@
 		</table>
 	</div>
 
-	<p style="margin-top: 40px;">
+	<!-- チケット価格改定対応に伴い、一時的にコメントアウト -->
+	<!-- <p style="margin-top: 40px;">
 		<a href={pdf}> 当リリースのPDF版 </a>
-	</p>
+	</p> -->
 </article>
 
 <style>
