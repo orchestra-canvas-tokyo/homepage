@@ -1,5 +1,6 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
+import pricingNoticePdf from '$lib/documents/公演チケット価格改定のお知らせ.pdf';
 // import flyer from './images/flyers/regular-17.png';
 
 const type = 'regular';
@@ -9,6 +10,12 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
+	message: {
+		title: '【価格改定のお知らせ】',
+		body: `2026年4月以降に開催する一部の公演につきまして、チケット価格の改定を行わせていただくこととなりました。`,
+		url: pricingNoticePdf,
+		linkText: '詳細はこちら（PDF）'
+	},
 	// flyer: flyer,
 	dateTime: { date: '2026-9-12', time: '昼公演' },
 	place: {

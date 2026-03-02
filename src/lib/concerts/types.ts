@@ -31,6 +31,8 @@ export interface Concert {
 	message?: {
 		title: string;
 		body: string;
+		url?: string; // お知らせに関連するリンク先URL（PDFなど）
+		linkText?: string; // リンクテキスト（未指定時は「詳細はこちら」）
 	};
 	flyers?: Flyer[];
 	dateTime: {
