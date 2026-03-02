@@ -39,7 +39,12 @@
 		<!-- 臨時のお知らせはタイトル直下に表示 -->
 		<section class="concert-message">
 			<h3>{data.message.title}</h3>
-			<p class="concert-message-body">{data.message.body}</p>
+			<p class="concert-message-body">
+				{data.message.body}
+				{#if data.message.url}
+					<br /><a href={data.message.url}>{data.message.linkText || '詳細はこちら'}</a>
+				{/if}
+			</p>
 		</section>
 	{/if}
 
