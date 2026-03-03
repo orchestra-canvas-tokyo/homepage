@@ -1,3 +1,5 @@
+import pricingNoticePdf from '$lib/documents/公演チケット価格改定のお知らせ.pdf';
+
 /** ニュースをもつ配列 */
 export const newsItems: {
 	date: string;
@@ -276,5 +278,10 @@ export const newsItems: {
 		url: '/nyanvas',
 		date: '2026/2/22',
 		content: '本日は猫の日。ホームページも猫たっぷりに！？'
+	},
+	{
+		url: pricingNoticePdf,
+		date: '2026/3/3',
+		content: '公演チケット価格改定のお知らせ'
 	}
 ];
