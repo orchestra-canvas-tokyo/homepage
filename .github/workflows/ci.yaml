@@ -44,8 +44,20 @@ jobs:
           node-version-file: './.node-version'
       - name: Prepare dependencies
         run: npm ci
-      - name: Run checkers & linters
-        run: npm run precommit
+      - name: Run type and Svelte checks
+        run: npm run check
+        env:
+          SESSION_SECRET: ${{secrets.SESSION_SECRET}}
+          RECAPTCHA_SECRET: ${{secrets.RECAPTCHA_SECRET}}
+          RESEND_API_KEY: ${{secrets.RESEND_API_KEY}}
+      - name: Run lint
+        run: npm run lint
+        env:
+          SESSION_SECRET: ${{secrets.SESSION_SECRET}}
+          RECAPTCHA_SECRET: ${{secrets.RECAPTCHA_SECRET}}
+          RESEND_API_KEY: ${{secrets.RESEND_API_KEY}}
+      - name: Run test
+        run: npm run test
         env:
           SESSION_SECRET: ${{secrets.SESSION_SECRET}}
           RECAPTCHA_SECRET: ${{secrets.RECAPTCHA_SECRET}}
