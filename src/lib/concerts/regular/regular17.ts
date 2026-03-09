@@ -17,7 +17,7 @@ export const concert: Concert = {
 		linkText: '詳細はこちら（PDF）'
 	},
 	// flyer: flyer,
-	dateTime: { date: '2026-9-12', time: '昼公演' },
+	dateTime: { date: '2026-9-12', time: '12:30開場 13:30開演' },
 	place: {
 		name: '横浜みなとみらいホール 大ホール',
 		url: 'https://yokohama-minatomiraihall.jp/access/'
@@ -25,15 +25,19 @@ export const concert: Concert = {
 	conductor: {
 		name: '田代 俊文'
 	},
-	// programs: [
-	// 	{
-	// 		composer: '●',
-	// 		title: '●'
-	// 	}
-	// ],
+	programs: [
+		{
+			composer: 'モーツァルト',
+			title: '交響曲第35番 ニ長調 K. 385 『ハフナー』'
+		},
+		{
+			composer: 'リヒャルト・シュトラウス',
+			title: 'アルプス交響曲 作品64'
+		}
+	],
 	ticket: {
-		description: '未定'
-		// url: '●?uid=hp'
+		description: '全席指定 1,500円',
+		url: 'https://teket.jp/1776/65178?uid=hp'
 	},
 	showLinkToProgramNote: false
 	// cspell: disable-next-line
