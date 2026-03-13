@@ -283,5 +283,10 @@ export const newsItems: {
 		url: pricingNoticePdf,
 		date: '2026/3/3',
 		content: '公演チケット価格改定のお知らせ'
+	},
+	{
+		url: '/concerts/regular-17',
+		date: '2026/3/14',
+		content: '第17回定期演奏会のチケットを発売しました。'
 	}
 ];
