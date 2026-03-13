@@ -12,7 +12,6 @@
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
 	import { onDestroy } from 'svelte';
-	import type { Component } from 'svelte';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
@@ -27,7 +26,8 @@
 	$: headerLogo = isNyanvasEvent ? nyanvasLogo : logo;
 	$: headerLogoSp = isNyanvasEvent ? nyanvasLogoSp : logoSp;
 	$: headerAlt = isNyanvasEvent ? 'Orchestra Nyanvas Tokyoのロゴ' : 'Orchestra Canvas Tokyoのロゴ';
-	let nyanvasOverlayComponent: Component<Record<string, unknown>> | null = null;
+	let nyanvasOverlayComponent: typeof import('./nyanvas/NyanvasOverlay.svelte').default | null =
+		null;
 	let isLoadingNyanvasOverlayComponent = false;
 
 	const loadNyanvasOverlay = async () => {
