@@ -34,7 +34,7 @@ export const concert: Concert = {
 		description: '全席指定 1,000円',
 		url: 'https://teket.jp/1776/59938?uid=hp'
 	},
-	showLinkToProgramNote: false
+	showLinkToProgramNote: true
 	// cspell: disable-next-line
 	// youtubePlaylistId: '●'
 };
