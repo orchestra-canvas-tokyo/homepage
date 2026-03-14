@@ -10,7 +10,7 @@ export const concert: Concert = {
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
 	// flyer: flyer,
-	dateTime: { date: '2026-5-23', time: '昼公演' },
+	dateTime: { date: '2026-5-23', time: '13:30開場 14:00開演' },
 	place: {
 		name: '国分寺市立いずみホール Aホール',
 		url: 'https://www.kokubunji-izumihall.jp/access/'
