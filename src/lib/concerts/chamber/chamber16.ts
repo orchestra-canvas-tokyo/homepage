@@ -19,7 +19,7 @@ export const concert: Concert = {
 	// 	{ composer: '●', title: '●' }
 	// ],
 	ticket: {
-		description: '未定',
+		description: '入場無料',
 		url: 'https://teket.jp/1776/66352?uid=hp'
 	},
 	showLinkToProgramNote: false
