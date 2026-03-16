@@ -7,6 +7,7 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import Slider from '$lib/components/Slider.svelte';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import OpenInNewIcon from '$lib/components/OpenInNewIcon.svelte';
 
 	export let data: PageServerData;
 </script>
@@ -71,13 +72,15 @@
 		<dt>場所</dt>
 		<dd>
 			<p>{data.place.name}</p>
-			<p><a href={data.place.url}>交通アクセス</a></p>
+			<p><a href={data.place.url} target="_blank">交通アクセス<OpenInNewIcon /></a></p>
 		</dd>
 		{#if data.conductor}
 			<dt>指揮</dt>
 			<dd>
 				{#if data.conductor.url}
-					<p><a href={data.conductor.url}>{data.conductor.name}</a></p>
+					<p>
+						<a href={data.conductor.url} target="_blank">{data.conductor.name}<OpenInNewIcon /></a>
+					</p>
 				{:else}
 					<p>{data.conductor.name}</p>
 				{/if}
@@ -87,7 +90,7 @@
 			<dt>{data.soloist.title || '独奏'}</dt>
 			<dd>
 				{#if data.soloist.url}
-					<p><a href={data.soloist.url}>{data.soloist.name}</a></p>
+					<p><a href={data.soloist.url} target="_blank">{data.soloist.name}<OpenInNewIcon /></a></p>
 				{:else}
 					<p>{data.soloist.name}</p>
 				{/if}
@@ -132,7 +135,7 @@
 				<dt>{credit.title}</dt>
 				<dd>
 					{#if credit.image}
-						<a href={credit.url} class="credit-image-link">
+						<a href={credit.url} target="_blank" class="credit-image-link">
 							<span>{credit.name}</span>
 							<img
 								class="inline-icon"
@@ -142,7 +145,7 @@
 							/>
 						</a>
 					{:else}
-						<a href={credit.url}>{credit.name}</a>
+						<a href={credit.url} target="_blank">{credit.name}</a>
 					{/if}
 				</dd>
 			{/each}
@@ -167,8 +170,9 @@
 						href="https://blog.orch-canvas.tokyo/tag/第{data.number}回{getConcertShortName(
 							data.type
 						)}"
+						target="_blank"
 					>
-						# 第{data.number}回{getConcertShortName(data.type)}の記事一覧
+						# 第{data.number}回{getConcertShortName(data.type)}の記事一覧<OpenInNewIcon />
 					</a>
 				</p>
 			</dl>
