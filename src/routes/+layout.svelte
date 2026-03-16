@@ -2,6 +2,7 @@
 	import type { LayoutData } from './$types';
 	import { newsItems } from '$lib/news';
 	import { isNyanvasPath, NYANVAS_ENTRY_PATH } from '$lib/nyanvasPaths';
+	import OpenInNewIcon from '$lib/components/OpenInNewIcon.svelte';
 
 	import logo from './logo.svg';
 	import logoSp from './canvas_symbol_white.png';
@@ -66,6 +67,7 @@
 		title: string;
 		url?: string;
 		lang: 'en' | 'ja'; // フォントの出しわけに使用
+		isExternal?: boolean; // 外部リンクかどうか
 	}
 	interface HeaderMenuItem extends MenuItem {
 		children?: MenuItem[];
@@ -120,12 +122,14 @@
 				{
 					title: 'music',
 					url: 'https://blog.orch-canvas.tokyo/',
-					lang: 'en'
+					lang: 'en',
+					isExternal: true
 				},
 				{
 					title: 'tech',
 					url: 'https://zenn.dev/p/orch_canvas',
-					lang: 'en'
+					lang: 'en',
+					isExternal: true
 				}
 			]
 		},
@@ -217,7 +221,13 @@
 							{#each menuItem.children as child}
 								<li>
 									{#if child.url}
-										<a href={child.url} class={child.lang}>{child.title}</a>
+										{#if child.isExternal}
+											<a href={child.url} target="_blank" class={child.lang}>
+												{child.title}<OpenInNewIcon />
+											</a>
+										{:else}
+											<a href={child.url} class={child.lang}>{child.title}</a>
+										{/if}
 									{:else}
 										<span class={child.lang}>{child.title}</span>
 									{/if}
