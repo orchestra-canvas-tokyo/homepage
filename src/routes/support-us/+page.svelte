@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
+	import OpenInNewIcon from '$lib/components/OpenInNewIcon.svelte';
 	import hollyWoodLatte from './hollywood-latte.png';
 	import mizuya from './mizuya.png';
 	// import pdf from './ご支援のお願い.pdf';
@@ -68,13 +69,13 @@
 
 	<div class="supporter-container">
 		<div class="fullwidth-supporters">
-			<a href="https://hollywoodlatte.com/">
+			<a href="https://hollywoodlatte.com/" target="_blank">
 				<img class="supporter-logo" src={hollyWoodLatte} alt="MC & Model Agency Hollywood Latte" />
 			</a>
 			<img class="supporter-logo" src={mizuya} alt="MC & Model Agency Hollywood Latte" />
-			<a href="http://spacephoto.c.ooco.jp/">(有)スタジオ・スペースフォト</a>
+			<a href="http://spacephoto.c.ooco.jp/" target="_blank">(有)スタジオ・スペースフォト</a>
 			<span>あらいクリニック</span>
-			<a href="https://royal-marriage.shop/">ロイヤルマリッジ銀座</a>
+			<a href="https://royal-marriage.shop/" target="_blank">ロイヤルマリッジ銀座</a>
 		</div>
 		<div class="halfwidth-supporters-left">
 			{#each supportersOnLeftSide as supporter}
@@ -93,7 +94,7 @@
 	<p>
 		ご寄付の際は、<a
 			href="https://docs.google.com/forms/d/e/1FAIpQLScyb3TBOqP0PLQFmmm4QO5sEmfTAEcorq9aqe2IEz9ZetBFAQ/viewform"
-			>専用フォーム</a
+			target="_blank">専用フォーム<OpenInNewIcon /></a
 		>より必要情報をお送りください。詳細のご案内を差し上げます。
 	</p>
 	<p>
@@ -278,8 +279,9 @@
 		ご提供の際は、
 		<a
 			href="https://docs.google.com/forms/d/e/1FAIpQLSf8VnIPzitpbt-QujtXnqQ4XsiFfxaoIS4cG606euRx9RktAg/viewform"
+			target="_blank"
 		>
-			専用フォーム
+			専用フォーム<OpenInNewIcon />
 		</a>
 		より必要情報をお送りください。担当よりご連絡を差し上げます。
 	</p>
@@ -320,8 +322,9 @@
 					<td>
 						<a
 							href="https://docs.google.com/forms/d/e/1FAIpQLScyb3TBOqP0PLQFmmm4QO5sEmfTAEcorq9aqe2IEz9ZetBFAQ/viewform"
+							target="_blank"
 						>
-							ご支援 受付フォーム
+							ご支援 受付フォーム<OpenInNewIcon />
 						</a>
 					</td>
 				</tr>
@@ -330,8 +333,9 @@
 					<td>
 						<a
 							href="https://docs.google.com/forms/d/e/1FAIpQLSf8VnIPzitpbt-QujtXnqQ4XsiFfxaoIS4cG606euRx9RktAg/viewform"
+							target="_blank"
 						>
-							練習会場 受付フォーム
+							練習会場 受付フォーム<OpenInNewIcon />
 						</a>
 					</td>
 				</tr>
