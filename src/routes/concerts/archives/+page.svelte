@@ -9,70 +9,94 @@
 	import type { YearlyFirstConcerts } from './YearAnchors';
 	import Meta from '$lib/components/Meta.svelte';
 
-	export let data: PageServerData;
+	let { data }: { data: PageServerData } = $props();
 
 	// 開催後の定期演奏会を抽出し、開催日昇順でソートしておく
-	const regularConcerts = data.concerts
-		.filter(
-			(concert) => concert.type === 'regular' && dayjs(concert.dateTime.date).isBefore(dayjs())
-		)
-		.sort((a, b) => (dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1));
+	const regularConcerts = $derived.by(() =>
+		data.concerts
+			.filter(
+				(concert) => concert.type === 'regular' && dayjs(concert.dateTime.date).isBefore(dayjs())
+			)
+			.sort((a, b) => (dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1))
+	);
 	// 室内楽演奏会も同様に
-	const chamberConcerts = data.concerts
-		.filter(
-			(concert) => concert.type === 'chamber' && dayjs(concert.dateTime.date).isBefore(dayjs())
-		)
-		.sort((a, b) => (dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1));
+	const chamberConcerts = $derived.by(() =>
+		data.concerts
+			.filter(
+				(concert) => concert.type === 'chamber' && dayjs(concert.dateTime.date).isBefore(dayjs())
+			)
+			.sort((a, b) => (dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1))
+	);
 
-	let yearlyFirstRegularConcerts: YearlyFirstConcerts = {};
-	let currentYear = null;
-	// 各年の最初の定期演奏会を抽出
-	// 後ほど、アンカーリンクを張るのに使う
-	for (let concert of regularConcerts) {
-		const concertYear = dayjs(concert.dateTime.date).year();
-		if (concertYear !== currentYear) {
-			currentYear = concertYear;
-			yearlyFirstRegularConcerts[concert.slug] = concertYear;
-		}
-	}
+	const yearlyFirstRegularConcerts = $derived.by((): YearlyFirstConcerts => {
+		const yearlyFirstConcerts: YearlyFirstConcerts = {};
+		let currentYear: number | null = null;
 
-	let yearlyFirstChamberConcerts: YearlyFirstConcerts = {};
-	currentYear = null;
-	// 各年の最初の室内楽演奏会を抽出
-	for (let concert of chamberConcerts) {
-		const concertYear = dayjs(concert.dateTime.date).year();
-		if (concertYear !== currentYear) {
-			currentYear = concertYear;
-			yearlyFirstChamberConcerts[concert.slug] = concertYear;
+		// 各年の最初の定期演奏会を抽出
+		// 後ほど、アンカーリンクを張るのに使う
+		for (const concert of regularConcerts) {
+			const concertYear = dayjs(concert.dateTime.date).year();
+			if (concertYear !== currentYear) {
+				currentYear = concertYear;
+				yearlyFirstConcerts[concert.slug] = concertYear;
+			}
 		}
-	}
+
+		return yearlyFirstConcerts;
+	});
+
+	const yearlyFirstChamberConcerts = $derived.by((): YearlyFirstConcerts => {
+		const yearlyFirstConcerts: YearlyFirstConcerts = {};
+		let currentYear: number | null = null;
+
+		// 各年の最初の室内楽演奏会を抽出
+		for (const concert of chamberConcerts) {
+			const concertYear = dayjs(concert.dateTime.date).year();
+			if (concertYear !== currentYear) {
+				currentYear = concertYear;
+				yearlyFirstConcerts[concert.slug] = concertYear;
+			}
+		}
+
+		return yearlyFirstConcerts;
+	});
 
 	onMount(() => {
-		const anchorLinks = document.querySelectorAll('a[href^="#"]');
+		const anchorLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'));
 		const offset = 100; // アンカーリンクへの遷移の際、上部に設けたいマージンの値
+
+		const onAnchorClick = (e: MouseEvent) => {
+			e.preventDefault();
+
+			const link = e.currentTarget as HTMLAnchorElement | null;
+			const targetId = link?.getAttribute('href');
+			if (targetId === null || targetId === undefined) return;
+
+			const targetElement = document.querySelector(targetId);
+			if (targetElement === null) return;
+
+			const targetPosition = window.scrollY + targetElement.getBoundingClientRect().top;
+			window.scrollTo({
+				top: targetPosition - offset,
+				behavior: 'smooth'
+			});
+		};
+
 		anchorLinks.forEach((link) => {
 			// スムーズに遷移するためのおまじない
-			link.addEventListener('click', function (e) {
-				e.preventDefault();
-
-				const targetId = link.getAttribute('href');
-				if (targetId === null) return;
-
-				const targetElement = document.querySelector(targetId);
-				if (targetElement === null) return;
-
-				const targetPosition = window.scrollY + targetElement.getBoundingClientRect().top;
-				window.scrollTo({
-					top: targetPosition - offset,
-					behavior: 'smooth'
-				});
-			});
+			link.addEventListener('click', onAnchorClick);
 		});
+
+		return () => {
+			anchorLinks.forEach((link) => {
+				link.removeEventListener('click', onAnchorClick);
+			});
+		};
 	});
 
 	// ページ遷移前後で定期・室内楽の選択状態が保持されるようにする
 	// SvelteKitのSnapshotを用いており、これは内部的にはSessionStorage
-	let checkedConcertType: string = 'regular';
+	let checkedConcertType = $state<string>('regular');
 	export const snapshot: Snapshot<string> = {
 		capture: () => checkedConcertType,
 		restore: (value) => (checkedConcertType = value)

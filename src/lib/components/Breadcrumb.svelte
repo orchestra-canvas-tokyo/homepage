@@ -1,6 +1,7 @@
 <script lang="ts">
 	/** パンくずの各要素を定義する配列 */
-	export let segments: { title: string; lang: 'en' | 'ja'; url?: string }[] = [];
+	let { segments = [] }: { segments?: { title: string; lang: 'en' | 'ja'; url?: string }[] } =
+		$props();
 </script>
 
 <!--

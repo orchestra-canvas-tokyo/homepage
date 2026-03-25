@@ -9,9 +9,14 @@
 	import youtubeLogo from './yt_logo_mono_dark.png';
 
 	/** このコンポーネントが表示する演奏会 */
-	export let concert: Concert;
+	let {
+		concert,
+		yearlyFirstConcert
+	}: {
+		concert: Concert;
+		yearlyFirstConcert: YearlyFirstConcerts;
+	} = $props();
 	/** アンカーリンクを張る、各年最初の演奏会の情報をまとめたオブジェクト */
-	export let yearlyFirstConcert: YearlyFirstConcerts;
 </script>
 
 <!--
@@ -203,7 +208,7 @@
 		}
 	}
 
-	:is(picture):has(.flyer) {
+	.flyer-container {
 		line-height: 0;
 	}
 

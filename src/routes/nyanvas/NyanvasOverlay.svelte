@@ -5,7 +5,7 @@
 
 	let pawEngine: PawEngine | null = null;
 	let deviceMotionController: DeviceMotionController | null = null;
-	let showPermissionToast = false;
+	let showPermissionToast = $state(false);
 
 	const updatePermissionStatus = (permitted: boolean) => {
 		showPermissionToast = !permitted;
@@ -55,11 +55,11 @@
 	};
 </script>
 
-<svelte:window on:click={onclick} on:devicemotion={ondevicemotion} on:resize={onresize} />
+<svelte:window {onclick} {ondevicemotion} {onresize} />
 
 <div id="permission-toast" class="toast" class:show={showPermissionToast}>
 	<p>ぜひ、加速度センサー付きでご覧ください！</p>
-	<button on:click={onclickGrantPermission}>進む</button>
+	<button onclick={onclickGrantPermission}>進む</button>
 </div>
 
 <style>

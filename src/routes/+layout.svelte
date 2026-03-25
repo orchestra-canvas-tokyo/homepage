@@ -12,55 +12,60 @@
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
-	import { onDestroy } from 'svelte';
-	import type { Component } from 'svelte';
-	import { page } from '$app/stores';
+	import type { Component, Snippet } from 'svelte';
+	import { page } from '$app/state';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
 
-	export let data: LayoutData;
+	let { data, children }: { data: LayoutData; children?: Snippet } = $props();
 
-	$: isNyanvasEvent = data.seasonalEvent?.id === 'nyanvas';
-	$: isNyanvasRoute = isNyanvasPath($page.url.pathname);
-	$: shouldShowNyanvasOverlay = isNyanvasEvent && !isNyanvasRoute;
-	$: headerHref = isNyanvasEvent ? (isNyanvasRoute ? '/' : NYANVAS_ENTRY_PATH) : '/';
-	$: headerLogo = isNyanvasEvent ? nyanvasLogo : logo;
-	$: headerLogoSp = isNyanvasEvent ? nyanvasLogoSp : logoSp;
-	$: headerAlt = isNyanvasEvent ? 'Orchestra Nyanvas Tokyoのロゴ' : 'Orchestra Canvas Tokyoのロゴ';
-	let nyanvasOverlayComponent: Component<Record<string, unknown>> | null = null;
-	let isLoadingNyanvasOverlayComponent = false;
+	const isNyanvasEvent = $derived(data.seasonalEvent?.id === 'nyanvas');
+	const isNyanvasRoute = $derived(isNyanvasPath(page.url.pathname));
+	const shouldShowNyanvasOverlay = $derived(isNyanvasEvent && !isNyanvasRoute);
+	const headerHref = $derived(isNyanvasEvent ? (isNyanvasRoute ? '/' : NYANVAS_ENTRY_PATH) : '/');
+	const headerLogo = $derived(isNyanvasEvent ? nyanvasLogo : logo);
+	const headerLogoSp = $derived(isNyanvasEvent ? nyanvasLogoSp : logoSp);
+	const headerAlt = $derived(
+		isNyanvasEvent ? 'Orchestra Nyanvas Tokyoのロゴ' : 'Orchestra Canvas Tokyoのロゴ'
+	);
+	let NyanvasOverlayComponent = $state<Component | null>(null);
+	let isLoadingNyanvasOverlayComponent = $state(false);
 
 	const loadNyanvasOverlay = async () => {
-		if (nyanvasOverlayComponent) return;
+		if (NyanvasOverlayComponent) return;
 		if (isLoadingNyanvasOverlayComponent) return;
 
 		isLoadingNyanvasOverlayComponent = true;
 
 		try {
 			const module = await import('./nyanvas/NyanvasOverlay.svelte');
-			nyanvasOverlayComponent = module.default;
+			NyanvasOverlayComponent = module.default;
 		} finally {
 			isLoadingNyanvasOverlayComponent = false;
 		}
 	};
 
-	$: if (browser && shouldShowNyanvasOverlay) {
-		void loadNyanvasOverlay();
-	}
+	$effect(() => {
+		if (browser && shouldShowNyanvasOverlay) {
+			void loadNyanvasOverlay();
+		}
+	});
 
-	const upcomingConcerts = data.concerts
-		.filter((concert) => {
-			// 開催日が未来か今日
-			return (
-				dayjs(concert.dateTime.date).isAfter(dayjs()) ||
-				dayjs(concert.dateTime.date).isSame(dayjs(), 'day')
-			);
-		})
-		.sort((a, b) => {
-			// 日付昇順
-			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
-		});
+	const upcomingConcerts = $derived.by(() =>
+		data.concerts
+			.filter((concert) => {
+				// 開催日が未来か今日
+				return (
+					dayjs(concert.dateTime.date).isAfter(dayjs()) ||
+					dayjs(concert.dateTime.date).isSame(dayjs(), 'day')
+				);
+			})
+			.sort((a, b) => {
+				// 日付昇順
+				return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
+			})
+	);
 
 	// メニュー項目の定義
 	interface MenuItem {
@@ -72,7 +77,7 @@
 	interface HeaderMenuItem extends MenuItem {
 		children?: MenuItem[];
 	}
-	const headerMenuItems: HeaderMenuItem[] = [
+	const headerMenuItems = $derived.by((): HeaderMenuItem[] => [
 		{
 			title: 'about',
 			lang: 'en',
@@ -138,7 +143,7 @@
 			lang: 'en',
 			url: '/contact'
 		}
-	];
+	]);
 
 	const snsMenuItems: {
 		url: string;
@@ -168,17 +173,17 @@
 	];
 
 	// ハンバーガーメニュー
-	let isOpen: boolean = false;
-	$: transformX = isOpen ? '0' : '300px';
-	$: if (browser) {
-		document.body.style.overflow = isOpen ? 'hidden' : '';
-	}
+	let isOpen = $state(false);
+	const transformX = $derived(isOpen ? '0' : '300px');
 
-	// ハンバーガーメニューオープン時はスクロールしないように
-	const unsubscribe = page.subscribe(() => {
-		if (browser) document.body.style.overflow = isOpen ? 'hidden' : '';
+	$effect(() => {
+		if (!browser) return;
+
+		document.body.style.overflow = isOpen ? 'hidden' : '';
+		return () => {
+			document.body.style.overflow = '';
+		};
 	});
-	onDestroy(unsubscribe);
 
 	// 画面遷移時はハンバーガーメニューを閉じる
 	afterNavigate(() => {
@@ -186,8 +191,8 @@
 	});
 </script>
 
-{#if shouldShowNyanvasOverlay && nyanvasOverlayComponent}
-	<svelte:component this={nyanvasOverlayComponent} />
+{#if shouldShowNyanvasOverlay && NyanvasOverlayComponent}
+	<NyanvasOverlayComponent />
 {/if}
 
 <header>
@@ -275,7 +280,7 @@
 </aside>
 
 <main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
-	<slot />
+	{@render children?.()}
 
 	{#if data.isRoot}
 		<aside class="mobile-news">
