@@ -4,17 +4,21 @@
 	import dayjs from 'dayjs';
 	import Meta from '$lib/components/Meta.svelte';
 
-	export let data: PageServerData;
+	let { data }: { data: PageServerData } = $props();
 	const sliceNumber = 10; //１ページに表示するnewsの数
 
-	const newsItems = data.newsItems
-		.sort((a, b) => (dayjs(b.date).isAfter(dayjs(a.date)) ? -1 : 1)) // 日付降順に並び替え
-		.reverse();
-	const pageLength = Math.ceil(newsItems.length / sliceNumber); // ページ数
-	const separatedNewsItems = new Array(pageLength) // slice_number個ずつに切り分け
-		.fill(null)
-		.map((_, i) => newsItems.slice(i * sliceNumber, (i + 1) * sliceNumber));
-	let page = 0;
+	const newsItems = $derived.by(() =>
+		[...data.newsItems]
+			.sort((a, b) => (dayjs(b.date).isAfter(dayjs(a.date)) ? -1 : 1)) // 日付降順に並び替え
+			.reverse()
+	);
+	const pageLength = $derived(Math.ceil(newsItems.length / sliceNumber)); // ページ数
+	const separatedNewsItems = $derived.by(() =>
+		new Array(pageLength) // slice_number個ずつに切り分け
+			.fill(null)
+			.map((_, i) => newsItems.slice(i * sliceNumber, (i + 1) * sliceNumber))
+	);
+	let page = $state(0);
 </script>
 
 <Meta title="News" canonical="/news" />
@@ -51,7 +55,7 @@
 		<div class="page-button">
 			{#if page != 0}
 				<button
-					on:click={() => {
+					onclick={() => {
 						if (page > 0) page -= 1;
 					}}
 				>
@@ -65,7 +69,7 @@
 		<div class="page-button right">
 			{#if page != pageLength - 1}
 				<button
-					on:click={() => {
+					onclick={() => {
 						if (page < pageLength - 1) page += 1;
 					}}
 				>

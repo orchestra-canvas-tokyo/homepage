@@ -8,54 +8,60 @@
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
 
-	export let data: PageServerData;
+	let { data }: { data: PageServerData } = $props();
 
 	const nonRegularDisplayingConcerts: string[] = [];
 	const newConcerts: string[] = [];
-	const nonNewSlideshowItems = data.concerts
-		.filter((concert) => {
-			// 定期演奏会と直接指定した室内楽演奏会を抽出
-			// newをつける演奏会はのちに抽出
-			return (
-				(concert.type === 'regular' || nonRegularDisplayingConcerts.includes(concert.slug)) &&
-				!newConcerts.includes(concert.slug)
-			);
-		})
-		.sort((a, b) => {
-			// 日付降順
-			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? 1 : -1;
-		});
-	const newSlideshowItems = data.concerts
-		.filter((concert) => {
-			// newをつける演奏会を抽出
-			return newConcerts.includes(concert.slug);
-		})
-		.sort((a, b) => {
-			// ここは開催日が近い順に：日付昇順
-			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
-		});
-	const slideshowItems = [...newSlideshowItems, ...nonNewSlideshowItems]
-		.map((concert) => {
-			return {
-				title: concert.title,
-				flyers: concert.flyers,
-				slug: concert.slug,
-				isNew: newConcerts.includes(concert.slug)
-			};
-		})
-		.filter(
-			(
-				concert
-			): concert is {
-				title: string;
-				flyers: FlyerType[];
-				slug: string;
-				isNew: boolean;
-			} => {
-				// フライヤーがないものは表示しない
-				return concert.flyers !== undefined;
-			}
-		);
+	const nonNewSlideshowItems = $derived.by(() =>
+		data.concerts
+			.filter((concert) => {
+				// 定期演奏会と直接指定した室内楽演奏会を抽出
+				// newをつける演奏会はのちに抽出
+				return (
+					(concert.type === 'regular' || nonRegularDisplayingConcerts.includes(concert.slug)) &&
+					!newConcerts.includes(concert.slug)
+				);
+			})
+			.sort((a, b) => {
+				// 日付降順
+				return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? 1 : -1;
+			})
+	);
+	const newSlideshowItems = $derived.by(() =>
+		data.concerts
+			.filter((concert) => {
+				// newをつける演奏会を抽出
+				return newConcerts.includes(concert.slug);
+			})
+			.sort((a, b) => {
+				// ここは開催日が近い順に：日付昇順
+				return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
+			})
+	);
+	const slideshowItems = $derived.by(() =>
+		[...newSlideshowItems, ...nonNewSlideshowItems]
+			.map((concert) => {
+				return {
+					title: concert.title,
+					flyers: concert.flyers,
+					slug: concert.slug,
+					isNew: newConcerts.includes(concert.slug)
+				};
+			})
+			.filter(
+				(
+					concert
+				): concert is {
+					title: string;
+					flyers: FlyerType[];
+					slug: string;
+					isNew: boolean;
+				} => {
+					// フライヤーがないものは表示しない
+					return concert.flyers !== undefined;
+				}
+			)
+	);
 
 	const updatePaginationColor = (e: CustomEvent<MoveEventDetail> | undefined) => {
 		if (!e) return;
@@ -104,8 +110,8 @@
 		</SplideTrack>
 
 		<div class="splide__arrows">
-			<button class="splide__arrow splide__arrow--prev"></button>
-			<button class="splide__arrow splide__arrow--next"></button>
+			<button aria-label="前のスライド" class="splide__arrow splide__arrow--prev"></button>
+			<button aria-label="次のスライド" class="splide__arrow splide__arrow--next"></button>
 		</div>
 	</Splide>
 </div>

@@ -3,14 +3,14 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
 
-	export let data: PageServerData;
+	let { data }: { data: PageServerData } = $props();
 
-	const items: { title: string; duration: string; url: string }[] = data.reports.map(
-		(report, index) => ({
+	const items = $derived.by<{ title: string; duration: string; url: string }[]>(() =>
+		data.reports.map((report, index) => ({
 			title: `第${index + 1}期`,
 			duration: report.duration,
 			url: `/about/accounting/fiscal-year-${index + 1}`
-		})
+		}))
 	);
 </script>
 
