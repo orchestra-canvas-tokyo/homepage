@@ -37,7 +37,6 @@ export const concert: Concert = {
 		url: 'https://teket.jp/1776/44429?uid=hp'
 	},
 	showLinkToProgramNote: true,
-	flyerInsertionClosed: true // 挟み込み募集終了
 	// cspell: disable-next-line
-	// youtubePlaylistId: '●'
+	youtubePlaylistId: 'PLlsZL5V_BM_GZgUvVoTjggu_VRt5g2KlI'
 };

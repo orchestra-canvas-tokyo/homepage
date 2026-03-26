@@ -3,9 +3,14 @@
 	import type { YearlyFirstConcerts } from './YearAnchors';
 
 	/** 年と対応する演奏会の一覧 */
-	export let yearlyFirstConcerts: YearlyFirstConcerts;
+	let {
+		yearlyFirstConcerts,
+		concertType
+	}: {
+		yearlyFirstConcerts: YearlyFirstConcerts;
+		concertType: ConcertType;
+	} = $props();
 	/** 演奏会種別 */
-	export let concertType: ConcertType;
 </script>
 
 <!--

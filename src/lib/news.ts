@@ -1,3 +1,5 @@
+import pricingNoticePdf from '$lib/documents/公演チケット価格改定のお知らせ.pdf';
+
 /** ニュースをもつ配列 */
 export const newsItems: {
 	date: string;
@@ -256,5 +258,35 @@ export const newsItems: {
 		url: '/concerts/regular-15',
 		date: '2025/9/19',
 		content: '第15回定期演奏会のフライヤーを公開しました。'
+	},
+	{
+		url: '/concerts/regular-15',
+		date: '2025/11/11',
+		content: '第15回定期演奏会の曲目解説を公開しました。'
+	},
+	{
+		url: '/concerts/regular-16',
+		date: '2025/11/24',
+		content: '第16回定期演奏会の詳細情報を公開しました。'
+	},
+	{
+		url: '/concerts/chamber-15',
+		date: '2026/1/11',
+		content: '第15回室内楽演奏会の演奏曲目数の変更について'
+	},
+	{
+		url: '/nyanvas',
+		date: '2026/2/22',
+		content: '本日は猫の日。ホームページも猫たっぷりに！？'
+	},
+	{
+		url: pricingNoticePdf,
+		date: '2026/3/3',
+		content: '公演チケット価格改定のお知らせ'
+	},
+	{
+		url: '/concerts/regular-17',
+		date: '2026/3/14',
+		content: '第17回定期演奏会のチケットを発売しました。'
 	}
 ];

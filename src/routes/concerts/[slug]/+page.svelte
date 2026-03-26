@@ -7,8 +7,9 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import Slider from '$lib/components/Slider.svelte';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import OpenInNewIcon from '$lib/components/OpenInNewIcon.svelte';
 
-	export let data: PageServerData;
+	let { data }: { data: PageServerData } = $props();
 </script>
 
 <Meta title={data.title} canonical="/concerts/{data.slug}" />
@@ -35,6 +36,19 @@
 	<h1 class="en">concerts</h1>
 	<h2>{data.title}</h2>
 
+	{#if data.message}
+		<!-- 臨時のお知らせはタイトル直下に表示 -->
+		<section class="concert-message">
+			<h3>{data.message.title}</h3>
+			<p class="concert-message-body">
+				{data.message.body}
+				{#if data.message.url}
+					<br /><a href={data.message.url}>{data.message.linkText || '詳細はこちら'}</a>
+				{/if}
+			</p>
+		</section>
+	{/if}
+
 	{#if data.flyers}
 		<div class="flyer-container">
 			{#if data.flyers.length > 1}
@@ -44,8 +58,6 @@
 			{/if}
 		</div>
 	{/if}
-
-	<div class="spacer" />
 
 	<dl>
 		<dt>日時</dt>
@@ -60,13 +72,15 @@
 		<dt>場所</dt>
 		<dd>
 			<p>{data.place.name}</p>
-			<p><a href={data.place.url}>交通アクセス</a></p>
+			<p><a href={data.place.url} target="_blank">交通アクセス<OpenInNewIcon /></a></p>
 		</dd>
 		{#if data.conductor}
 			<dt>指揮</dt>
 			<dd>
 				{#if data.conductor.url}
-					<p><a href={data.conductor.url}>{data.conductor.name}</a></p>
+					<p>
+						<a href={data.conductor.url} target="_blank">{data.conductor.name}<OpenInNewIcon /></a>
+					</p>
 				{:else}
 					<p>{data.conductor.name}</p>
 				{/if}
@@ -76,7 +90,7 @@
 			<dt>{data.soloist.title || '独奏'}</dt>
 			<dd>
 				{#if data.soloist.url}
-					<p><a href={data.soloist.url}>{data.soloist.name}</a></p>
+					<p><a href={data.soloist.url} target="_blank">{data.soloist.name}<OpenInNewIcon /></a></p>
 				{:else}
 					<p>{data.soloist.name}</p>
 				{/if}
@@ -121,7 +135,7 @@
 				<dt>{credit.title}</dt>
 				<dd>
 					{#if credit.image}
-						<a href={credit.url} class="credit-image-link">
+						<a href={credit.url} target="_blank" class="credit-image-link">
 							<span>{credit.name}</span>
 							<img
 								class="inline-icon"
@@ -131,7 +145,7 @@
 							/>
 						</a>
 					{:else}
-						<a href={credit.url}>{credit.name}</a>
+						<a href={credit.url} target="_blank">{credit.name}</a>
 					{/if}
 				</dd>
 			{/each}
@@ -156,8 +170,9 @@
 						href="https://blog.orch-canvas.tokyo/tag/第{data.number}回{getConcertShortName(
 							data.type
 						)}"
+						target="_blank"
 					>
-						# 第{data.number}回{getConcertShortName(data.type)}の記事一覧
+						# 第{data.number}回{getConcertShortName(data.type)}の記事一覧<OpenInNewIcon />
 					</a>
 				</p>
 			</dl>
@@ -166,14 +181,14 @@
 
 	{#if // チケット情報があり、開催日が未来か今日だったら
 	data.ticket && data.ticket.url && (dayjs(data.dateTime.date).isAfter(dayjs()) || dayjs(data.dateTime.date).isSame(dayjs(), 'day'))}
-		<div class="spacer" />
+		<div class="spacer"></div>
 		<a href={data.ticket.url} class="full-width-button">
 			<img alt="teketロゴ" class="teket-logo" />でチケット購入
 		</a>
 	{/if}
 
 	{#if data.youtubePlaylistId}
-		<div class="spacer" />
+		<div class="spacer"></div>
 		<iframe
 			width="560"
 			height="315"
@@ -200,6 +215,22 @@
 		margin: 5px 0 35px;
 		font-size: 2em;
 		font-weight: normal;
+	}
+	.concert-message {
+		border: 1px solid var(--main-color);
+		border-radius: 12px;
+		padding: 18px 22px;
+		margin: 0 0 40px;
+	}
+	.concert-message h3 {
+		margin: 0 0 10px;
+		font-size: 1.25em;
+		font-weight: normal;
+	}
+	.concert-message-body {
+		/* 改行コードを反映して表示する */
+		white-space: pre-line;
+		margin: 0;
 	}
 
 	@media (max-width: 950px) {
@@ -240,6 +271,7 @@
 	}
 
 	.flyer-container :global(img) {
+		margin-bottom: 40px;
 		max-width: min(100%, 700px);
 		height: auto;
 	}

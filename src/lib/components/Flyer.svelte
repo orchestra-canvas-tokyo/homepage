@@ -1,11 +1,19 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
-	export let src: string;
-	export let alt: string;
-	export let lazy: boolean = false;
-	export let width: number | undefined = undefined;
-	export let height: number | undefined = undefined;
+	let {
+		src,
+		alt,
+		lazy = false,
+		width = undefined,
+		height = undefined
+	}: {
+		src: string;
+		alt: string;
+		lazy?: boolean;
+		width?: number;
+		height?: number;
+	} = $props();
 
 	const commonOptions = [
 		['format', 'auto'],
@@ -13,10 +21,9 @@
 	] satisfies [string, string][];
 	const defaultHeight = 1920;
 
-	$: useCloudflareImages = false;
-	onMount(() => {
-		useCloudflareImages = new URL(window.location.href).hostname === 'www.orch-canvas.tokyo';
-	});
+	const useCloudflareImages = $derived(
+		browser && window.location.hostname === 'www.orch-canvas.tokyo'
+	);
 
 	function getCloudflareSrc(src: string, options: [string, string][]): string {
 		const optionsString = options.map(([key, value]) => `${key}=${value}`).join(',');

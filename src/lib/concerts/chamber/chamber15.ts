@@ -9,18 +9,33 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
+	message: {
+		title: '【お知らせ】演奏曲目数の変更',
+		body: `出演者の体調不良のため、演奏曲数が変更となります。
+以下の3曲にて演奏会を開催いたします。
+
+ドホナーニ / ピアノ五重奏曲第2番
+ブラームス / ピアノ四重奏曲第1番より第4楽章
+ハイドン / 弦楽四重奏曲第63番「日の出」より
+
+急な変更となり、大変申し訳ございません。
+短い時間とはなりますが、お楽しみいただければ幸いです。`
+	},
 	// flyer: flyer,
-	dateTime: { date: '2026-1-11', time: '昼公演' },
+	dateTime: { date: '2026-1-11', time: '13:30開場 14:00開演' },
 	place: {
-		name: '横浜市戸塚区民文化センター さくらホール',
+		name: '横浜市戸塚区民文化センターさくらプラザ・ホール（４階）',
 		url: 'https://totsuka.hall-info.jp/access/'
 	},
-	// programs: [
-	// 	{ composer: '●', title: '●' },
-	// ],
+	programs: [
+		{ composer: 'ポッパー', title: '2つのチェロのための組曲より第4曲' },
+		{ composer: 'ドホナーニ', title: 'ピアノ五重奏曲第2番' },
+		{ composer: 'ブラームス', title: 'ピアノ四重奏曲第1番より第4楽章' },
+		{ composer: 'ハイドン', title: '弦楽四重奏曲第63番「日の出」' }
+	],
 	ticket: {
-		description: '未定'
-		// url: '●?uid=hp'
+		description: '入場無料',
+		url: 'https://teket.jp/1776/61699?uid=hp'
 	},
 	showLinkToProgramNote: false
 	// cspell: disable-next-line

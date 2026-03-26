@@ -28,9 +28,10 @@ export const concert: Concert = {
 	// 		composer: '●'
 	// 	}
 	// ],
-	// ticket: {
-	// 	url: '●'
-	// },
+	ticket: {
+		description: '未定',
+		// url: '●?uid=hp'
+	},
 	showLinkToProgramNote: false,
 	// cspell: disable-next-line
 	// youtubePlaylistId: '●'

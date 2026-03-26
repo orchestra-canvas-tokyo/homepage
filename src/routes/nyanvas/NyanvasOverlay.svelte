@@ -5,16 +5,17 @@
 
 	let pawEngine: PawEngine | null = null;
 	let deviceMotionController: DeviceMotionController | null = null;
-	let showPermissionToast = false;
 	let permissionButton: HTMLButtonElement | null = null;
+	let showPermissionToast = $state(false);
 
 	const updatePermissionStatus = (permitted: boolean) => {
 		showPermissionToast = !permitted;
 	};
 
-	$: if (showPermissionToast) {
+	$effect(() => {
+		if (!showPermissionToast) return;
 		void tick().then(() => permissionButton?.focus());
-	}
+	});
 
 	onMount(() => {
 		pawEngine = new PawEngine(
@@ -60,7 +61,7 @@
 	};
 </script>
 
-<svelte:window on:click={onclick} on:devicemotion={ondevicemotion} on:resize={onresize} />
+<svelte:window {onclick} {ondevicemotion} {onresize} />
 
 <div
 	id="permission-toast"
@@ -71,7 +72,7 @@
 	aria-labelledby="permission-toast-message"
 >
 	<p id="permission-toast-message">ぜひ、加速度センサー付きでご覧ください！</p>
-	<button bind:this={permissionButton} type="button" on:click={onclickGrantPermission}>進む</button>
+	<button bind:this={permissionButton} type="button" onclick={onclickGrantPermission}>進む</button>
 </div>
 
 <style>

@@ -27,6 +27,13 @@ export interface Concert {
 	number: number;
 	slug: string;
 	title: string;
+	// 演奏会に関する臨時のお知らせ（未指定なら表示しない）
+	message?: {
+		title: string;
+		body: string;
+		url?: string; // お知らせに関連するリンク先URL（PDFなど）
+		linkText?: string; // リンクテキスト（未指定時は「詳細はこちら」）
+	};
 	flyers?: Flyer[];
 	dateTime: {
 		date: string;
@@ -65,5 +72,4 @@ export interface Concert {
 	};
 	showLinkToProgramNote?: boolean; // blogへのリンクを表示するかどうか
 	youtubePlaylistId?: string;
-	flyerInsertionClosed?: boolean; // 挟み込み募集が終了している場合true
 }

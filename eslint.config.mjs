@@ -2,6 +2,7 @@ import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import globals from 'globals';
 import tsParser from '@typescript-eslint/parser';
 import parser from 'svelte-eslint-parser';
+import svelte from 'eslint-plugin-svelte';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
@@ -32,12 +33,8 @@ export default [
 			'.wrangler'
 		]
 	},
-	...compat.extends(
-		'eslint:recommended',
-		'plugin:@typescript-eslint/recommended',
-		'plugin:svelte/recommended',
-		'prettier'
-	),
+	...compat.extends('eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'),
+	...svelte.configs['flat/base'],
 	{
 		plugins: {
 			'@typescript-eslint': typescriptEslint
@@ -59,7 +56,12 @@ export default [
 		},
 
 		rules: {
-			'no-irregular-whitespace': ['off']
+			'no-irregular-whitespace': [
+				'error',
+				{
+					skipTemplates: true
+				}
+			]
 		}
 	},
 	{
