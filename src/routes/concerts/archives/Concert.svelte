@@ -42,6 +42,8 @@
 				<a
 					class="show-on-mobile"
 					href="https://youtube.com/playlist?list={concert.youtubePlaylistId}"
+					target="_blank"
+					rel="noopener noreferrer"
 				>
 					<img src={youtubeLogo} alt="YouTube" class="youtube-logo" />
 				</a>
@@ -84,6 +86,8 @@
 				<a
 					class="hide-on-mobile"
 					href="https://youtube.com/playlist?list={concert.youtubePlaylistId}"
+					target="_blank"
+					rel="noopener noreferrer"
 				>
 					<img src={youtubeLogo} alt="YouTube" class="youtube-logo" />
 				</a>

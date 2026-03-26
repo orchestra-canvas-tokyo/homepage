@@ -1,9 +1,13 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
 	import { newsItems } from '$lib/news';
+	import { isNyanvasPath, NYANVAS_ENTRY_PATH } from '$lib/nyanvasPaths';
+	import OpenInNewIcon from '$lib/components/OpenInNewIcon.svelte';
 
 	import logo from './logo.svg';
 	import logoSp from './canvas_symbol_white.png';
+	import nyanvasLogo from './nyanvas/orchestra-nyanvas-tokyo.png';
+	import nyanvasLogoSp from './nyanvas/orchestra-nyanvas-tokyo-small.png';
 	import instagramIcon from './instagram-brands.svg';
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
@@ -34,6 +38,7 @@
 		title: string;
 		url?: string;
 		lang: 'en' | 'ja'; // フォントの出しわけに使用
+		isExternal?: boolean; // 外部リンクかどうか
 	}
 	interface HeaderMenuItem extends MenuItem {
 		children?: MenuItem[];
@@ -88,12 +93,14 @@
 				{
 					title: 'music',
 					url: 'https://blog.orch-canvas.tokyo/',
-					lang: 'en'
+					lang: 'en',
+					isExternal: true
 				},
 				{
 					title: 'tech',
 					url: 'https://zenn.dev/p/orch_canvas',
-					lang: 'en'
+					lang: 'en',
+					isExternal: true
 				}
 			]
 		},
@@ -133,9 +140,29 @@
 
 	// ハンバーガーメニュー
 	let isOpen: boolean = false;
+	let isNyanvasRoute: boolean;
+	let isNyanvasEvent: boolean;
+	let shouldShowNyanvasOverlay: boolean;
+	let headerHref: string;
+	let headerLogo: string;
+	let headerLogoSp: string;
+	let headerAlt: string;
+	let NyanvasOverlayComponent: typeof import('./nyanvas/NyanvasOverlay.svelte').default | null =
+		null;
+	let isLoadingNyanvasOverlayComponent = false;
 	$: transformX = isOpen ? '0' : '300px';
+	$: isNyanvasEvent = data.seasonalEvent?.id === 'nyanvas';
+	$: isNyanvasRoute = isNyanvasPath($page.url.pathname);
+	$: shouldShowNyanvasOverlay = isNyanvasEvent && !isNyanvasRoute;
+	$: headerHref = isNyanvasEvent ? (isNyanvasRoute ? '/' : NYANVAS_ENTRY_PATH) : '/';
+	$: headerLogo = isNyanvasEvent ? nyanvasLogo : logo;
+	$: headerLogoSp = isNyanvasEvent ? nyanvasLogoSp : logoSp;
+	$: headerAlt = isNyanvasEvent ? 'Orchestra Nyanvas Tokyoのロゴ' : 'Orchestra Canvas Tokyoのロゴ';
 	$: if (browser) {
 		document.body.style.overflow = isOpen ? 'hidden' : '';
+	}
+	$: if (browser && shouldShowNyanvasOverlay) {
+		void loadNyanvasOverlay();
 	}
 
 	// ハンバーガーメニューオープン時はスクロールしないように
@@ -144,18 +171,36 @@
 	});
 	onDestroy(unsubscribe);
 
+	const loadNyanvasOverlay = async () => {
+		if (NyanvasOverlayComponent) return;
+		if (isLoadingNyanvasOverlayComponent) return;
+
+		isLoadingNyanvasOverlayComponent = true;
+
+		try {
+			const module = await import('./nyanvas/NyanvasOverlay.svelte');
+			NyanvasOverlayComponent = module.default;
+		} finally {
+			isLoadingNyanvasOverlayComponent = false;
+		}
+	};
+
 	// 画面遷移時はハンバーガーメニューを閉じる
 	afterNavigate(() => {
 		isOpen = false;
 	});
 </script>
 
+{#if shouldShowNyanvasOverlay && NyanvasOverlayComponent}
+	<svelte:component this={NyanvasOverlayComponent} />
+{/if}
+
 <div class="container">
 	<div class="content">
 		<header>
-			<a href="/">
-				<img src={logo} alt="Orchestra Canvas Tokyoのロゴ" class="logo" />
-				<img src={logoSp} alt="Orchestra Canvas Tokyoのロゴ" class="logo-sp" />
+			<a href={headerHref}>
+				<img src={headerLogo} alt={headerAlt} class="logo" />
+				<img src={headerLogoSp} alt={headerAlt} class="logo-sp" />
 			</a>
 			<nav>
 				<input
@@ -183,7 +228,18 @@
 									{#each menuItem.children as child}
 										<li>
 											{#if child.url}
-												<a href={child.url} class={child.lang}>{child.title}</a>
+												{#if child.isExternal}
+													<a
+														href={child.url}
+														target="_blank"
+														rel="noopener noreferrer"
+														class={child.lang}
+													>
+														{child.title}<OpenInNewIcon />
+													</a>
+												{:else}
+													<a href={child.url} class={child.lang}>{child.title}</a>
+												{/if}
 											{:else}
 												<span class={child.lang}>{child.title}</span>
 											{/if}
@@ -255,6 +311,8 @@
 	}
 
 	.content {
+		position: relative;
+		z-index: 1;
 		width: min(100dvw, 1280px);
 	}
 
