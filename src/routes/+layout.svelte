@@ -195,124 +195,128 @@
 	<NyanvasOverlayComponent />
 {/if}
 
-<header>
-	<a href={headerHref}>
-		<img src={headerLogo} alt={headerAlt} class="logo" />
-		<img src={headerLogoSp} alt={headerAlt} class="logo-sp" />
-	</a>
-	<nav>
-		<input
-			bind:checked={isOpen}
-			type="checkbox"
-			id="hamburger-menu-check"
-			aria-label="ハンバーガーメニューを開閉する"
-		/>
-		<label id="hamburger-menu-button" for="hamburger-menu-check">
-			<span></span>
-			<span></span>
-			<span></span>
-		</label>
+<div class="container">
+	<div class="content">
+		<header>
+			<a href={headerHref}>
+				<img src={headerLogo} alt={headerAlt} class="logo" />
+				<img src={headerLogoSp} alt={headerAlt} class="logo-sp" />
+			</a>
+			<nav>
+				<input
+					bind:checked={isOpen}
+					type="checkbox"
+					id="hamburger-menu-check"
+					aria-label="ハンバーガーメニューを開閉する"
+				/>
+				<label id="hamburger-menu-button" for="hamburger-menu-check">
+					<span></span>
+					<span></span>
+					<span></span>
+				</label>
 
-		<ul style="--translate-x: {transformX}">
-			{#each headerMenuItems as menuItem}
-				<li>
-					{#if menuItem.url}
-						<a href={menuItem.url} class={menuItem.lang}>{menuItem.title}</a>
-					{:else}
-						<span class={menuItem.lang}>{menuItem.title}</span>
-					{/if}
-					{#if menuItem.children}
-						<ul>
-							{#each menuItem.children as child}
-								<li>
-									{#if child.url}
-										{#if child.isExternal}
-											<a href={child.url} target="_blank" class={child.lang}>
-												{child.title}<OpenInNewIcon />
-											</a>
-										{:else}
-											<a href={child.url} class={child.lang}>{child.title}</a>
-										{/if}
-									{:else}
-										<span class={child.lang}>{child.title}</span>
-									{/if}
-								</li>
-							{/each}
-						</ul>
-					{/if}
-				</li>
-			{/each}
-			<li class="hamburger-sns-container">
-				{#each snsMenuItems as sns}
-					<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
-				{/each}
-			</li>
-		</ul>
-	</nav>
-</header>
-
-<aside class="sidebar">
-	{#if data.isRoot}
-		<div class="news">
-			<h2 class="en"><a href="/news">news!</a></h2>
-			<ul>
-				{#each newsItems.slice(-2).reverse() as item}
-					<li>
-						<a href={item.url}>
-							<span class="date">{item.date}</span>
-							<p>{item.content}</p>
-						</a>
+				<ul style="--translate-x: {transformX}">
+					{#each headerMenuItems as menuItem}
+						<li>
+							{#if menuItem.url}
+								<a href={menuItem.url} class={menuItem.lang}>{menuItem.title}</a>
+							{:else}
+								<span class={menuItem.lang}>{menuItem.title}</span>
+							{/if}
+							{#if menuItem.children}
+								<ul>
+									{#each menuItem.children as child}
+										<li>
+											{#if child.url}
+												{#if child.isExternal}
+													<a
+														href={child.url}
+														target="_blank"
+														rel="noopener noreferrer"
+														class={child.lang}
+													>
+														{child.title}<OpenInNewIcon />
+													</a>
+												{:else}
+													<a href={child.url} class={child.lang}>{child.title}</a>
+												{/if}
+											{:else}
+												<span class={child.lang}>{child.title}</span>
+											{/if}
+										</li>
+									{/each}
+								</ul>
+							{/if}
+						</li>
+					{/each}
+					<li class="hamburger-sns-container">
+						{#each snsMenuItems as sns}
+							<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+						{/each}
 					</li>
-				{/each}
-			</ul>
-		</div>
-	{/if}
+				</ul>
+			</nav>
+		</header>
 
-	<nav>
-		<ul>
-			{#each snsMenuItems as item}
-				<li>
-					<a href={item.url}><img src={item.icon} alt={item.alt} width="25px" /></a>
-				</li>
-			{/each}
-		</ul>
-	</nav>
-</aside>
+		<aside class="sidebar">
+			{#if data.isRoot}
+				<div class="news">
+					<h2 class="en"><a href="/news">news!</a></h2>
+					<ul>
+						{#each newsItems.slice(-2).reverse() as item}
+							<li>
+								<a href={item.url}>
+									<span class="date">{item.date}</span>
+									<p>{item.content}</p>
+								</a>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
 
-<main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
-	{@render children?.()}
-
-	{#if data.isRoot}
-		<aside class="mobile-news">
-			<div class="news">
-				<h2 class="en">news!</h2>
-				<a href={newsItems.slice(-1)[0].url}>
-					<span class="date">{newsItems.slice(-1)[0].date}</span>
-					<p>{newsItems.slice(-1)[0].content}</p>
-				</a>
-			</div>
+			<nav>
+				<ul>
+					{#each snsMenuItems as item}
+						<li>
+							<a href={item.url}><img src={item.icon} alt={item.alt} width="25px" /></a>
+						</li>
+					{/each}
+				</ul>
+			</nav>
 		</aside>
-	{/if}
-</main>
+
+		<main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
+			{@render children?.()}
+
+			{#if data.isRoot}
+				<aside class="mobile-news">
+					<div class="news">
+						<h2 class="en">news!</h2>
+						<a href={newsItems.slice(-1)[0].url}>
+							<span class="date">{newsItems.slice(-1)[0].date}</span>
+							<p>{newsItems.slice(-1)[0].content}</p>
+						</a>
+					</div>
+				</aside>
+			{/if}
+		</main>
+	</div>
+</div>
 
 <style>
-	/* Nyanvas用 */
-	:global(canvas) {
-		position: fixed;
-		top: 0;
-		left: 0;
+	.container {
+		display: flex;
+		justify-content: center;
 	}
-	main {
-		z-index: 100;
+
+	.content {
+		position: relative;
+		z-index: 1;
+		width: min(100dvw, 1280px);
 	}
 
 	:global(body) {
-		display: grid;
-		grid-template-areas:
-			'header header'
-			'sidebar main';
-		grid-template-columns: var(--aside-width) 1fr;
-		grid-template-rows: var(--header-height) auto;
 		color: var(--main-color);
 		background-color: var(--background-color);
 		margin: 0;
@@ -329,7 +333,7 @@
 	}
 
 	header {
-		grid-area: header;
+		position: relative;
 		z-index: 1000;
 		display: flex;
 		justify-content: space-between;
@@ -553,13 +557,14 @@
 	}
 
 	.sidebar {
-		grid-area: sidebar;
 		z-index: 500;
 		position: fixed;
 		bottom: var(--window-padding);
 		width: var(--aside-width);
+		height: calc(100dvh - var(--header-height));
 		display: flex;
 		flex-direction: column;
+		justify-content: flex-end;
 		gap: 45px;
 	}
 	.sidebar ul {
@@ -605,10 +610,15 @@
 	}
 
 	main {
-		grid-area: main;
+		margin-left: var(--aside-width);
 		margin-bottom: var(--window-padding);
 	}
 	@media (max-width: 950px) {
+		main {
+			margin-left: unset;
+			overflow-x: hidden;
+		}
+
 		.non-root-main {
 			padding: 0 var(--window-padding);
 		}

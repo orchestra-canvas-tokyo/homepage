@@ -9,14 +9,9 @@
 	import youtubeLogo from './yt_logo_mono_dark.png';
 
 	/** このコンポーネントが表示する演奏会 */
-	let {
-		concert,
-		yearlyFirstConcert
-	}: {
-		concert: Concert;
-		yearlyFirstConcert: YearlyFirstConcerts;
-	} = $props();
+	export let concert: Concert;
 	/** アンカーリンクを張る、各年最初の演奏会の情報をまとめたオブジェクト */
+	export let yearlyFirstConcert: YearlyFirstConcerts;
 </script>
 
 <!--
@@ -48,6 +43,7 @@
 					class="show-on-mobile"
 					href="https://youtube.com/playlist?list={concert.youtubePlaylistId}"
 					target="_blank"
+					rel="noopener noreferrer"
 				>
 					<img src={youtubeLogo} alt="YouTube" class="youtube-logo" />
 				</a>
@@ -91,6 +87,7 @@
 					class="hide-on-mobile"
 					href="https://youtube.com/playlist?list={concert.youtubePlaylistId}"
 					target="_blank"
+					rel="noopener noreferrer"
 				>
 					<img src={youtubeLogo} alt="YouTube" class="youtube-logo" />
 				</a>
@@ -119,7 +116,6 @@
 	}
 
 	.concert {
-		/* width: min(calc(100dvw - var(--aside-width) - var(--window-padding)), 900px); */
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
@@ -208,7 +204,7 @@
 		}
 	}
 
-	.flyer-container {
+	:is(picture):has(.flyer) {
 		line-height: 0;
 	}
 
