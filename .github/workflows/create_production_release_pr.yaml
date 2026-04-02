@@ -1,0 +1,56 @@
+name: production merge用のPRを作成
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: production-release-pr
+  cancel-in-progress: false
+
+jobs:
+  create-production-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch production branch
+        run: git fetch origin main production
+
+      - name: Check whether production needs a release PR
+        run: |
+          if [ "$(git rev-list --count origin/production..origin/main)" -eq 0 ]; then
+            echo "SHOULD_CREATE=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          echo "SHOULD_CREATE=true" >> "$GITHUB_ENV"
+          echo "RELEASE_DATE=$(TZ=Asia/Tokyo date -d '+1 day' '+%Y/%m/%d')" >> "$GITHUB_ENV"
+
+      - name: Create production release PR
+        if: env.SHOULD_CREATE == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          EXISTING_PR_NUMBER="$(gh pr list --base production --head main --state open --json number --jq '.[0].number')"
+
+          if [ -n "$EXISTING_PR_NUMBER" ]; then
+            echo "Open production PR already exists: #$EXISTING_PR_NUMBER"
+            exit 0
+          fi
+
+          gh pr create \
+            --base production \
+            --head main \
+            --title "production release ${RELEASE_DATE}" \
+            --body "main の変更を production へ取り込むための自動作成 PR です。レビュー後に手動でマージしてください。"

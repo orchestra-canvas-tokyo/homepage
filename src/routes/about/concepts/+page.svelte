@@ -1,7 +1,21 @@
 <script lang="ts">
+	import organizationStats from '$lib/organizationStats.json';
+	import {
+		formatAttendanceCount,
+		formatYouTubeSubscriberCount,
+		formatYouTubeTotalViewCount
+	} from '$lib/organizationStats';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
 	import organizationChart from './organization-chart.png';
+
+	const displayingTotalAttendance = formatAttendanceCount(organizationStats.totalAttendance);
+	const displayingYouTubeSubscriberCount = formatYouTubeSubscriberCount(
+		organizationStats.youtubeSubscriberCount
+	);
+	const displayingYouTubeTotalViewCount = formatYouTubeTotalViewCount(
+		organizationStats.youtubeTotalViewCount
+	);
 </script>
 
 <Meta title="Concepts" canonical="/about/concepts" />
@@ -28,15 +42,15 @@
 	<h1 class="en">concepts</h1>
 	<p>Orchestra Canvas Tokyo (OCT) は、2020年8月に発足した音楽団体です。</p>
 	<p>
-		OCTは、特定の音楽団体を母体に持たない開かれた音楽コミュニティとして設立されました。様々な知識や経験、アイディアを持つ奏者が交流する場となることによって、価値創造の拠点となることを目指しています。
+		OCTは、特定の音楽団体を母体に持たない開かれた音楽コミュニティとして設立されました。団体名である"Canvas(
+		画布
+		)"という単語には、さまざまな知識・経験が出会い、一つの作品を織りなす場となることを目指す、当団設立の理念が込められています。
 	</p>
 	<p>
-		設立後は、宇都宮シンフォニーオーケストラ、お茶の水管弦楽団、神奈川大学管弦楽団、九大フィルハーモニー・オーケストラ、京都大学交響楽団、成蹊大学管弦楽団、千葉大学管弦楽団、筑波大学管弦楽団、電気通信大学管弦楽団、東京外国語大学管弦楽団、東京工業大学管弦楽団、東京大学音楽部管弦楽団、東京大学歌劇団、東京大学吹奏楽部、東京大学フィルハーモニー管弦楽団、東京大学フィロムジカ交響楽団、東京農業大学農友会管弦楽部、名古屋市立大学管弦楽団、日本大学管弦楽団、一橋大学交響楽団、法政大学交響楽団、明治大学交響楽団、立教大学交響楽団、ワグネル・ソサィエティー・オーケストラ、早稲田大学交響楽団、Kプレミアムオーケストラ、La
-		Jolla Symphony Orchestra、Princeton University
-		Orchestraなど多くの団体にルーツを持つ優秀な奏者が多数参加しています。
+		設立後は、定期演奏会・室内楽演奏会を中心とする演奏活動を重ね、累計{displayingTotalAttendance}を超えるお客様をお迎えするとともに、YouTubeを通じた動画配信ではチャンネル登録者数{displayingYouTubeSubscriberCount}、総再生回数{displayingYouTubeTotalViewCount}を達成するなど、時間や場所の制約を超えた音楽活動を目指しています。
 	</p>
 	<p>
-		また、強固な運営基盤が整えられていることもOCTの特徴の一つです。団の維持機能を担う総務部、会計業務を担う経理部、演奏活動の広報を担う広報部、演奏活動の企画を担う企画部、演奏会の運営を担う制作部の5つの常設事業部を設け、奏者の持つアイディアに可能な限り挑戦する体制を整えています。
+		また、強固な運営基盤が整えられていることもOCTの特徴の一つです。団の維持機能を担う総務部・経理部、広報機能を担う広報部、制作機能を担う企画部・制作部の5つの常設組織を設け、奏者の持つアイディアに可能な限り挑戦する体制を整えています。
 	</p>
 	<p>
 		これらの環境を最大限活かし、人的・知的交流が支える音楽的挑戦を通じて、皆様に新たな音楽的価値をお届けして参ります。

@@ -1,4 +1,4 @@
-name: YouTubeの総再生回数を更新
+name: 団体情報の統計を更新
 
 on:
   schedule:
@@ -8,52 +8,89 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
-  group: youtube-view-count-production
+  group: organization-stats-main
   cancel-in-progress: false
 
 jobs:
-  update-view-count:
+  update-organization-stats:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout production branch
+      - name: Checkout main branch
         uses: actions/checkout@v4
         with:
-          ref: production
+          ref: main
+          fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Reset local main branch to origin/main
+        run: git checkout -B main origin/main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.x'
+          node-version-file: './.node-version'
 
-      - name: Install dependencies
-        run: pip install requests
-
-      - name: Fetch YouTube view count
+      - name: Update organization stats
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           # cspell: disable-next-line
           CHANNEL_ID: 'UCX2SZ5NViwsaOza3biDNjIw'
-          MAX_ALLOWED_INCREASE: '5000000'
-        run: python .github/workflows/fetch_view_count.py
+          ATTENDANCE_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7y_wh0ZipLnKas7Re_tDuU9LxOkhkInNJCT8ziIDGDscRDrmWnGSW2cDUlgFKjROO4HrNRzmZxT0N/pub?gid=0&single=true&output=csv'
+          MAX_ALLOWED_VIEW_INCREASE: '5000000'
+          MAX_ALLOWED_SUBSCRIBER_INCREASE: '5000'
+          MAX_ALLOWED_ATTENDANCE_INCREASE: '5000'
+        run: node .github/workflows/update_organization_stats.ts
 
       - name: Validate changed files
         if: env.SHOULD_COMMIT == 'true'
         run: |
           mapfile -t CHANGED_FILES < <(git status --porcelain | awk '{print $2}')
 
-          if [ "${#CHANGED_FILES[@]}" -ne 1 ] || [ "${CHANGED_FILES[0]}" != "src/routes/support-us/youtube_total_view_count.txt" ]; then
+          if [ "${#CHANGED_FILES[@]}" -ne 1 ] || [ "${CHANGED_FILES[0]}" != "src/lib/organizationStats.json" ]; then
             echo "Unexpected file changes detected: ${CHANGED_FILES[*]}"
             exit 1
           fi
 
-      - name: Commit and push to production
+      - name: Commit and push stats branch
         if: env.SHOULD_COMMIT == 'true'
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git pull --ff-only origin production
-          git add src/routes/support-us/youtube_total_view_count.txt
-          git commit -m "chore(stats): 総再生回数を更新（${TOTAL_VIEWS}回）"
-          git push origin production
+          git checkout -B chore/update-organization-stats
+          git add src/lib/organizationStats.json
+          git commit -m "chore(stats): update organization figures"
+          git push --force-with-lease origin chore/update-organization-stats
+
+      - name: Create or update main PR
+        if: env.SHOULD_COMMIT == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY_FILE="$(mktemp)"
+          cat <<EOF > "$BODY_FILE"
+          ## Summary
+          - update the shared organization stats consumed by \`/about/concepts\` and \`/support-us\`
+          - refresh figures from the published attendance CSV and the YouTube channel statistics API
+
+          ## Updated figures
+          - total attendance: ${TOTAL_ATTENDANCE} (${DISPLAY_TOTAL_ATTENDANCE})
+          - YouTube subscribers: ${YOUTUBE_SUBSCRIBER_COUNT} (${DISPLAY_YOUTUBE_SUBSCRIBER_COUNT})
+          - YouTube total views: ${YOUTUBE_TOTAL_VIEW_COUNT} (${DISPLAY_YOUTUBE_TOTAL_VIEW_COUNT})
+          EOF
+
+          EXISTING_PR_NUMBER="$(gh pr list --base main --head chore/update-organization-stats --state open --json number --jq '.[0].number')"
+
+          if [ -n "$EXISTING_PR_NUMBER" ]; then
+            gh pr edit "$EXISTING_PR_NUMBER" \
+              --title "chore(stats): update organization figures" \
+              --body-file "$BODY_FILE"
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head chore/update-organization-stats \
+            --title "chore(stats): update organization figures" \
+            --body-file "$BODY_FILE"
