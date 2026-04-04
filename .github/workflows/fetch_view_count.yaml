@@ -18,13 +18,14 @@ jobs:
   update-organization-stats:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main branch
+      - name: Checkout workflow ref
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref }}
           fetch-depth: 0
 
       - name: Reset local main branch to origin/main
+        if: github.ref_name == github.event.repository.default_branch
         run: git checkout -B main origin/main
 
       - name: Set up Node.js
@@ -57,7 +58,7 @@ jobs:
 
       - name: Commit and push stats branch
         id: commit_and_push_stats_branch
-        if: env.SHOULD_COMMIT == 'true'
+        if: env.SHOULD_COMMIT == 'true' && github.ref_name == github.event.repository.default_branch
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
@@ -68,7 +69,7 @@ jobs:
 
       - name: Create or update main PR
         id: create_or_update_main_pr
-        if: env.SHOULD_COMMIT == 'true'
+        if: env.SHOULD_COMMIT == 'true' && github.ref_name == github.event.repository.default_branch
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -100,7 +101,7 @@ jobs:
             --body-file "$BODY_FILE"
 
       - name: Post Slack summary
-        if: always()
+        if: always() && github.ref_name == github.event.repository.default_branch
         env:
           SLACK_ORGANIZATION_STATS_WEBHOOK_URL: ${{ secrets.SLACK_ORGANIZATION_STATS_WEBHOOK_URL }}
           ORGANIZATION_STATS_UPDATE_SUMMARY: ${{ env.ORGANIZATION_STATS_UPDATE_SUMMARY }}
