@@ -22,7 +22,7 @@
 <div class="container">
 	<article>
 		<img src={oldLogo} alt="Orchestra Canvas Tokyo" />
-		<span class="arrow" />
+		<span class="arrow"></span>
 		<section>
 			<h1>
 				<img src={logo} alt="Orchestra Nyanvas Tokyo" />

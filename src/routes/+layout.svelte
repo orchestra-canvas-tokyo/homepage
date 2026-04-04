@@ -12,55 +12,60 @@
 	import facebookIcon from './facebook-brands.svg';
 	import xIcon from './x-brands.svg';
 	import youtubeIcon from './youtube-brands.svg';
-	import { onDestroy } from 'svelte';
-	import type { Component } from 'svelte';
-	import { page } from '$app/stores';
+	import type { Component, Snippet } from 'svelte';
+	import { page } from '$app/state';
 	import { browser } from '$app/environment';
 	import dayjs from 'dayjs';
 	import { afterNavigate } from '$app/navigation';
 
-	export let data: LayoutData;
+	let { data, children }: { data: LayoutData; children?: Snippet } = $props();
 
-	$: isNyanvasEvent = data.seasonalEvent?.id === 'nyanvas';
-	$: isNyanvasRoute = isNyanvasPath($page.url.pathname);
-	$: shouldShowNyanvasOverlay = isNyanvasEvent && !isNyanvasRoute;
-	$: headerHref = isNyanvasEvent ? (isNyanvasRoute ? '/' : NYANVAS_ENTRY_PATH) : '/';
-	$: headerLogo = isNyanvasEvent ? nyanvasLogo : logo;
-	$: headerLogoSp = isNyanvasEvent ? nyanvasLogoSp : logoSp;
-	$: headerAlt = isNyanvasEvent ? 'Orchestra Nyanvas Tokyoのロゴ' : 'Orchestra Canvas Tokyoのロゴ';
-	let nyanvasOverlayComponent: Component<Record<string, unknown>> | null = null;
-	let isLoadingNyanvasOverlayComponent = false;
+	const isNyanvasEvent = $derived(data.seasonalEvent?.id === 'nyanvas');
+	const isNyanvasRoute = $derived(isNyanvasPath(page.url.pathname));
+	const shouldShowNyanvasOverlay = $derived(isNyanvasEvent && !isNyanvasRoute);
+	const headerHref = $derived(isNyanvasEvent ? (isNyanvasRoute ? '/' : NYANVAS_ENTRY_PATH) : '/');
+	const headerLogo = $derived(isNyanvasEvent ? nyanvasLogo : logo);
+	const headerLogoSp = $derived(isNyanvasEvent ? nyanvasLogoSp : logoSp);
+	const headerAlt = $derived(
+		isNyanvasEvent ? 'Orchestra Nyanvas Tokyoのロゴ' : 'Orchestra Canvas Tokyoのロゴ'
+	);
+	let NyanvasOverlayComponent = $state<Component | null>(null);
+	let isLoadingNyanvasOverlayComponent = $state(false);
 
 	const loadNyanvasOverlay = async () => {
-		if (nyanvasOverlayComponent) return;
+		if (NyanvasOverlayComponent) return;
 		if (isLoadingNyanvasOverlayComponent) return;
 
 		isLoadingNyanvasOverlayComponent = true;
 
 		try {
 			const module = await import('./nyanvas/NyanvasOverlay.svelte');
-			nyanvasOverlayComponent = module.default;
+			NyanvasOverlayComponent = module.default;
 		} finally {
 			isLoadingNyanvasOverlayComponent = false;
 		}
 	};
 
-	$: if (browser && shouldShowNyanvasOverlay) {
-		void loadNyanvasOverlay();
-	}
+	$effect(() => {
+		if (browser && shouldShowNyanvasOverlay) {
+			void loadNyanvasOverlay();
+		}
+	});
 
-	const upcomingConcerts = data.concerts
-		.filter((concert) => {
-			// 開催日が未来か今日
-			return (
-				dayjs(concert.dateTime.date).isAfter(dayjs()) ||
-				dayjs(concert.dateTime.date).isSame(dayjs(), 'day')
-			);
-		})
-		.sort((a, b) => {
-			// 日付昇順
-			return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
-		});
+	const upcomingConcerts = $derived.by(() =>
+		data.concerts
+			.filter((concert) => {
+				// 開催日が未来か今日
+				return (
+					dayjs(concert.dateTime.date).isAfter(dayjs()) ||
+					dayjs(concert.dateTime.date).isSame(dayjs(), 'day')
+				);
+			})
+			.sort((a, b) => {
+				// 日付昇順
+				return dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1;
+			})
+	);
 
 	// メニュー項目の定義
 	interface MenuItem {
@@ -72,7 +77,7 @@
 	interface HeaderMenuItem extends MenuItem {
 		children?: MenuItem[];
 	}
-	const headerMenuItems: HeaderMenuItem[] = [
+	const headerMenuItems = $derived.by((): HeaderMenuItem[] => [
 		{
 			title: 'about',
 			lang: 'en',
@@ -138,7 +143,7 @@
 			lang: 'en',
 			url: '/contact'
 		}
-	];
+	]);
 
 	const snsMenuItems: {
 		url: string;
@@ -168,17 +173,17 @@
 	];
 
 	// ハンバーガーメニュー
-	let isOpen: boolean = false;
-	$: transformX = isOpen ? '0' : '300px';
-	$: if (browser) {
-		document.body.style.overflow = isOpen ? 'hidden' : '';
-	}
+	let isOpen = $state(false);
+	const transformX = $derived(isOpen ? '0' : '300px');
 
-	// ハンバーガーメニューオープン時はスクロールしないように
-	const unsubscribe = page.subscribe(() => {
-		if (browser) document.body.style.overflow = isOpen ? 'hidden' : '';
+	$effect(() => {
+		if (!browser) return;
+
+		document.body.style.overflow = isOpen ? 'hidden' : '';
+		return () => {
+			document.body.style.overflow = '';
+		};
 	});
-	onDestroy(unsubscribe);
 
 	// 画面遷移時はハンバーガーメニューを閉じる
 	afterNavigate(() => {
@@ -186,128 +191,132 @@
 	});
 </script>
 
-{#if shouldShowNyanvasOverlay && nyanvasOverlayComponent}
-	<svelte:component this={nyanvasOverlayComponent} />
+{#if shouldShowNyanvasOverlay && NyanvasOverlayComponent}
+	<NyanvasOverlayComponent />
 {/if}
 
-<header>
-	<a href={headerHref}>
-		<img src={headerLogo} alt={headerAlt} class="logo" />
-		<img src={headerLogoSp} alt={headerAlt} class="logo-sp" />
-	</a>
-	<nav>
-		<input
-			bind:checked={isOpen}
-			type="checkbox"
-			id="hamburger-menu-check"
-			aria-label="ハンバーガーメニューを開閉する"
-		/>
-		<label id="hamburger-menu-button" for="hamburger-menu-check">
-			<span></span>
-			<span></span>
-			<span></span>
-		</label>
+<div class="container">
+	<div class="content">
+		<header>
+			<a href={headerHref}>
+				<img src={headerLogo} alt={headerAlt} class="logo" />
+				<img src={headerLogoSp} alt={headerAlt} class="logo-sp" />
+			</a>
+			<nav>
+				<input
+					bind:checked={isOpen}
+					type="checkbox"
+					id="hamburger-menu-check"
+					aria-label="ハンバーガーメニューを開閉する"
+				/>
+				<label id="hamburger-menu-button" for="hamburger-menu-check">
+					<span></span>
+					<span></span>
+					<span></span>
+				</label>
 
-		<ul style="--translate-x: {transformX}">
-			{#each headerMenuItems as menuItem}
-				<li>
-					{#if menuItem.url}
-						<a href={menuItem.url} class={menuItem.lang}>{menuItem.title}</a>
-					{:else}
-						<span class={menuItem.lang}>{menuItem.title}</span>
-					{/if}
-					{#if menuItem.children}
-						<ul>
-							{#each menuItem.children as child}
-								<li>
-									{#if child.url}
-										{#if child.isExternal}
-											<a href={child.url} target="_blank" class={child.lang}>
-												{child.title}<OpenInNewIcon />
-											</a>
-										{:else}
-											<a href={child.url} class={child.lang}>{child.title}</a>
-										{/if}
-									{:else}
-										<span class={child.lang}>{child.title}</span>
-									{/if}
-								</li>
-							{/each}
-						</ul>
-					{/if}
-				</li>
-			{/each}
-			<li class="hamburger-sns-container">
-				{#each snsMenuItems as sns}
-					<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
-				{/each}
-			</li>
-		</ul>
-	</nav>
-</header>
-
-<aside class="sidebar">
-	{#if data.isRoot}
-		<div class="news">
-			<h2 class="en"><a href="/news">news!</a></h2>
-			<ul>
-				{#each newsItems.slice(-2).reverse() as item}
-					<li>
-						<a href={item.url}>
-							<span class="date">{item.date}</span>
-							<p>{item.content}</p>
-						</a>
+				<ul style="--translate-x: {transformX}">
+					{#each headerMenuItems as menuItem}
+						<li>
+							{#if menuItem.url}
+								<a href={menuItem.url} class={menuItem.lang}>{menuItem.title}</a>
+							{:else}
+								<span class={menuItem.lang}>{menuItem.title}</span>
+							{/if}
+							{#if menuItem.children}
+								<ul>
+									{#each menuItem.children as child}
+										<li>
+											{#if child.url}
+												{#if child.isExternal}
+													<a
+														href={child.url}
+														target="_blank"
+														rel="noopener noreferrer"
+														class={child.lang}
+													>
+														{child.title}<OpenInNewIcon />
+													</a>
+												{:else}
+													<a href={child.url} class={child.lang}>{child.title}</a>
+												{/if}
+											{:else}
+												<span class={child.lang}>{child.title}</span>
+											{/if}
+										</li>
+									{/each}
+								</ul>
+							{/if}
+						</li>
+					{/each}
+					<li class="hamburger-sns-container">
+						{#each snsMenuItems as sns}
+							<a href={sns.url}><img src={sns.icon} alt={sns.alt} width="25px" /></a>
+						{/each}
 					</li>
-				{/each}
-			</ul>
-		</div>
-	{/if}
+				</ul>
+			</nav>
+		</header>
 
-	<nav>
-		<ul>
-			{#each snsMenuItems as item}
-				<li>
-					<a href={item.url}><img src={item.icon} alt={item.alt} width="25px" /></a>
-				</li>
-			{/each}
-		</ul>
-	</nav>
-</aside>
+		<aside class="sidebar">
+			{#if data.isRoot}
+				<div class="news">
+					<h2 class="en"><a href="/news">news!</a></h2>
+					<ul>
+						{#each newsItems.slice(-2).reverse() as item}
+							<li>
+								<a href={item.url}>
+									<span class="date">{item.date}</span>
+									<p>{item.content}</p>
+								</a>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
 
-<main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
-	<slot />
-
-	{#if data.isRoot}
-		<aside class="mobile-news">
-			<div class="news">
-				<h2 class="en">news!</h2>
-				<a href={newsItems.slice(-1)[0].url}>
-					<span class="date">{newsItems.slice(-1)[0].date}</span>
-					<p>{newsItems.slice(-1)[0].content}</p>
-				</a>
-			</div>
+			<nav>
+				<ul>
+					{#each snsMenuItems as item}
+						<li>
+							<a href={item.url}><img src={item.icon} alt={item.alt} width="25px" /></a>
+						</li>
+					{/each}
+				</ul>
+			</nav>
 		</aside>
-	{/if}
-</main>
+
+		<main class=" {data.isRoot ? 'root-main' : 'non-root-main'}">
+			{@render children?.()}
+
+			{#if data.isRoot}
+				<aside class="mobile-news">
+					<div class="news">
+						<h2 class="en">news!</h2>
+						<a href={newsItems.slice(-1)[0].url}>
+							<span class="date">{newsItems.slice(-1)[0].date}</span>
+							<p>{newsItems.slice(-1)[0].content}</p>
+						</a>
+					</div>
+				</aside>
+			{/if}
+		</main>
+	</div>
+</div>
 
 <style>
-	/* Nyanvas用 */
-	:global(canvas) {
-		position: fixed;
-		top: 0;
-		left: 0;
+	.container {
+		display: flex;
+		justify-content: center;
 	}
-	main {
-		z-index: 100;
+
+	.content {
+		position: relative;
+		z-index: 1;
+		width: min(100dvw, 1280px);
 	}
 
 	:global(body) {
-		display: grid;
-		grid-template-areas:
-			'header header'
-			'sidebar main';
-		grid-template-columns: var(--aside-width) 1fr;
-		grid-template-rows: var(--header-height) auto;
 		color: var(--main-color);
 		background-color: var(--background-color);
 		margin: 0;
@@ -324,7 +333,7 @@
 	}
 
 	header {
-		grid-area: header;
+		position: relative;
 		z-index: 1000;
 		display: flex;
 		justify-content: space-between;
@@ -548,13 +557,14 @@
 	}
 
 	.sidebar {
-		grid-area: sidebar;
 		z-index: 500;
 		position: fixed;
 		bottom: var(--window-padding);
 		width: var(--aside-width);
+		height: calc(100dvh - var(--header-height));
 		display: flex;
 		flex-direction: column;
+		justify-content: flex-end;
 		gap: 45px;
 	}
 	.sidebar ul {
@@ -600,10 +610,15 @@
 	}
 
 	main {
-		grid-area: main;
+		margin-left: var(--aside-width);
 		margin-bottom: var(--window-padding);
 	}
 	@media (max-width: 950px) {
+		main {
+			margin-left: unset;
+			overflow-x: hidden;
+		}
+
 		.non-root-main {
 			padding: 0 var(--window-padding);
 		}

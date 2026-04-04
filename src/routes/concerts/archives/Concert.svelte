@@ -43,6 +43,7 @@
 					class="show-on-mobile"
 					href="https://youtube.com/playlist?list={concert.youtubePlaylistId}"
 					target="_blank"
+					rel="noopener noreferrer"
 				>
 					<img src={youtubeLogo} alt="YouTube" class="youtube-logo" />
 				</a>
@@ -86,6 +87,7 @@
 					class="hide-on-mobile"
 					href="https://youtube.com/playlist?list={concert.youtubePlaylistId}"
 					target="_blank"
+					rel="noopener noreferrer"
 				>
 					<img src={youtubeLogo} alt="YouTube" class="youtube-logo" />
 				</a>
@@ -114,7 +116,6 @@
 	}
 
 	.concert {
-		/* width: min(calc(100dvw - var(--aside-width) - var(--window-padding)), 900px); */
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;

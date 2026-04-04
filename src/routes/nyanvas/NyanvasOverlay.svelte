@@ -1,15 +1,21 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { PawEngine } from './pawEngine';
 	import { DeviceMotionController } from './DeviceMotionController';
 
 	let pawEngine: PawEngine | null = null;
 	let deviceMotionController: DeviceMotionController | null = null;
-	let showPermissionToast = false;
+	let permissionButton: HTMLButtonElement | null = null;
+	let showPermissionToast = $state(false);
 
 	const updatePermissionStatus = (permitted: boolean) => {
 		showPermissionToast = !permitted;
 	};
+
+	$effect(() => {
+		if (!showPermissionToast) return;
+		void tick().then(() => permissionButton?.focus());
+	});
 
 	onMount(() => {
 		pawEngine = new PawEngine(
@@ -55,14 +61,27 @@
 	};
 </script>
 
-<svelte:window on:click={onclick} on:devicemotion={ondevicemotion} on:resize={onresize} />
+<svelte:window {onclick} {ondevicemotion} {onresize} />
 
-<div id="permission-toast" class="toast" class:show={showPermissionToast}>
-	<p>ぜひ、加速度センサー付きでご覧ください！</p>
-	<button on:click={onclickGrantPermission}>進む</button>
+<div
+	id="permission-toast"
+	class="toast"
+	class:show={showPermissionToast}
+	role="alertdialog"
+	aria-modal="true"
+	aria-labelledby="permission-toast-message"
+>
+	<p id="permission-toast-message">ぜひ、加速度センサー付きでご覧ください！</p>
+	<button bind:this={permissionButton} type="button" onclick={onclickGrantPermission}>進む</button>
 </div>
 
 <style>
+	:global(canvas.paw-canvas) {
+		position: fixed;
+		top: 0;
+		left: 0;
+	}
+
 	.toast {
 		--spacing-unit: 4px;
 

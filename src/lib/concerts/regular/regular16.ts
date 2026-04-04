@@ -28,7 +28,8 @@ export const concert: Concert = {
 		{ composer: 'バルトーク', title: 'ルーマニア民俗舞曲 Sz. 68' },
 		{ composer: 'リスト', title: 'メフィスト・ワルツ第1番「村の居酒屋での踊り」' },
 		{ composer: 'ヨハン・シュトラウス', title: '皇帝円舞曲' },
-		{ composer: 'バーンスタイン', title: '「ウェストサイドストーリー」よりシンフォニックダンス' }
+		{ composer: 'バーンスタイン', title: '「ウェストサイドストーリー」よりシンフォニックダンス' },
+		{ composer: 'J. シュトラウスⅡ', title: 'ポルカ「雷鳴と電光」', encoreType: 'standard' }
 	],
 	ticket: {
 		description: '全席指定 1,000円',

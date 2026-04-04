@@ -28,6 +28,7 @@ export class PawEngine {
 				wireframes: false
 			}
 		});
+		this.render.canvas.classList.add('paw-canvas');
 
 		this.updateBox(width, height);
 

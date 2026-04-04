@@ -1,4 +1,6 @@
 <script lang="ts">
+	import organizationStats from '$lib/organizationStats.json';
+	import { formatAttendanceCount, formatYouTubeTotalViewCount } from '$lib/organizationStats';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
 	import OpenInNewIcon from '$lib/components/OpenInNewIcon.svelte';
@@ -6,10 +8,10 @@
 	import mizuya from './mizuya.png';
 	// import pdf from './ご支援のお願い.pdf';
 
-	import youTubeTotalViewCount from './youtube_total_view_count.txt?raw';
-	const displayingYouTubeTotalViewCount = `${
-		Math.floor(parseInt(youTubeTotalViewCount) / 100000) * 10
-	}万回`;
+	const displayingTotalAttendance = formatAttendanceCount(organizationStats.totalAttendance);
+	const displayingYouTubeTotalViewCount = formatYouTubeTotalViewCount(
+		organizationStats.youtubeTotalViewCount
+	);
 
 	const supporters: string[] = [
 		'内田　明美子　様',
@@ -55,7 +57,7 @@
 	<h1>ご支援のお願い</h1>
 	<p>平素より、Orchestra Canvas Tokyo へのご厚情を賜りまして、誠にありがとうございます。</p>
 	<p>
-		当団は、2020年に発足して以降、定期演奏会や室内楽演奏会を開催し、累計7,000名を超えるお客様にご来場をいただきました。また、時間や場所の制約を超えて演奏をお届けしたいとの思いから、演奏会の様子をYouTubeにて公開し、合計{displayingYouTubeTotalViewCount}を超える再生回数をいただいております。
+		当団は、2020年に発足して以降、定期演奏会や室内楽演奏会を開催し、累計{displayingTotalAttendance}を超えるお客様にご来場をいただきました。また、時間や場所の制約を超えて演奏をお届けしたいとの思いから、演奏会の様子をYouTubeにて公開し、合計{displayingYouTubeTotalViewCount}を超える再生回数をいただいております。
 	</p>
 	<p>
 		他方、活動規模の拡大に伴って演奏会開催に要する費用も増加をしており、奏者の負担を原資とする現在の財政においては、活動規模の上限を迎えつつあります。また、財政面を理由とする活動規模の上限は他団体さまも直面をする問題であり、このことがアマチュアオーケストラ界の企画の同質化を招いています。
@@ -474,8 +476,7 @@
 	thead {
 		border-bottom: 2px solid;
 	}
-	thead tr th:first-child,
-	thead tr td:first-child {
+	thead tr th:first-child {
 		border-right: 2px solid;
 	}
 	table ul {

@@ -3,7 +3,7 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
 
-	export let data: PageServerData;
+	let { data }: { data: PageServerData } = $props();
 </script>
 
 <Meta title="Contact" canonical="/contact" />
@@ -58,10 +58,10 @@
 	<iframe
 		src="https://contact.orch-canvas.tokyo/"
 		width="100%"
-		height="635"
+		height="650"
 		frameborder="0"
 		title="お問い合わせフォーム"
-	/>
+	></iframe>
 </article>
 
 <style>
