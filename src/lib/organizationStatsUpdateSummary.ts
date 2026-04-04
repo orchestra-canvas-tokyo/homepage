@@ -6,7 +6,7 @@ import {
 	shouldPersistOrganizationStats,
 	type OrganizationStats,
 	type PersistedOrganizationStats
-} from './organizationStats';
+} from './organizationStats.ts';
 
 export type OrganizationStatsFieldKey = keyof OrganizationStats;
 
