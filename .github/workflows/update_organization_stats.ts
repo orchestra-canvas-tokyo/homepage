@@ -5,10 +5,14 @@ import {
 	extractTotalAttendanceFromCsv,
 	extractYouTubeChannelStatistics,
 	getOrganizationStatsDisplayValues,
-	shouldPersistOrganizationStats,
 	type OrganizationStats,
 	type PersistedOrganizationStats
 } from '../../src/lib/organizationStats.ts';
+import {
+	createOrganizationStatsErrorSummary,
+	summarizeOrganizationStatsUpdate,
+	type OrganizationStatsUpdateSummary
+} from '../../src/lib/organizationStatsUpdateSummary.ts';
 
 const CHANNEL_ID = process.env.CHANNEL_ID;
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
@@ -37,6 +41,10 @@ const appendGitHubEnv = async (key: string, value: string): Promise<void> => {
 		encoding: 'utf-8',
 		flag: 'a'
 	});
+};
+
+const appendUpdateSummary = async (summary: OrganizationStatsUpdateSummary): Promise<void> => {
+	await appendGitHubEnv('ORGANIZATION_STATS_UPDATE_SUMMARY', JSON.stringify(summary));
 };
 
 const ensureValidIncrease = (
@@ -95,6 +103,10 @@ const updateOrganizationStats = async (): Promise<void> => {
 		youtubeSubscriberCount: youTubeStatistics.youtubeSubscriberCount,
 		youtubeTotalViewCount: youTubeStatistics.youtubeTotalViewCount
 	};
+	const summary = summarizeOrganizationStatsUpdate(
+		persistedCurrentOrganizationStats,
+		nextOrganizationStats
+	);
 
 	ensureValidIncrease(
 		'total attendance',
@@ -118,9 +130,14 @@ const updateOrganizationStats = async (): Promise<void> => {
 	);
 
 	await appendGitHubEnv('SHOULD_COMMIT', 'false');
+	await appendUpdateSummary(summary);
 
-	if (!shouldPersistOrganizationStats(persistedCurrentOrganizationStats, nextOrganizationStats)) {
-		console.log('No organization stats display change detected.');
+	if (summary.status === 'no_change') {
+		console.log('No organization stats value change detected.');
+	}
+
+	if (!summary.shouldPersist) {
+		console.log('No persisted organization stats update is required.');
 		return;
 	}
 
@@ -158,6 +175,7 @@ updateOrganizationStats().catch(async (error: unknown) => {
 
 	if (GITHUB_ENV) {
 		await appendGitHubEnv('SHOULD_COMMIT', 'false');
+		await appendUpdateSummary(createOrganizationStatsErrorSummary(message));
 	}
 
 	process.exitCode = 1;

@@ -33,6 +33,7 @@ jobs:
           node-version-file: './.node-version'
 
       - name: Update organization stats
+        id: update_organization_stats
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           # cspell: disable-next-line
@@ -44,6 +45,7 @@ jobs:
         run: node .github/workflows/update_organization_stats.ts
 
       - name: Validate changed files
+        id: validate_changed_files
         if: env.SHOULD_COMMIT == 'true'
         run: |
           mapfile -t CHANGED_FILES < <(git status --porcelain | awk '{print $2}')
@@ -54,6 +56,7 @@ jobs:
           fi
 
       - name: Commit and push stats branch
+        id: commit_and_push_stats_branch
         if: env.SHOULD_COMMIT == 'true'
         run: |
           git config --global user.name "github-actions"
@@ -64,6 +67,7 @@ jobs:
           git push --force-with-lease origin chore/update-organization-stats
 
       - name: Create or update main PR
+        id: create_or_update_main_pr
         if: env.SHOULD_COMMIT == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -94,3 +98,18 @@ jobs:
             --head chore/update-organization-stats \
             --title "chore(stats): update organization figures" \
             --body-file "$BODY_FILE"
+
+      - name: Post Slack summary
+        if: always()
+        env:
+          SLACK_ORGANIZATION_STATS_WEBHOOK_URL: ${{ secrets.SLACK_ORGANIZATION_STATS_WEBHOOK_URL }}
+          ORGANIZATION_STATS_UPDATE_SUMMARY: ${{ env.ORGANIZATION_STATS_UPDATE_SUMMARY }}
+          WORKFLOW_JOB_STATUS: ${{ job.status }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          UPDATE_ORGANIZATION_STATS_OUTCOME: ${{ steps.update_organization_stats.outcome }}
+          VALIDATE_CHANGED_FILES_OUTCOME: ${{ steps.validate_changed_files.outcome }}
+          COMMIT_AND_PUSH_STATS_BRANCH_OUTCOME: ${{ steps.commit_and_push_stats_branch.outcome }}
+          CREATE_OR_UPDATE_MAIN_PR_OUTCOME: ${{ steps.create_or_update_main_pr.outcome }}
+        run: node .github/workflows/post_organization_stats_slack_summary.ts

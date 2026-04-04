@@ -17,7 +17,10 @@ const formatInteger = (value: number): string => value.toLocaleString('ja-JP');
 const floorToStep = (value: number, step: number): number => Math.floor(value / step) * step;
 
 const parseInteger = (value: string, label: string): number => {
-	const normalized = value.replaceAll(',', '').trim();
+	const normalized = value
+		.replaceAll(',', '')
+		.replace(/^\uFEFF/, '')
+		.trim();
 
 	if (!/^\d+$/.test(normalized)) {
 		throw new Error(`Invalid integer for ${label}: ${value}`);
@@ -128,49 +131,16 @@ export const parseCsvText = (csvText: string): string[][] => {
 };
 
 export const extractTotalAttendanceFromCsv = (csvText: string): number => {
-	const rows = parseCsvText(csvText).filter((row) => row.some((cell) => cell.trim() !== ''));
-	const headerRowIndex = rows.findIndex((row) => row[0]?.trim() === '演奏会名');
+	const totalAttendance = parseCsvText(csvText)
+		.flatMap((row) => row)
+		.map((cell) => cell.trim())
+		.find((cell) => cell !== '');
 
-	if (headerRowIndex < 0) {
-		throw new Error('Attendance CSV is missing the 演奏会名 header row.');
+	if (totalAttendance === undefined) {
+		throw new Error('Attendance CSV is empty.');
 	}
 
-	const headerRow = rows[headerRowIndex];
-	const totalAttendanceColumnIndex = headerRow.findIndex((cell) => cell.trim() === '合計来場者');
-
-	if (totalAttendanceColumnIndex < 0) {
-		throw new Error('Attendance CSV is missing the 合計来場者 column.');
-	}
-
-	const summaryRow = rows[headerRowIndex + 1];
-
-	if (!summaryRow || summaryRow[0]?.trim() !== '合計') {
-		throw new Error('Attendance CSV is missing the summary row below the header.');
-	}
-
-	const summaryTotalAttendance = parseInteger(
-		summaryRow[totalAttendanceColumnIndex] ?? '',
-		'attendance summary total'
-	);
-
-	const computedTotalAttendance = rows.slice(headerRowIndex + 2).reduce((total, row) => {
-		const rowLabel = row[0]?.trim() ?? '(unknown row)';
-		const cellValue = row[totalAttendanceColumnIndex]?.trim() ?? '';
-
-		if (cellValue === '') {
-			return total;
-		}
-
-		return total + parseInteger(cellValue, `attendance total for ${rowLabel}`);
-	}, 0);
-
-	if (summaryTotalAttendance !== computedTotalAttendance) {
-		throw new Error(
-			`Attendance CSV summary mismatch: ${summaryTotalAttendance} !== ${computedTotalAttendance}.`
-		);
-	}
-
-	return summaryTotalAttendance;
+	return parseInteger(totalAttendance, 'attendance total');
 };
 
 export const extractYouTubeChannelStatistics = (
