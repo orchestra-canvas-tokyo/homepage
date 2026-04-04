@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 
 import currentOrganizationStats from '../../src/lib/organizationStats.json' with { type: 'json' };
+import { normalizePublishedGoogleSheetCsvUrl } from '../../src/lib/googleSheets.ts';
 import {
 	extractTotalAttendanceFromCsv,
 	extractYouTubeChannelStatistics,
@@ -89,7 +90,9 @@ const updateOrganizationStats = async (): Promise<void> => {
 		throw new Error('Missing CHANNEL_ID, YOUTUBE_API_KEY, or ATTENDANCE_CSV_URL.');
 	}
 
-	const attendanceCsvText = await fetchText(ATTENDANCE_CSV_URL);
+	const attendanceCsvText = await fetchText(
+		normalizePublishedGoogleSheetCsvUrl(ATTENDANCE_CSV_URL)
+	);
 	const totalAttendance = extractTotalAttendanceFromCsv(attendanceCsvText);
 	const youTubeApiUrl =
 		'https://www.googleapis.com/youtube/v3/channels' +

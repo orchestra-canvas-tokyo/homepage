@@ -38,7 +38,7 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           # cspell: disable-next-line
           CHANNEL_ID: 'UCX2SZ5NViwsaOza3biDNjIw'
-          ATTENDANCE_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7y_wh0ZipLnKas7Re_tDuU9LxOkhkInNJCT8ziIDGDscRDrmWnGSW2cDUlgFKjROO4HrNRzmZxT0N/pub?gid=0&single=true&output=csv'
+          ATTENDANCE_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7y_wh0ZipLnKas7Re_tDuU9LxOkhkInNJCT8ziIDGDscRDrmWnGSW2cDUlgFKjROO4HrNRzmZxT0N/pubhtml?gid=1637142681&single=true'
           MAX_ALLOWED_VIEW_INCREASE: '5000000'
           MAX_ALLOWED_SUBSCRIBER_INCREASE: '5000'
           MAX_ALLOWED_ATTENDANCE_INCREASE: '5000'
