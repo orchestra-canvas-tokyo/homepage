@@ -8,10 +8,12 @@ declare global {
 		// interface PageState {}
 		interface Platform {
 			env: {
-				KV: KVNamespace;
-				DB: D1Database;
-				RECAPTCHA_SECRET: string;
-				RESEND_API_KEY: string;
+				DB?: D1Database;
+				CF_PAGES_BRANCH?: string;
+				RECAPTCHA_SITE_KEY?: string;
+				RECAPTCHA_SECRET?: string;
+				RESEND_API_KEY?: string;
+				SLACK_WEBHOOK_URL?: string;
 			};
 		}
 	}

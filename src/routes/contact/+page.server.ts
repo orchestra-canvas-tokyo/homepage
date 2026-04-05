@@ -1,7 +1,16 @@
-import type { PageServerLoad } from './$types';
+import { fail } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
+import {
+	flattenContactFormErrors,
+	pickContactFormValues,
+	validateContactRequest,
+	type ContactActionData
+} from '$lib/contact/form';
 import { getConcertBySlug, isFinished } from '$lib/concerts/utils';
+import { resolveContactRuntimeConfig } from '$lib/server/contact/config';
+import { submitContactForm } from '$lib/server/contact/submit';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ platform }) => {
 	const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
 		{
 			concertSlug: 'regular-15',
@@ -9,11 +18,53 @@ export const load: PageServerLoad = async () => {
 		}
 	];
 	const flyerInsertionStatus = getFlyerInsertionStatus(...flyerInsertionData);
+	const { reCaptchaSiteKey } = resolveContactRuntimeConfig(platform?.env);
 
 	return {
-		flyerInsertionStatus
+		flyerInsertionStatus,
+		reCaptchaSiteKey
 	};
 };
+
+export const actions = {
+	default: async ({ request, platform }) => {
+		const rawValues: Record<string, FormDataEntryValue> = {};
+		(await request.formData()).forEach((value, key) => {
+			rawValues[key] = value;
+		});
+
+		const values = pickContactFormValues(rawValues);
+		const validationResult = validateContactRequest(rawValues);
+		if (!validationResult.success) {
+			return fail(400, {
+				success: false,
+				message: '入力内容を確認してください。',
+				values,
+				errors: flattenContactFormErrors(validationResult.error)
+			} satisfies ContactActionData);
+		}
+
+		const result = await submitContactForm(
+			validationResult.data,
+			resolveContactRuntimeConfig(platform?.env)
+		);
+		if (!result.ok) {
+			return fail(
+				result.reason === 'configuration' ? 503 : result.reason === 'invalid_captcha' ? 400 : 502,
+				{
+					success: false,
+					message: result.message,
+					values
+				} satisfies ContactActionData
+			);
+		}
+
+		return {
+			success: true,
+			message: result.message
+		} satisfies ContactActionData;
+	}
+} satisfies Actions;
 
 /**
  * # 挟み込み募集案内の詳細仕様
