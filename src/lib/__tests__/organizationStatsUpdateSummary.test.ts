@@ -2,11 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
 	createOrganizationStatsErrorSummary,
+	formatOrganizationStatsSlackPayload,
 	formatOrganizationStatsSlackSummary,
 	summarizeOrganizationStatsUpdate
 } from '../organizationStatsUpdateSummary';
 
 describe('organization stats update summary', () => {
+	const generatedAt = new Date('2026-04-10T02:50:24.893Z');
+
 	it('marks raw numeric changes as updated even when display buckets stay the same', () => {
 		const summary = summarizeOrganizationStatsUpdate(
 			{
@@ -55,7 +58,7 @@ describe('organization stats update summary', () => {
 	});
 
 	it('formats updated summaries with diffs and persistence decisions', () => {
-		const text = formatOrganizationStatsSlackSummary(
+		const payload = formatOrganizationStatsSlackPayload(
 			summarizeOrganizationStatsUpdate(
 				{
 					totalAttendance: 7867,
@@ -70,18 +73,78 @@ describe('organization stats update summary', () => {
 				}
 			),
 			{
+				generatedAt,
 				runUrl: 'https://example.com/runs/1'
 			}
 		);
 
-		expect(text).toContain('結果: 更新あり (3項目)');
-		expect(text).toContain('累計来場者数: 7,867 -> 8,001 (+134)');
-		expect(text).toContain('公開用JSON: 更新対象あり（表示値差分あり）');
-		expect(text).toContain('Run: https://example.com/runs/1');
+		expect(payload.text).toContain('団体情報統計 更新サマリー | 2026-04-09 JST');
+		expect(payload.text).toContain('生成: 2026-04-10T02:50:24.893Z');
+		expect(payload.text).toContain('サマリー: 3件更新');
+		expect(payload.text).toContain('- 🟡 YT総再生回数 6,704,321回 (+96,431)');
+		expect(payload.text).toContain('- 🟡 YT登録者数 16,050人 (+1,050)');
+		expect(payload.text).toContain('- 🟡 累計来場者数 8,001名 (+134)');
+		expect(payload.text).toContain('公開用JSON: 更新対象あり（表示値差分あり）');
+		expect(payload.text).toContain('<https://example.com/runs/1|実行ログ>');
+		expect(payload.blocks.slice(0, 4)).toMatchObject([
+			{
+				type: 'section',
+				text: {
+					type: 'mrkdwn',
+					text: '*団体情報統計 更新サマリー | 2026-04-09 JST*'
+				}
+			},
+			{
+				type: 'context',
+				elements: [
+					{
+						type: 'mrkdwn',
+						text: '生成: 2026-04-10T02:50:24.893Z'
+					}
+				]
+			},
+			{
+				type: 'divider'
+			},
+			{
+				type: 'section',
+				text: {
+					type: 'mrkdwn',
+					text: '*サマリー: 3件更新*'
+				}
+			}
+		]);
+	});
+
+	it('formats no-change summaries with current metric values', () => {
+		const text = formatOrganizationStatsSlackSummary(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: false
+				},
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890
+				}
+			),
+			{
+				generatedAt
+			}
+		);
+
+		expect(text).toContain('サマリー: 更新なし');
+		expect(text).toContain('- 🟢 YT総再生回数 6,607,890回');
+		expect(text).toContain('- 🟢 YT登録者数 15,000人');
+		expect(text).toContain('- 🟢 累計来場者数 7,867名');
+		expect(text).toContain('公開用JSON: 更新対象あり（登録者数検証フラグを確定）');
 	});
 
 	it('formats workflow failures as errors while preserving fetched values', () => {
-		const text = formatOrganizationStatsSlackSummary(
+		const payload = formatOrganizationStatsSlackPayload(
 			summarizeOrganizationStatsUpdate(
 				{
 					totalAttendance: 7867,
@@ -96,22 +159,27 @@ describe('organization stats update summary', () => {
 				}
 			),
 			{
+				generatedAt,
 				workflowStatus: 'failure',
 				failedSteps: ['Create or update main PR']
 			}
 		);
 
-		expect(text).toContain('結果: エラー');
-		expect(text).toContain('Create or update main PR');
-		expect(text).toContain('取得できた差分:');
+		expect(payload.text).toContain('サマリー: エラー');
+		expect(payload.text).toContain('Create or update main PR');
+		expect(payload.text).toContain('- 🟡 累計来場者数 7,868名 (+1)');
 	});
 
 	it('formats update errors directly', () => {
-		const text = formatOrganizationStatsSlackSummary(
-			createOrganizationStatsErrorSummary('Attendance CSV is empty.')
+		const payload = formatOrganizationStatsSlackPayload(
+			createOrganizationStatsErrorSummary('Attendance CSV is empty.'),
+			{
+				generatedAt
+			}
 		);
 
-		expect(text).toContain('結果: エラー');
-		expect(text).toContain('Attendance CSV is empty.');
+		expect(payload.text).toContain('サマリー: エラー');
+		expect(payload.text).toContain('Attendance CSV is empty.');
+		expect(payload.blocks).toHaveLength(4);
 	});
 });

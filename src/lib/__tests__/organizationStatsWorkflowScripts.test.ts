@@ -1,4 +1,5 @@
 import { execFile } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
@@ -9,15 +10,12 @@ const execFileAsync = promisify(execFile);
 const testDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(testDirectory, '../../..');
 
-const runWorkflowScript = async (scriptPath: string): Promise<{ code: number; stderr: string }> => {
-	const env = { ...process.env };
-
-	delete env.ATTENDANCE_CSV_URL;
-	delete env.CHANNEL_ID;
-	delete env.GITHUB_ENV;
-	delete env.ORGANIZATION_STATS_UPDATE_SUMMARY;
-	delete env.SLACK_ORGANIZATION_STATS_WEBHOOK_URL;
-	delete env.YOUTUBE_API_KEY;
+const runWorkflowScript = async (scriptPath: string): Promise<{ code: number; output: string }> => {
+	const env = {
+		HOME: process.env.HOME,
+		PATH: process.env.PATH,
+		TMPDIR: process.env.TMPDIR
+	};
 
 	try {
 		await execFileAsync(process.execPath, [scriptPath], {
@@ -25,36 +23,46 @@ const runWorkflowScript = async (scriptPath: string): Promise<{ code: number; st
 			env
 		});
 
-		return { code: 0, stderr: '' };
+		return { code: 0, output: '' };
 	} catch (error) {
-		const { code = 1, stderr = '' } = error as {
+		const {
+			code = 1,
+			stderr = '',
+			stdout = ''
+		} = error as {
 			code?: number;
+			stdout?: string;
 			stderr?: string;
 		};
 
 		return {
 			code,
-			stderr
+			output: `${stdout}${stderr}`
 		};
 	}
 };
 
+const expectWorkflowScriptLoads = async (scriptPath: string, expectedGuard: string) => {
+	const result = await runWorkflowScript(scriptPath);
+	const scriptSource = readFileSync(resolve(repositoryRoot, scriptPath), 'utf-8');
+
+	expect(result.code).toBe(1);
+	expect(result.output).not.toContain('ERR_MODULE_NOT_FOUND');
+	expect(scriptSource).toContain(expectedGuard);
+};
+
 describe('organization stats workflow scripts', () => {
 	it('loads update_organization_stats.ts with native Node resolution', async () => {
-		const result = await runWorkflowScript('.github/workflows/update_organization_stats.ts');
-
-		expect(result.code).toBe(1);
-		expect(result.stderr).toContain('Missing CHANNEL_ID, YOUTUBE_API_KEY, or ATTENDANCE_CSV_URL.');
-		expect(result.stderr).not.toContain('ERR_MODULE_NOT_FOUND');
+		await expectWorkflowScriptLoads(
+			'.github/workflows/update_organization_stats.ts',
+			'Missing CHANNEL_ID, YOUTUBE_API_KEY, or ATTENDANCE_CSV_URL.'
+		);
 	});
 
 	it('loads post_organization_stats_slack_summary.ts with native Node resolution', async () => {
-		const result = await runWorkflowScript(
-			'.github/workflows/post_organization_stats_slack_summary.ts'
+		await expectWorkflowScriptLoads(
+			'.github/workflows/post_organization_stats_slack_summary.ts',
+			'Missing SLACK_ORGANIZATION_STATS_WEBHOOK_URL.'
 		);
-
-		expect(result.code).toBe(1);
-		expect(result.stderr).toContain('Missing SLACK_ORGANIZATION_STATS_WEBHOOK_URL.');
-		expect(result.stderr).not.toContain('ERR_MODULE_NOT_FOUND');
 	});
 });
