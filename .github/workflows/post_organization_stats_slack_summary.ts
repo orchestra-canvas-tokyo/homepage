@@ -1,10 +1,15 @@
 import {
 	createOrganizationStatsErrorSummary,
-	formatOrganizationStatsSlackSummary,
+	formatOrganizationStatsSlackPayload,
 	type OrganizationStatsUpdateSummary
 } from '../../src/lib/organizationStatsUpdateSummary.ts';
 
 const SLACK_WEBHOOK_URL = process.env.SLACK_ORGANIZATION_STATS_WEBHOOK_URL;
+
+const writeError = async (message: string): Promise<void> =>
+	new Promise((resolve) => {
+		process.stderr.write(`${message}\n`, () => resolve());
+	});
 
 const parseSummary = (): OrganizationStatsUpdateSummary => {
 	const rawSummary = process.env.ORGANIZATION_STATS_UPDATE_SUMMARY;
@@ -48,7 +53,7 @@ const postSlackSummary = async (): Promise<void> => {
 	}
 
 	const summary = parseSummary();
-	const text = formatOrganizationStatsSlackSummary(summary, {
+	const payload = formatOrganizationStatsSlackPayload(summary, {
 		failedSteps: getFailedSteps(),
 		runUrl: getRunUrl(),
 		workflowStatus: process.env.WORKFLOW_JOB_STATUS
@@ -58,7 +63,7 @@ const postSlackSummary = async (): Promise<void> => {
 		headers: {
 			'content-type': 'application/json'
 		},
-		body: JSON.stringify({ text })
+		body: JSON.stringify(payload)
 	});
 
 	if (!response.ok) {
@@ -69,8 +74,8 @@ const postSlackSummary = async (): Promise<void> => {
 	}
 };
 
-postSlackSummary().catch((error: unknown) => {
+postSlackSummary().catch(async (error: unknown) => {
 	const message = error instanceof Error ? error.message : String(error);
-	console.error(message);
+	await writeError(message);
 	process.exitCode = 1;
 });
