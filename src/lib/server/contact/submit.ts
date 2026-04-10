@@ -59,7 +59,7 @@ export const submitContactForm = async (
 		};
 	}
 
-	let captchaVerified = false;
+	let captchaVerified: boolean;
 	try {
 		captchaVerified = await verifyRecaptcha(content.reCaptchaToken, config.reCaptchaSecret);
 	} catch (error) {

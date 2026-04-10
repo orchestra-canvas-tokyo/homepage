@@ -83,8 +83,8 @@
 	// imgタグの属性として指定するサイズを計算する
 	const A4_ASPECT_RATIO = Math.SQRT1_2; // A4版のみを想定
 	let slideshowEl: HTMLDivElement | null = null;
-	let flyerHeight: number | undefined;
-	let flyerWidth: number | undefined;
+	let flyerHeight = $state<number | undefined>();
+	let flyerWidth = $state<number | undefined>();
 
 	const updateFlyerDimensions = () => {
 		if (!slideshowEl) return;
