@@ -33,6 +33,11 @@ const MAX_ALLOWED_ATTENDANCE_INCREASE = Number.parseInt(
 );
 const ORGANIZATION_STATS_PATH = 'src/lib/organizationStats.json';
 
+const writeError = async (message: string): Promise<void> =>
+	new Promise((resolve) => {
+		process.stderr.write(`${message}\n`, () => resolve());
+	});
+
 const appendGitHubEnv = async (key: string, value: string): Promise<void> => {
 	if (!GITHUB_ENV) {
 		return;
@@ -174,7 +179,7 @@ const updateOrganizationStats = async (): Promise<void> => {
 
 updateOrganizationStats().catch(async (error: unknown) => {
 	const message = error instanceof Error ? error.message : String(error);
-	console.error(message);
+	await writeError(message);
 
 	if (GITHUB_ENV) {
 		await appendGitHubEnv('SHOULD_COMMIT', 'false');
