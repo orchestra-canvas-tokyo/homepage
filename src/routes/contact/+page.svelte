@@ -19,16 +19,21 @@
 	let turnstileContainer = $state<HTMLDivElement | null>(null);
 	let turnstileWidgetId = $state<string | null>(null);
 	let turnstileToken = $state('');
-	let feedbackTone = $state<'success' | 'error' | null>(null);
 	let feedbackMessage = $state<string | null>(null);
+	let isToastShown = $state(false);
+	let toastTimer = 0;
 	let isSubmitting = $state(false);
 	let isCaptchaReady = $state(false);
 
 	const getFieldError = (field: 'name' | 'email' | 'categoryKey' | 'body') => form?.errors?.[field];
 
-	const setFeedback = (tone: 'success' | 'error', message: string) => {
-		feedbackTone = tone;
+	const setFeedback = (message: string) => {
 		feedbackMessage = message;
+		isToastShown = true;
+		window.clearTimeout(toastTimer);
+		toastTimer = window.setTimeout(() => {
+			isToastShown = false;
+		}, 5000);
 	};
 
 	const resetTurnstileWidget = () => {
@@ -61,7 +66,6 @@
 				turnstileToken = '';
 				isCaptchaReady = false;
 				setFeedback(
-					'error',
 					'Turnstile の読み込みに失敗しました。ページを再読み込みして再度お試しください。'
 				);
 			},
@@ -95,6 +99,7 @@
 				window.turnstile.remove(turnstileWidgetId);
 				turnstileWidgetId = null;
 			}
+			window.clearTimeout(toastTimer);
 		};
 	});
 
@@ -103,19 +108,16 @@
 
 		const targetForm = formElement ?? (event.currentTarget as HTMLFormElement | null);
 		if (!targetForm) {
-			setFeedback('error', '送信に失敗しました。時間をおいて再度お試しください。');
+			setFeedback('送信に失敗しました。時間をおいて再度お試しください。');
 			return;
 		}
 
 		if (!data.turnstileSiteKey) {
-			setFeedback('error', '現在フォームを利用できません。しばらくしてから再度お試しください。');
+			setFeedback('現在フォームを利用できません。しばらくしてから再度お試しください。');
 			return;
 		}
 		if (!isCaptchaReady || turnstileToken === '') {
-			setFeedback(
-				'error',
-				'Turnstile の検証が完了していません。少し待ってから再度お試しください。'
-			);
+			setFeedback('Turnstile の検証が完了していません。少し待ってから再度お試しください。');
 			return;
 		}
 
@@ -138,7 +140,7 @@
 			}
 		} catch (error) {
 			console.error('Failed to submit contact form:', error);
-			setFeedback('error', '送信に失敗しました。時間をおいて再度お試しください。');
+			setFeedback('送信に失敗しました。時間をおいて再度お試しください。');
 		} finally {
 			isSubmitting = false;
 			resetTurnstileWidget();
@@ -148,7 +150,7 @@
 	$effect(() => {
 		if (!form) return;
 
-		setFeedback(form.success ? 'success' : 'error', form.message);
+		setFeedback(form.message);
 	});
 </script>
 
@@ -211,100 +213,98 @@
 		</p>
 	{/if}
 
-	{#if feedbackMessage}
-		<p
-			class:success={feedbackTone === 'success'}
-			class:error={feedbackTone === 'error'}
-			role={feedbackTone === 'success' ? 'status' : 'alert'}
-		>
-			{feedbackMessage}
-		</p>
-	{/if}
-
 	{#if data.turnstileSiteKey}
 		<form bind:this={formElement} method="POST" onsubmit={onSubmit}>
-			<div class="form-grid">
+			<div class="form-container">
 				<div class="field">
 					<label for="name">お名前</label>
-					<input
-						id="name"
-						name="name"
-						type="text"
-						maxlength={maxNameLength}
-						value={form?.values?.name ?? ''}
-						disabled={isSubmitting}
-						aria-invalid={getFieldError('name') ? 'true' : undefined}
-						aria-describedby={getFieldError('name') ? 'name-error' : undefined}
-					/>
-					{#if getFieldError('name')}
-						<p id="name-error" class="field-error">{getFieldError('name')}</p>
-					{/if}
+					<div class="field-control">
+						<input
+							id="name"
+							name="name"
+							type="text"
+							maxlength={maxNameLength}
+							value={form?.values?.name ?? ''}
+							disabled={isSubmitting}
+							aria-invalid={getFieldError('name') ? 'true' : undefined}
+							aria-describedby={getFieldError('name') ? 'name-error' : undefined}
+						/>
+						{#if getFieldError('name')}
+							<p id="name-error" class="field-error">{getFieldError('name')}</p>
+						{/if}
+					</div>
 				</div>
 
 				<div class="field">
 					<label for="email" class="required-label">メールアドレス</label>
-					<input
-						id="email"
-						name="email"
-						type="email"
-						required
-						value={form?.values?.email ?? ''}
-						disabled={isSubmitting}
-						aria-invalid={getFieldError('email') ? 'true' : undefined}
-						aria-describedby={getFieldError('email') ? 'email-error' : undefined}
-					/>
-					{#if getFieldError('email')}
-						<p id="email-error" class="field-error">{getFieldError('email')}</p>
-					{/if}
+					<div class="field-control">
+						<input
+							id="email"
+							name="email"
+							type="email"
+							required
+							value={form?.values?.email ?? ''}
+							disabled={isSubmitting}
+							aria-invalid={getFieldError('email') ? 'true' : undefined}
+							aria-describedby={getFieldError('email') ? 'email-error' : undefined}
+						/>
+						{#if getFieldError('email')}
+							<p id="email-error" class="field-error">{getFieldError('email')}</p>
+						{/if}
+					</div>
 				</div>
 
 				<div class="field">
 					<label for="categoryKey" class="required-label">種類</label>
-					<select
-						id="categoryKey"
-						name="categoryKey"
-						required
-						disabled={isSubmitting}
-						aria-invalid={getFieldError('categoryKey') ? 'true' : undefined}
-						aria-describedby={getFieldError('categoryKey') ? 'categoryKey-error' : undefined}
-					>
-						<option value="" selected={(form?.values?.categoryKey ?? '') === ''} hidden></option>
-						{#each Object.entries(categories) as [key, description]}
-							<option value={key} selected={(form?.values?.categoryKey ?? '') === key}>
-								{description}
-							</option>
-						{/each}
-					</select>
-					{#if getFieldError('categoryKey')}
-						<p id="categoryKey-error" class="field-error">{getFieldError('categoryKey')}</p>
-					{/if}
+					<div class="field-control">
+						<select
+							id="categoryKey"
+							name="categoryKey"
+							required
+							disabled={isSubmitting}
+							aria-invalid={getFieldError('categoryKey') ? 'true' : undefined}
+							aria-describedby={getFieldError('categoryKey') ? 'categoryKey-error' : undefined}
+						>
+							<option value="" selected={(form?.values?.categoryKey ?? '') === ''} hidden></option>
+							{#each Object.entries(categories) as [key, description]}
+								<option value={key} selected={(form?.values?.categoryKey ?? '') === key}>
+									{description}
+								</option>
+							{/each}
+						</select>
+						{#if getFieldError('categoryKey')}
+							<p id="categoryKey-error" class="field-error">{getFieldError('categoryKey')}</p>
+						{/if}
+					</div>
 				</div>
 
 				<div class="field">
 					<label for="body" class="required-label">本文</label>
-					<textarea
-						id="body"
-						name="body"
-						rows="8"
-						maxlength={maxBodyLength}
-						required
-						disabled={isSubmitting}
-						aria-invalid={getFieldError('body') ? 'true' : undefined}
-						aria-describedby={getFieldError('body') ? 'body-error' : 'body-hint'}
-						>{form?.values?.body ?? ''}</textarea
-					>
-					<p id="body-hint" class="field-hint">{maxBodyLength}文字以内でご記入ください。</p>
-					{#if getFieldError('body')}
-						<p id="body-error" class="field-error">{getFieldError('body')}</p>
+					<div class="field-control">
+						<textarea
+							id="body"
+							name="body"
+							rows="6"
+							maxlength={maxBodyLength}
+							required
+							disabled={isSubmitting}
+							aria-invalid={getFieldError('body') ? 'true' : undefined}
+							aria-describedby={getFieldError('body') ? 'body-error' : 'body-hint'}
+							>{form?.values?.body ?? ''}</textarea
+						>
+						<p id="body-hint" class="field-hint">{maxBodyLength}文字以内でご記入ください。</p>
+						{#if getFieldError('body')}
+							<p id="body-error" class="field-error">{getFieldError('body')}</p>
+						{/if}
+					</div>
+				</div>
+
+				<div class="turnstile-wrapper">
+					<div bind:this={turnstileContainer} class="turnstile-widget"></div>
+					{#if form?.errors?.turnstileToken}
+						<p class="field-error">{form.errors.turnstileToken}</p>
 					{/if}
 				</div>
-			</div>
-
-			<div class="turnstile-wrapper">
-				<div bind:this={turnstileContainer} class="turnstile-widget"></div>
-				{#if form?.errors?.turnstileToken}
-					<p class="field-error">{form.errors.turnstileToken}</p>
-				{/if}
 			</div>
 
 			<input type="hidden" name="turnstileToken" value={turnstileToken} />
@@ -344,6 +344,10 @@
 	{/if}
 </article>
 
+<div class="toast" class:shown={isToastShown} role="status" aria-live="polite">
+	{feedbackMessage}
+</div>
+
 <style>
 	article {
 		max-width: 800px;
@@ -365,121 +369,103 @@
 	}
 
 	form {
-		margin-top: 40px;
-		padding: 32px;
-		border: 1px solid var(--secondary-color);
-		border-radius: 24px;
-		background: linear-gradient(180deg, rgb(255 255 255 / 4%), rgb(255 255 255 / 2%));
+		margin-top: 30px;
 	}
 
-	.form-grid {
+	.form-container {
 		display: grid;
-		gap: 24px;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: 20px;
+		align-items: start;
+	}
+
+	.field {
+		display: contents;
+	}
+
+	label {
+		padding-top: 8px;
+		font-size: 1rem;
+	}
+
+	.field-control,
+	.turnstile-wrapper {
+		display: grid;
+		gap: 6px;
 	}
 
 	.turnstile-wrapper {
-		display: grid;
-		gap: 10px;
-		margin-top: 32px;
+		grid-column: 2;
+		margin-top: 4px;
 	}
 
 	.turnstile-widget {
 		min-height: 72px;
 	}
 
-	.field {
-		display: grid;
-		gap: 10px;
-	}
-
-	label {
-		font-size: 1rem;
-	}
-
 	.required-label::after {
 		content: '必須';
 		margin-left: 8px;
-		padding: 2px 6px;
-		border-radius: 999px;
+		padding: 2px 4px;
+		border-radius: 4px;
 		background-color: var(--main-color);
 		color: var(--background-color);
-		font-size: 0.75rem;
+		font-size: 0.75em;
 	}
 
-	input,
+	input[type='text'],
+	input[type='email'],
 	select,
 	textarea {
 		box-sizing: border-box;
 		width: 100%;
-		border: 1px solid rgb(255 255 255 / 20%);
-		border-radius: 14px;
-		padding: 14px 16px;
-		color: var(--main-color);
-		background-color: rgb(255 255 255 / 6%);
-		font: inherit;
-	}
-
-	input:focus,
-	select:focus,
-	textarea:focus {
-		outline: 2px solid rgb(255 255 255 / 45%);
-		outline-offset: 2px;
-	}
-
-	textarea {
-		resize: vertical;
-		min-height: 11rem;
-	}
-
-	button {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-width: 180px;
-		margin-top: 32px;
-		padding: 14px 28px;
-		border: 1px solid var(--main-color);
-		border-radius: 999px;
+		padding: 8px;
+		border: none;
+		border-radius: 4px;
 		color: var(--background-color);
 		background-color: var(--main-color);
 		font: inherit;
-		transition:
-			color 0.2s ease,
-			background-color 0.2s ease,
-			opacity 0.2s ease;
+	}
+
+	textarea {
+		font-family: var(--font-family);
+	}
+
+	button {
+		display: block;
+		width: 100%;
+		margin-top: 30px;
+		padding: 15px 0;
+		border: 1px solid;
+		color: var(--main-color);
+		background-color: var(--background-color);
+		font: inherit;
+		text-align: center;
+		transition-duration: 0.3s;
 	}
 
 	button:hover:enabled {
-		color: var(--main-color);
-		background-color: transparent;
+		color: var(--background-color);
+		background-color: var(--main-color);
 	}
 
 	button:disabled {
-		opacity: 0.55;
+		color: var(--main-color);
+		border-color: var(--background-color);
+		background-color: var(--secondary-color);
 		cursor: wait;
 	}
 
-	.success,
 	.error {
-		padding: 16px 18px;
-		border-radius: 16px;
-	}
-
-	.success {
-		border: 1px solid rgb(156 223 182 / 45%);
-		background-color: rgb(118 187 145 / 18%);
-	}
-
-	.error {
-		border: 1px solid rgb(255 163 163 / 35%);
-		background-color: rgb(212 93 93 / 14%);
+		color: #ffb4b4;
 	}
 
 	.field-error,
 	.field-hint,
 	.turnstile-description {
 		margin: 0;
-		font-size: 0.9rem;
+		font-size: 0.8em;
+		line-height: 1.9em;
 	}
 
 	.field-error {
@@ -491,10 +477,42 @@
 		color: rgb(255 255 255 / 76%);
 	}
 
-	@media (max-width: 950px) {
-		form {
-			padding: 24px 20px;
-			border-radius: 18px;
+	.toast {
+		position: fixed;
+		right: 20px;
+		bottom: 20px;
+		padding: 8px;
+		border: 1px solid;
+		border-radius: 4px;
+		color: var(--main-color);
+		background-color: var(--background-color);
+		transform: translateX(30px);
+		opacity: 0;
+		transition-duration: 0.3s;
+	}
+
+	.toast.shown {
+		transform: none;
+		opacity: 1;
+	}
+
+	@media (max-width: 790px) {
+		.form-container {
+			grid-template-columns: inherit;
+			gap: 5px;
+		}
+
+		label {
+			padding-top: 0;
+		}
+
+		.turnstile-wrapper {
+			grid-column: auto;
+		}
+
+		.field-control,
+		.turnstile-wrapper {
+			margin-bottom: 20px;
 		}
 	}
 </style>
