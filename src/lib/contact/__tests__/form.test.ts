@@ -15,7 +15,7 @@ describe('pickContactFormValues', () => {
 				email: 'contact@example.com',
 				categoryKey: 'others',
 				body: 'こんにちは',
-				reCaptchaToken: 'token',
+				turnstileToken: 'token',
 				ignored: 'value'
 			})
 		).toEqual({
@@ -50,7 +50,7 @@ describe('validateContactRequest', () => {
 			email: '  user@example.com  ',
 			categoryKey: 'advertisement',
 			body: '  お問い合わせ本文  ',
-			reCaptchaToken: 'token'
+			turnstileToken: 'token'
 		});
 
 		expect(result.success).toBe(true);
@@ -61,7 +61,7 @@ describe('validateContactRequest', () => {
 			email: 'user@example.com',
 			categoryKey: 'advertisement',
 			body: 'お問い合わせ本文',
-			reCaptchaToken: 'token'
+			turnstileToken: 'token'
 		});
 	});
 
@@ -71,7 +71,7 @@ describe('validateContactRequest', () => {
 			email: 'invalid-email',
 			categoryKey: 'invalid-category',
 			body: ' ',
-			reCaptchaToken: ''
+			turnstileToken: ''
 		});
 
 		expect(result.success).toBe(false);
@@ -82,7 +82,7 @@ describe('validateContactRequest', () => {
 			email: 'メールアドレスの形式を確認してください。',
 			categoryKey: '種類を選択してください。',
 			body: '本文を入力してください。',
-			reCaptchaToken: 'reCAPTCHA の検証に失敗しました。'
+			turnstileToken: 'Turnstile の検証に失敗しました。'
 		});
 	});
 
@@ -92,7 +92,7 @@ describe('validateContactRequest', () => {
 			email: 'user@example.com',
 			categoryKey: 'others',
 			body: 'x'.repeat(maxBodyLength + 1),
-			reCaptchaToken: 'token'
+			turnstileToken: 'token'
 		});
 
 		expect(result.success).toBe(false);

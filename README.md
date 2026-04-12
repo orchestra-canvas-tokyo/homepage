@@ -150,7 +150,7 @@ npm install
 
 `/contact` は `homepage` 内の SvelteKit form action で動作します。
 
-- Google reCAPTCHA v3 で bot 対策を行います。
+- Cloudflare Turnstile で bot 対策を行います。
 - Resend で送信者向けの確認メールを送ります。
 - カテゴリに応じて、内部の CC / Reply-To を切り替えます。
 - `SLACK_WEBHOOK_URL` が設定されている場合は Slack 通知を送ります。
@@ -158,11 +158,13 @@ npm install
 
 ### Contactのセットアップ
 
-公開リポジトリには Cloudflare の実設定をコミットしません。環境ごとにダッシュボードまたは `.env.local` / `.dev.vars` などのローカル専用設定で投入してください。
+公開リポジトリには Turnstile の SecretKey をコミットしません。環境ごとにダッシュボードまたは `.env.local` / `.dev.vars` などのローカル専用設定で投入してください。
 
-- 必須環境変数: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET`, `RESEND_API_KEY`
-- 任意環境変数: `SLACK_WEBHOOK_URL`
+- 必須環境変数: `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`
+- 任意環境変数: `TURNSTILE_SITE_KEY`, `SLACK_WEBHOOK_URL`
 - 任意バインディング: `DB` (Cloudflare D1)
+
+`/contact` では公開用 SiteKey `0x4AAAAAAC8aVLMvG7TLd5z2` を既定値として使います。別 widget に切り替える場合のみ `TURNSTILE_SITE_KEY` で上書きしてください。
 
 #### D1 を使う場合
 

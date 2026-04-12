@@ -11,10 +11,14 @@
 	import type { PageData } from './$types';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
+	import { contactTurnstileAction } from '$lib/contact/captcha';
 
 	let { data, form }: { data: PageData; form?: ContactActionData } = $props();
 
 	let formElement = $state<HTMLFormElement | null>(null);
+	let turnstileContainer = $state<HTMLDivElement | null>(null);
+	let turnstileWidgetId = $state<string | null>(null);
+	let turnstileToken = $state('');
 	let feedbackTone = $state<'success' | 'error' | null>(null);
 	let feedbackMessage = $state<string | null>(null);
 	let isSubmitting = $state(false);
@@ -27,36 +31,59 @@
 		feedbackMessage = message;
 	};
 
-	const executeRecaptcha = async (siteKey: string): Promise<string> =>
-		new Promise((resolve, reject) => {
-			if (typeof window.grecaptcha === 'undefined') {
-				reject(new Error('grecaptcha is not available'));
-				return;
-			}
+	const resetTurnstileWidget = () => {
+		turnstileToken = '';
+		isCaptchaReady = false;
+		if (turnstileWidgetId && typeof window.turnstile !== 'undefined') {
+			window.turnstile.reset(turnstileWidgetId);
+		}
+	};
 
-			window.grecaptcha.ready(() => {
-				window.grecaptcha.execute(siteKey, { action: 'submit' }).then(resolve, reject);
-			});
+	const renderTurnstileWidget = () => {
+		if (
+			typeof window.turnstile === 'undefined' ||
+			turnstileContainer === null ||
+			!data.turnstileSiteKey ||
+			turnstileWidgetId !== null
+		) {
+			return false;
+		}
+
+		turnstileWidgetId = window.turnstile.render(turnstileContainer, {
+			sitekey: data.turnstileSiteKey,
+			action: contactTurnstileAction,
+			size: 'flexible',
+			callback: (token) => {
+				turnstileToken = token;
+				isCaptchaReady = true;
+			},
+			'error-callback': () => {
+				turnstileToken = '';
+				isCaptchaReady = false;
+				setFeedback(
+					'error',
+					'Turnstile の読み込みに失敗しました。ページを再読み込みして再度お試しください。'
+				);
+			},
+			'expired-callback': () => {
+				resetTurnstileWidget();
+			}
 		});
 
+		return true;
+	};
+
 	onMount(() => {
-		if (!data.reCaptchaSiteKey) return;
+		if (!data.turnstileSiteKey) return;
 
 		let cancelled = false;
 		let timer = 0;
 
 		const waitForCaptcha = () => {
 			if (cancelled) return;
-			if (typeof window.grecaptcha === 'undefined') {
+			if (!renderTurnstileWidget()) {
 				timer = window.setTimeout(waitForCaptcha, 100);
-				return;
 			}
-
-			window.grecaptcha.ready(() => {
-				if (!cancelled) {
-					isCaptchaReady = true;
-				}
-			});
 		};
 
 		waitForCaptcha();
@@ -64,6 +91,10 @@
 		return () => {
 			cancelled = true;
 			window.clearTimeout(timer);
+			if (turnstileWidgetId && typeof window.turnstile !== 'undefined') {
+				window.turnstile.remove(turnstileWidgetId);
+				turnstileWidgetId = null;
+			}
 		};
 	});
 
@@ -76,14 +107,14 @@
 			return;
 		}
 
-		if (!data.reCaptchaSiteKey) {
+		if (!data.turnstileSiteKey) {
 			setFeedback('error', '現在フォームを利用できません。しばらくしてから再度お試しください。');
 			return;
 		}
-		if (!isCaptchaReady) {
+		if (!isCaptchaReady || turnstileToken === '') {
 			setFeedback(
 				'error',
-				'reCAPTCHA の準備が完了していません。少し待ってから再度お試しください。'
+				'Turnstile の検証が完了していません。少し待ってから再度お試しください。'
 			);
 			return;
 		}
@@ -92,7 +123,7 @@
 
 		try {
 			const formData = new FormData(targetForm);
-			formData.set('reCaptchaToken', await executeRecaptcha(data.reCaptchaSiteKey));
+			formData.set('turnstileToken', turnstileToken);
 
 			const response = await fetch(targetForm.action || window.location.pathname, {
 				method: 'POST',
@@ -110,6 +141,7 @@
 			setFeedback('error', '送信に失敗しました。時間をおいて再度お試しください。');
 		} finally {
 			isSubmitting = false;
+			resetTurnstileWidget();
 		}
 	}
 
@@ -121,10 +153,11 @@
 </script>
 
 <svelte:head>
-	{#if data.reCaptchaSiteKey}
+	{#if data.turnstileSiteKey}
 		<script
-			src={`https://www.google.com/recaptcha/api.js?render=${data.reCaptchaSiteKey}`}
+			src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
 			async
+			defer
 		></script>
 	{/if}
 </svelte:head>
@@ -188,7 +221,7 @@
 		</p>
 	{/if}
 
-	{#if data.reCaptchaSiteKey}
+	{#if data.turnstileSiteKey}
 		<form bind:this={formElement} method="POST" onsubmit={onSubmit}>
 			<div class="form-grid">
 				<div class="field">
@@ -267,23 +300,38 @@
 				</div>
 			</div>
 
-			<input type="hidden" name="reCaptchaToken" value="" />
+			<div class="turnstile-wrapper">
+				<div bind:this={turnstileContainer} class="turnstile-widget"></div>
+				{#if form?.errors?.turnstileToken}
+					<p class="field-error">{form.errors.turnstileToken}</p>
+				{/if}
+			</div>
+
+			<input type="hidden" name="turnstileToken" value={turnstileToken} />
 
 			<button type="submit" disabled={isSubmitting || !isCaptchaReady}>
 				{isSubmitting ? '送信中...' : '送信'}
 			</button>
 
 			{#if !isCaptchaReady}
-				<p class="field-hint">reCAPTCHA を読み込んでいます。数秒おいてから送信してください。</p>
+				<p class="field-hint">Turnstile を確認中です。数秒おいてから送信してください。</p>
 			{/if}
 
-			<p class="recaptcha-description">
-				このサイトはreCAPTCHAによって保護されており、Googleの
-				<a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+			<p class="turnstile-description">
+				このサイトは Cloudflare Turnstile によって保護されており、Cloudflare の
+				<a
+					href="https://www.cloudflare.com/privacypolicy/"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					プライバシーポリシー
 				</a>
 				と
-				<a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">
+				<a
+					href="https://www.cloudflare.com/website-terms/"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					利用規約
 				</a>
 				が適用されます。
@@ -327,6 +375,16 @@
 	.form-grid {
 		display: grid;
 		gap: 24px;
+	}
+
+	.turnstile-wrapper {
+		display: grid;
+		gap: 10px;
+		margin-top: 32px;
+	}
+
+	.turnstile-widget {
+		min-height: 72px;
 	}
 
 	.field {
@@ -419,7 +477,7 @@
 
 	.field-error,
 	.field-hint,
-	.recaptcha-description {
+	.turnstile-description {
 		margin: 0;
 		font-size: 0.9rem;
 	}
@@ -429,12 +487,8 @@
 	}
 
 	.field-hint,
-	.recaptcha-description {
+	.turnstile-description {
 		color: rgb(255 255 255 / 76%);
-	}
-
-	:global(.grecaptcha-badge) {
-		visibility: hidden;
 	}
 
 	@media (max-width: 950px) {

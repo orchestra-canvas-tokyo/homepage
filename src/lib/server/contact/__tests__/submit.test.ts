@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ContactRequest } from '$lib/contact/form';
 import type { ContactRuntimeConfig } from '../config';
 import { submitContactForm } from '../submit';
-import { verifyRecaptcha } from '../captcha';
+import { verifyTurnstile } from '../captcha';
 import { sendContactEmail } from '../email';
 import { writeContactLog } from '../log';
 import { sendSlackNotification } from '../slack';
@@ -10,7 +10,7 @@ import { sendSlackNotification } from '../slack';
 type ContactDatabase = NonNullable<App.Platform['env']['DB']>;
 
 vi.mock('../captcha', () => ({
-	verifyRecaptcha: vi.fn()
+	verifyTurnstile: vi.fn()
 }));
 
 vi.mock('../email', () => ({
@@ -25,7 +25,7 @@ vi.mock('../slack', () => ({
 	sendSlackNotification: vi.fn()
 }));
 
-const mockedVerifyRecaptcha = vi.mocked(verifyRecaptcha);
+const mockedVerifyTurnstile = vi.mocked(verifyTurnstile);
 const mockedSendContactEmail = vi.mocked(sendContactEmail);
 const mockedWriteContactLog = vi.mocked(writeContactLog);
 const mockedSendSlackNotification = vi.mocked(sendSlackNotification);
@@ -35,13 +35,13 @@ const baseSubmission: ContactRequest = {
 	email: 'contact@example.com',
 	categoryKey: 'others',
 	body: 'お問い合わせ本文',
-	reCaptchaToken: 'token'
+	turnstileToken: 'token'
 };
 
 const baseConfig: ContactRuntimeConfig = {
 	db: null,
-	reCaptchaSiteKey: 'site-key',
-	reCaptchaSecret: 'secret',
+	turnstileSiteKey: 'site-key',
+	turnstileSecretKey: 'secret',
 	resendApiKey: 'api-key',
 	slackWebhookUrl: null,
 	deploymentBranch: 'preview',
@@ -51,7 +51,7 @@ const baseConfig: ContactRuntimeConfig = {
 describe('submitContactForm', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockedVerifyRecaptcha.mockResolvedValue(true);
+		mockedVerifyTurnstile.mockResolvedValue(true);
 		mockedSendContactEmail.mockResolvedValue();
 		mockedWriteContactLog.mockResolvedValue();
 		mockedSendSlackNotification.mockResolvedValue();
@@ -60,7 +60,7 @@ describe('submitContactForm', () => {
 	it('必須設定が足りない場合は設定エラーを返す', async () => {
 		const result = await submitContactForm(baseSubmission, {
 			...baseConfig,
-			reCaptchaSecret: null
+			turnstileSecretKey: null
 		});
 
 		expect(result).toEqual({
@@ -68,30 +68,33 @@ describe('submitContactForm', () => {
 			reason: 'configuration',
 			message: '現在フォームを利用できません。しばらくしてから再度お試しください。'
 		});
-		expect(mockedVerifyRecaptcha).not.toHaveBeenCalled();
+		expect(mockedVerifyTurnstile).not.toHaveBeenCalled();
 	});
 
 	it('captcha が無効な場合は失敗を返す', async () => {
-		mockedVerifyRecaptcha.mockResolvedValue(false);
+		mockedVerifyTurnstile.mockResolvedValue(false);
 
 		const result = await submitContactForm(baseSubmission, baseConfig);
 
 		expect(result).toEqual({
 			ok: false,
 			reason: 'invalid_captcha',
-			message: 'reCAPTCHA の検証に失敗しました。時間をおいて再度お試しください。'
+			message: 'Turnstile の検証に失敗しました。時間をおいて再度お試しください。'
 		});
 		expect(mockedSendContactEmail).not.toHaveBeenCalled();
 		expect(mockedWriteContactLog).not.toHaveBeenCalled();
 	});
 
 	it('preview 送信ではプレビューモードのメール送信を行う', async () => {
-		const result = await submitContactForm(baseSubmission, baseConfig);
+		const result = await submitContactForm(baseSubmission, baseConfig, {
+			remoteIp: '198.51.100.10'
+		});
 
 		expect(result).toEqual({
 			ok: true,
 			message: 'お問い合わせを受け付けました。確認メールをご確認ください。'
 		});
+		expect(mockedVerifyTurnstile).toHaveBeenCalledWith('token', 'secret', '198.51.100.10');
 		expect(mockedSendContactEmail).toHaveBeenCalledWith(baseSubmission, {
 			apiKey: 'api-key',
 			isProduction: false

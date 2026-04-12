@@ -29,7 +29,7 @@ export type ContactFormValues = {
 	body: string;
 };
 
-export type ContactFormErrors = Partial<Record<keyof ContactFormValues | 'reCaptchaToken', string>>;
+export type ContactFormErrors = Partial<Record<keyof ContactFormValues | 'turnstileToken', string>>;
 
 export type ContactActionData = {
 	success: boolean;
@@ -64,7 +64,7 @@ const contactRequestSchema = z.object({
 		.trim()
 		.min(1, '本文を入力してください。')
 		.max(maxBodyLength, `本文は${maxBodyLength}文字以内で入力してください。`),
-	reCaptchaToken: z.string().min(1, 'reCAPTCHA の検証に失敗しました。')
+	turnstileToken: z.string().min(1, 'Turnstile の検証に失敗しました。')
 });
 
 export type ContactRequest = z.infer<typeof contactRequestSchema>;
@@ -75,7 +75,7 @@ export const validateContactRequest = (values: Record<string, unknown>) =>
 		email: toStringValue(values.email),
 		categoryKey: toStringValue(values.categoryKey),
 		body: toStringValue(values.body),
-		reCaptchaToken: toStringValue(values.reCaptchaToken)
+		turnstileToken: toStringValue(values.turnstileToken)
 	});
 
 export const flattenContactFormErrors = (error: z.ZodError<ContactRequest>): ContactFormErrors => {
@@ -86,6 +86,6 @@ export const flattenContactFormErrors = (error: z.ZodError<ContactRequest>): Con
 		email: fieldErrors.email?.[0],
 		categoryKey: fieldErrors.categoryKey?.[0],
 		body: fieldErrors.body?.[0],
-		reCaptchaToken: fieldErrors.reCaptchaToken?.[0]
+		turnstileToken: fieldErrors.turnstileToken?.[0]
 	};
 };

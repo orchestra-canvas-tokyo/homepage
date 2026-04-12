@@ -7,6 +7,12 @@ const { applyActionMock, deserializeMock } = vi.hoisted(() => ({
 	deserializeMock: vi.fn()
 }));
 
+const { removeMock, renderMock, resetMock } = vi.hoisted(() => ({
+	renderMock: vi.fn(),
+	resetMock: vi.fn(),
+	removeMock: vi.fn()
+}));
+
 vi.mock('$app/forms', async () => {
 	return {
 		applyAction: applyActionMock,
@@ -20,7 +26,7 @@ const baseData = {
 	concerts: [],
 	isRoot: false,
 	seasonalEvent: null,
-	reCaptchaSiteKey: 'site-key',
+	turnstileSiteKey: 'site-key',
 	flyerInsertionStatus: {
 		status: 'notAvailable' as const
 	}
@@ -30,11 +36,19 @@ describe('/contact page', () => {
 	beforeEach(() => {
 		applyActionMock.mockClear();
 		deserializeMock.mockReset();
+		renderMock.mockReset();
+		resetMock.mockReset();
+		removeMock.mockReset();
+		renderMock.mockImplementation((_container: HTMLElement, options: TurnstileRenderOptions) => {
+			options.callback?.('turnstile-token');
+			return 'widget-id';
+		});
 
 		Object.assign(globalThis, {
-			grecaptcha: {
-				ready: (callback: () => void) => callback(),
-				execute: vi.fn()
+			turnstile: {
+				render: renderMock,
+				reset: resetMock,
+				remove: removeMock
 			}
 		});
 	});
@@ -98,18 +112,11 @@ describe('/contact page', () => {
 		expect(screen.getByLabelText('メールアドレス')).toHaveAttribute('aria-invalid', 'true');
 	});
 
-	it('reCAPTCHA token を付与して submit する', async () => {
-		const executeMock = vi.fn().mockResolvedValue('captcha-token');
+	it('Turnstile token を付与して submit する', async () => {
 		const fetchMock = vi
 			.spyOn(globalThis, 'fetch')
 			.mockResolvedValue(new Response('serialized-action-result'));
 
-		Object.assign(globalThis, {
-			grecaptcha: {
-				ready: (callback: () => void) => callback(),
-				execute: executeMock
-			}
-		});
 		deserializeMock.mockReturnValue({
 			type: 'success',
 			data: {
@@ -136,14 +143,14 @@ describe('/contact page', () => {
 		await fireEvent.submit(container.querySelector('form') as HTMLFormElement);
 
 		await waitFor(() => {
-			expect(executeMock).toHaveBeenCalledWith('site-key', { action: 'submit' });
+			expect(renderMock).toHaveBeenCalledTimes(1);
 			expect(fetchMock).toHaveBeenCalledTimes(1);
 		});
 
 		const requestInit = fetchMock.mock.calls[0]?.[1];
 		expect(requestInit?.method).toBe('POST');
 		expect(requestInit?.body).toBeInstanceOf(FormData);
-		expect((requestInit?.body as FormData).get('reCaptchaToken')).toBe('captcha-token');
+		expect((requestInit?.body as FormData).get('turnstileToken')).toBe('turnstile-token');
 
 		await waitFor(() => {
 			expect(applyActionMock).toHaveBeenCalledWith({
@@ -154,6 +161,7 @@ describe('/contact page', () => {
 				}
 			});
 		});
+		expect(resetMock).toHaveBeenCalledWith('widget-id');
 
 		fetchMock.mockRestore();
 	});

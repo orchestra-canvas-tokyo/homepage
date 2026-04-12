@@ -10,6 +10,21 @@ import { getConcertBySlug, isFinished } from '$lib/concerts/utils';
 import { resolveContactRuntimeConfig } from '$lib/server/contact/config';
 import { submitContactForm } from '$lib/server/contact/submit';
 
+const getClientIp = (request: Request): string | null => {
+	const cfConnectingIp = request.headers.get('CF-Connecting-IP');
+	if (cfConnectingIp) {
+		return cfConnectingIp.trim();
+	}
+
+	const forwardedFor = request.headers.get('X-Forwarded-For');
+	if (!forwardedFor) {
+		return null;
+	}
+
+	const [firstIp] = forwardedFor.split(',');
+	return firstIp?.trim() || null;
+};
+
 export const load: PageServerLoad = async ({ platform }) => {
 	const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
 		{
@@ -18,11 +33,11 @@ export const load: PageServerLoad = async ({ platform }) => {
 		}
 	];
 	const flyerInsertionStatus = getFlyerInsertionStatus(...flyerInsertionData);
-	const { reCaptchaSiteKey } = resolveContactRuntimeConfig(platform?.env);
+	const { turnstileSiteKey } = resolveContactRuntimeConfig(platform?.env);
 
 	return {
 		flyerInsertionStatus,
-		reCaptchaSiteKey
+		turnstileSiteKey
 	};
 };
 
@@ -46,7 +61,8 @@ export const actions = {
 
 		const result = await submitContactForm(
 			validationResult.data,
-			resolveContactRuntimeConfig(platform?.env)
+			resolveContactRuntimeConfig(platform?.env),
+			{ remoteIp: getClientIp(request) }
 		);
 		if (!result.ok) {
 			return fail(

@@ -1,6 +1,6 @@
 import type { ContactRequest } from '$lib/contact/form';
 import type { ContactRuntimeConfig } from './config';
-import { verifyRecaptcha } from './captcha';
+import { verifyTurnstile } from './captcha';
 import { sendContactEmail } from './email';
 import { writeContactLog } from './log';
 import { type ContactLogEntry, type ContactLogStatus } from './schema';
@@ -49,9 +49,12 @@ const persistContactLog = async (
 
 export const submitContactForm = async (
 	content: ContactRequest,
-	config: ContactRuntimeConfig
+	config: ContactRuntimeConfig,
+	options: {
+		remoteIp?: string | null;
+	} = {}
 ): Promise<SubmitContactResult> => {
-	if (!config.reCaptchaSecret || !config.resendApiKey) {
+	if (!config.turnstileSecretKey || !config.resendApiKey) {
 		return {
 			ok: false,
 			reason: 'configuration',
@@ -61,9 +64,13 @@ export const submitContactForm = async (
 
 	let captchaVerified: boolean;
 	try {
-		captchaVerified = await verifyRecaptcha(content.reCaptchaToken, config.reCaptchaSecret);
+		captchaVerified = await verifyTurnstile(
+			content.turnstileToken,
+			config.turnstileSecretKey,
+			options.remoteIp
+		);
 	} catch (error) {
-		console.error('Failed to verify reCAPTCHA:', error);
+		console.error('Failed to verify Turnstile:', error);
 		return {
 			ok: false,
 			reason: 'captcha_verification_failed',
@@ -75,7 +82,7 @@ export const submitContactForm = async (
 		return {
 			ok: false,
 			reason: 'invalid_captcha',
-			message: 'reCAPTCHA の検証に失敗しました。時間をおいて再度お試しください。'
+			message: 'Turnstile の検証に失敗しました。時間をおいて再度お試しください。'
 		};
 	}
 

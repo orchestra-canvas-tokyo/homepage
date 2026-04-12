@@ -60,7 +60,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **演奏会管理**: Hygenテンプレートによる自動演奏会ページ生成
 - **複数演奏会タイプ**: 定期演奏会と室内楽演奏会の異なるデータ構造に対応
 - **レスポンシブデザイン**: モバイルファーストのアダプティブレイアウト
-- **お問い合わせシステム**: reCAPTCHA v3、Resendによるメール送信、任意のSlack通知とD1ログ保存
+- **お問い合わせシステム**: Cloudflare Turnstile、Resendによるメール送信、任意のSlack通知とD1ログ保存
 - **アクセス解析**: Cloudflare Web AnalyticsとGoogle Search Console連携
 
 ### データフロー

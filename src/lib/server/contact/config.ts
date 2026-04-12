@@ -1,5 +1,6 @@
 type ContactPlatformEnv = Partial<NonNullable<App.Platform['env']>> | undefined;
 type ContactDatabase = NonNullable<App.Platform['env']['DB']>;
+const defaultTurnstileSiteKey = '0x4AAAAAAC8aVLMvG7TLd5z2';
 
 const readNonEmptyString = (value: unknown): string | null =>
 	typeof value === 'string' && value.length > 0 ? value : null;
@@ -11,8 +12,8 @@ const readProcessEnv = (key: string): string | null => {
 
 export type ContactRuntimeConfig = {
 	db: ContactDatabase | null;
-	reCaptchaSiteKey: string | null;
-	reCaptchaSecret: string | null;
+	turnstileSiteKey: string | null;
+	turnstileSecretKey: string | null;
 	resendApiKey: string | null;
 	slackWebhookUrl: string | null;
 	deploymentBranch: string | null;
@@ -27,10 +28,15 @@ export const resolveContactRuntimeConfig = (
 
 	return {
 		db: platformEnv?.DB ?? null,
-		reCaptchaSiteKey:
-			readNonEmptyString(platformEnv?.RECAPTCHA_SITE_KEY) ?? readProcessEnv('RECAPTCHA_SITE_KEY'),
-		reCaptchaSecret:
-			readNonEmptyString(platformEnv?.RECAPTCHA_SECRET) ?? readProcessEnv('RECAPTCHA_SECRET'),
+		turnstileSiteKey:
+			readNonEmptyString(platformEnv?.TURNSTILE_SITE_KEY) ??
+			readProcessEnv('TURNSTILE_SITE_KEY') ??
+			defaultTurnstileSiteKey,
+		turnstileSecretKey:
+			readNonEmptyString(platformEnv?.TURNSTILE_SECRET_KEY) ??
+			readProcessEnv('TURNSTILE_SECRET_KEY') ??
+			readNonEmptyString(platformEnv?.TURNSTILE_SECRET) ??
+			readProcessEnv('TURNSTILE_SECRET'),
 		resendApiKey:
 			readNonEmptyString(platformEnv?.RESEND_API_KEY) ?? readProcessEnv('RESEND_API_KEY'),
 		slackWebhookUrl:

@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { actions, load } from '../+page.server';
 
 describe('/contact page server', () => {
-	it('load で reCAPTCHA site key を公開データに含める', async () => {
+	it('load で Turnstile site key を公開データに含める', async () => {
 		const result = await load({
 			platform: {
 				env: {
-					RECAPTCHA_SITE_KEY: 'site-key'
+					TURNSTILE_SITE_KEY: 'site-key'
 				}
 			}
 		} as Parameters<typeof load>[0]);
@@ -16,7 +16,7 @@ describe('/contact page server', () => {
 			throw new Error('load result was unexpectedly undefined');
 		}
 
-		expect(result.reCaptchaSiteKey).toBe('site-key');
+		expect(result.turnstileSiteKey).toBe('site-key');
 	});
 
 	it('不正な入力は 400 で返し、入力値を保持する', async () => {
@@ -27,7 +27,7 @@ describe('/contact page server', () => {
 				email: 'invalid-email',
 				categoryKey: '',
 				body: '',
-				reCaptchaToken: ''
+				turnstileToken: ''
 			})
 		});
 
@@ -53,7 +53,7 @@ describe('/contact page server', () => {
 					email: 'メールアドレスの形式を確認してください。',
 					categoryKey: '種類を選択してください。',
 					body: '本文を入力してください。',
-					reCaptchaToken: 'reCAPTCHA の検証に失敗しました。'
+					turnstileToken: 'Turnstile の検証に失敗しました。'
 				}
 			}
 		});
