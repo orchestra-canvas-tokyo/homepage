@@ -1,3 +1,15 @@
+type DeviceMotionEventWithRequestPermission = typeof window.DeviceMotionEvent & {
+	requestPermission: () => Promise<'granted' | 'denied'>;
+};
+
+const isDeviceMotionEventWithRequestPermission = (
+	value: unknown
+): value is DeviceMotionEventWithRequestPermission =>
+	typeof value === 'function' &&
+	value !== null &&
+	'requestPermission' in value &&
+	typeof value.requestPermission === 'function';
+
 export class DeviceMotionController {
 	readonly isWithRequestPermission: boolean;
 	readonly updatePermissionStatusCallback: (permitted: boolean) => void;
@@ -10,13 +22,9 @@ export class DeviceMotionController {
 	 */
 	constructor(updatePermissionStatusCallback: typeof this.updatePermissionStatusCallback) {
 		this.updatePermissionStatusCallback = updatePermissionStatusCallback;
-
-		const unknownDeviceMotionEvent = window.DeviceMotionEvent as unknown;
-		this.isWithRequestPermission =
-			typeof unknownDeviceMotionEvent === 'function' &&
-			unknownDeviceMotionEvent !== null &&
-			'requestPermission' in unknownDeviceMotionEvent &&
-			typeof unknownDeviceMotionEvent.requestPermission === 'function';
+		this.isWithRequestPermission = isDeviceMotionEventWithRequestPermission(
+			window.DeviceMotionEvent
+		);
 	}
 
 	/**
@@ -25,23 +33,14 @@ export class DeviceMotionController {
 	 * パーミッション状態を変更することができます。
 	 */
 	requestPermission(): void {
-		const unknownDeviceMotionEvent = window.DeviceMotionEvent as unknown;
+		const deviceMotionEvent = window.DeviceMotionEvent;
 
-		type deviceMotionEventWithRequestPermission = typeof window.DeviceMotionEvent & {
-			requestPermission: () => Promise<'granted' | 'denied'>;
-		};
-
-		const isDeviceMotionEventWithRequestPermission = (
-			unknownDeviceMotionEvent: unknown
-		): unknownDeviceMotionEvent is deviceMotionEventWithRequestPermission =>
-			this.isWithRequestPermission;
-
-		if (!isDeviceMotionEventWithRequestPermission(unknownDeviceMotionEvent)) {
+		if (!isDeviceMotionEventWithRequestPermission(deviceMotionEvent)) {
 			// 許可取得が不要な環境
 			return;
 		}
 
-		unknownDeviceMotionEvent
+		deviceMotionEvent
 			.requestPermission()
 			.then((permissionState) => {
 				this.updatePermissionStatusCallback(permissionState === 'granted');

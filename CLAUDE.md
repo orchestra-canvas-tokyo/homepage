@@ -23,8 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## データベースコマンド（Cloudflare D1）
 
 - **ローカルDB作成**: `npx wrangler d1 create DB`
-- **マイグレーション適用**: `npx wrangler d1 migrations apply DB`
-- **マイグレーション生成**: `npx drizzle-kit generate`
+- **マイグレーション適用**: `npx wrangler d1 migrations apply DB`（未コミットの wrangler 設定または dashboard 側 binding 前提）
 - **環境別適用**:
   - ローカル: `npx wrangler d1 migrations apply DB`
   - プレビュー: `npx wrangler d1 migrations apply DB --remote --env preview`
@@ -61,7 +60,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **演奏会管理**: Hygenテンプレートによる自動演奏会ページ生成
 - **複数演奏会タイプ**: 定期演奏会と室内楽演奏会の異なるデータ構造に対応
 - **レスポンシブデザイン**: モバイルファーストのアダプティブレイアウト
-- **お問い合わせシステム**: reCAPTCHA v3、Cloudflare KVによるセッション管理、Resendによるメール送信
+- **お問い合わせシステム**: Cloudflare Turnstile、Resendによるメール送信、任意のSlack通知とD1ログ保存
 - **アクセス解析**: Cloudflare Web AnalyticsとGoogle Search Console連携
 
 ### データフロー

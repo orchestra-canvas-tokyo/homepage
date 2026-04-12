@@ -1,10 +1,168 @@
 <script lang="ts">
-	import type { PageServerData } from './$types';
+	import { applyAction, deserialize } from '$app/forms';
+	import type { ActionResult } from '@sveltejs/kit';
+	import { onMount } from 'svelte';
+	import {
+		categories,
+		maxBodyLength,
+		maxNameLength,
+		type ContactActionData
+	} from '$lib/contact/form';
+	import type { PageData } from './$types';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Meta from '$lib/components/Meta.svelte';
+	import { contactTurnstileAction } from '$lib/contact/captcha';
 
-	let { data }: { data: PageServerData } = $props();
+	let { data, form }: { data: PageData; form?: ContactActionData } = $props();
+
+	let formElement = $state<HTMLFormElement | null>(null);
+	let turnstileContainer = $state<HTMLDivElement | null>(null);
+	let turnstileWidgetId = $state<string | null>(null);
+	let turnstileToken = $state('');
+	let feedbackMessage = $state<string | null>(null);
+	let isToastShown = $state(false);
+	let toastTimer = 0;
+	let isSubmitting = $state(false);
+	let isCaptchaReady = $state(false);
+
+	const getFieldError = (field: 'name' | 'email' | 'categoryKey' | 'body') => form?.errors?.[field];
+
+	const setFeedback = (message: string) => {
+		feedbackMessage = message;
+		isToastShown = true;
+		window.clearTimeout(toastTimer);
+		toastTimer = window.setTimeout(() => {
+			isToastShown = false;
+		}, 5000);
+	};
+
+	const resetTurnstileWidget = () => {
+		turnstileToken = '';
+		isCaptchaReady = false;
+		if (turnstileWidgetId && typeof window.turnstile !== 'undefined') {
+			window.turnstile.reset(turnstileWidgetId);
+		}
+	};
+
+	const renderTurnstileWidget = () => {
+		if (
+			typeof window.turnstile === 'undefined' ||
+			turnstileContainer === null ||
+			!data.turnstileSiteKey ||
+			turnstileWidgetId !== null
+		) {
+			return false;
+		}
+
+		turnstileWidgetId = window.turnstile.render(turnstileContainer, {
+			sitekey: data.turnstileSiteKey,
+			action: contactTurnstileAction,
+			size: 'flexible',
+			callback: (token) => {
+				turnstileToken = token;
+				isCaptchaReady = true;
+			},
+			'error-callback': () => {
+				turnstileToken = '';
+				isCaptchaReady = false;
+				setFeedback(
+					'Turnstile の読み込みに失敗しました。ページを再読み込みして再度お試しください。'
+				);
+			},
+			'expired-callback': () => {
+				resetTurnstileWidget();
+			}
+		});
+
+		return true;
+	};
+
+	onMount(() => {
+		if (!data.turnstileSiteKey) return;
+
+		let cancelled = false;
+		let timer = 0;
+
+		const waitForCaptcha = () => {
+			if (cancelled) return;
+			if (!renderTurnstileWidget()) {
+				timer = window.setTimeout(waitForCaptcha, 100);
+			}
+		};
+
+		waitForCaptcha();
+
+		return () => {
+			cancelled = true;
+			window.clearTimeout(timer);
+			if (turnstileWidgetId && typeof window.turnstile !== 'undefined') {
+				window.turnstile.remove(turnstileWidgetId);
+				turnstileWidgetId = null;
+			}
+			window.clearTimeout(toastTimer);
+		};
+	});
+
+	async function onSubmit(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }) {
+		event.preventDefault();
+
+		const targetForm = formElement ?? (event.currentTarget as HTMLFormElement | null);
+		if (!targetForm) {
+			setFeedback('送信に失敗しました。時間をおいて再度お試しください。');
+			return;
+		}
+
+		if (!data.turnstileSiteKey) {
+			setFeedback('現在フォームを利用できません。しばらくしてから再度お試しください。');
+			return;
+		}
+		if (!isCaptchaReady || turnstileToken === '') {
+			setFeedback('Turnstile の検証が完了していません。少し待ってから再度お試しください。');
+			return;
+		}
+
+		isSubmitting = true;
+
+		try {
+			const formData = new FormData(targetForm);
+			formData.set('turnstileToken', turnstileToken);
+
+			const response = await fetch(targetForm.action || window.location.pathname, {
+				method: 'POST',
+				body: formData
+			});
+			const result = deserialize(await response.text()) as ActionResult;
+
+			await applyAction(result);
+
+			if (result.type === 'success' && result.data?.success === true) {
+				formElement?.reset();
+			}
+		} catch (error) {
+			console.error('Failed to submit contact form:', error);
+			setFeedback('送信に失敗しました。時間をおいて再度お試しください。');
+		} finally {
+			isSubmitting = false;
+			resetTurnstileWidget();
+		}
+	}
+
+	$effect(() => {
+		if (!form) return;
+
+		setFeedback(form.message);
+	});
 </script>
+
+<svelte:head>
+	{#if data.turnstileSiteKey}
+		<script
+			src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+			async
+			defer
+		></script>
+	{/if}
+</svelte:head>
 
 <Meta title="Contact" canonical="/contact" />
 
@@ -55,14 +213,115 @@
 		</p>
 	{/if}
 
-	<iframe
-		src="https://contact.orch-canvas.tokyo/"
-		width="100%"
-		height="650"
-		frameborder="0"
-		title="お問い合わせフォーム"
-	></iframe>
+	{#if data.turnstileSiteKey}
+		<form bind:this={formElement} method="POST" onsubmit={onSubmit}>
+			<div class="form-container">
+				<div class="field">
+					<label for="name">お名前</label>
+					<div class="field-control">
+						<input
+							id="name"
+							name="name"
+							type="text"
+							maxlength={maxNameLength}
+							value={form?.values?.name ?? ''}
+							disabled={isSubmitting}
+							aria-invalid={getFieldError('name') ? 'true' : undefined}
+							aria-describedby={getFieldError('name') ? 'name-error' : undefined}
+						/>
+						{#if getFieldError('name')}
+							<p id="name-error" class="field-error">{getFieldError('name')}</p>
+						{/if}
+					</div>
+				</div>
+
+				<div class="field">
+					<label for="email" class="required-label">メールアドレス</label>
+					<div class="field-control">
+						<input
+							id="email"
+							name="email"
+							type="email"
+							required
+							value={form?.values?.email ?? ''}
+							disabled={isSubmitting}
+							aria-invalid={getFieldError('email') ? 'true' : undefined}
+							aria-describedby={getFieldError('email') ? 'email-error' : undefined}
+						/>
+						{#if getFieldError('email')}
+							<p id="email-error" class="field-error">{getFieldError('email')}</p>
+						{/if}
+					</div>
+				</div>
+
+				<div class="field">
+					<label for="categoryKey" class="required-label">種類</label>
+					<div class="field-control">
+						<select
+							id="categoryKey"
+							name="categoryKey"
+							value={form?.values?.categoryKey ?? ''}
+							required
+							disabled={isSubmitting}
+							aria-invalid={getFieldError('categoryKey') ? 'true' : undefined}
+							aria-describedby={getFieldError('categoryKey') ? 'categoryKey-error' : undefined}
+						>
+							<option value="" hidden></option>
+							{#each Object.entries(categories) as [key, description]}
+								<option value={key}>{description}</option>
+							{/each}
+						</select>
+						{#if getFieldError('categoryKey')}
+							<p id="categoryKey-error" class="field-error">{getFieldError('categoryKey')}</p>
+						{/if}
+					</div>
+				</div>
+
+				<div class="field">
+					<label for="body" class="required-label">本文</label>
+					<div class="field-control">
+						<textarea
+							id="body"
+							name="body"
+							rows="6"
+							maxlength={maxBodyLength}
+							required
+							disabled={isSubmitting}
+							aria-invalid={getFieldError('body') ? 'true' : undefined}
+							aria-describedby={getFieldError('body') ? 'body-error' : 'body-hint'}
+							>{form?.values?.body ?? ''}</textarea
+						>
+						<p id="body-hint" class="field-hint">{maxBodyLength}文字以内でご記入ください。</p>
+						{#if getFieldError('body')}
+							<p id="body-error" class="field-error">{getFieldError('body')}</p>
+						{/if}
+					</div>
+				</div>
+
+				<div class="turnstile-wrapper">
+					<div bind:this={turnstileContainer} class="turnstile-widget"></div>
+					{#if form?.errors?.turnstileToken}
+						<p class="field-error">{form.errors.turnstileToken}</p>
+					{/if}
+				</div>
+			</div>
+
+			<input type="hidden" name="turnstileToken" value={turnstileToken} />
+
+			<button type="submit" disabled={isSubmitting || !isCaptchaReady}>
+				{isSubmitting ? '送信中...' : '送信'}
+			</button>
+		</form>
+	{:else}
+		<p class="error" role="alert">
+			現在フォームを利用できません。しばらくしてから再度お試しください。
+		</p>
+	{/if}
 </article>
+
+<div class="toast" class:shown={isToastShown} role="status" aria-live="polite">
+	{feedbackMessage}
+</div>
 
 <style>
 	article {
@@ -84,9 +343,149 @@
 		margin: 30px 0;
 	}
 
-	@media (min-width: 878px) {
-		iframe {
-			height: 448px;
+	form {
+		margin-top: 30px;
+	}
+
+	.form-container {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: 20px;
+		align-items: start;
+	}
+
+	.field {
+		display: contents;
+	}
+
+	label {
+		padding-top: 8px;
+		font-size: 1rem;
+	}
+
+	.field-control,
+	.turnstile-wrapper {
+		display: grid;
+		gap: 6px;
+	}
+
+	.turnstile-wrapper {
+		grid-column: 2;
+		margin-top: 4px;
+	}
+
+	.turnstile-widget {
+		min-height: 72px;
+	}
+
+	.required-label::after {
+		content: '必須';
+		margin-left: 8px;
+		padding: 2px 4px;
+		border-radius: 4px;
+		background-color: var(--main-color);
+		color: var(--background-color);
+		font-size: 0.75em;
+	}
+
+	input[type='text'],
+	input[type='email'],
+	select,
+	textarea {
+		box-sizing: border-box;
+		width: 100%;
+		padding: 8px;
+		border: none;
+		border-radius: 4px;
+		color: var(--background-color);
+		background-color: var(--main-color);
+		font: inherit;
+	}
+
+	textarea {
+		font-family: var(--font-family);
+	}
+
+	button {
+		display: block;
+		width: 100%;
+		margin-top: 30px;
+		padding: 15px 0;
+		border: 1px solid;
+		color: var(--main-color);
+		background-color: var(--background-color);
+		font: inherit;
+		text-align: center;
+		transition-duration: 0.3s;
+	}
+
+	button:hover:enabled {
+		color: var(--background-color);
+		background-color: var(--main-color);
+	}
+
+	button:disabled {
+		color: var(--main-color);
+		border-color: var(--background-color);
+		background-color: var(--secondary-color);
+		cursor: wait;
+	}
+
+	.error {
+		color: #ffb4b4;
+	}
+
+	.field-error,
+	.field-hint {
+		margin: 0;
+		font-size: 0.8em;
+		line-height: 1.9em;
+	}
+
+	.field-error {
+		color: #ffb4b4;
+	}
+
+	.field-hint {
+		color: rgb(255 255 255 / 76%);
+	}
+
+	.toast {
+		position: fixed;
+		right: 20px;
+		bottom: 20px;
+		padding: 8px;
+		border: 1px solid;
+		border-radius: 4px;
+		color: var(--main-color);
+		background-color: var(--background-color);
+		transform: translateX(30px);
+		opacity: 0;
+		transition-duration: 0.3s;
+	}
+
+	.toast.shown {
+		transform: none;
+		opacity: 1;
+	}
+
+	@media (max-width: 790px) {
+		.form-container {
+			grid-template-columns: inherit;
+			gap: 5px;
+		}
+
+		label {
+			padding-top: 0;
+		}
+
+		.turnstile-wrapper {
+			grid-column: auto;
+		}
+
+		.field-control,
+		.turnstile-wrapper {
+			margin-bottom: 20px;
 		}
 	}
 </style>

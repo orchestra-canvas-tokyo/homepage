@@ -42,6 +42,7 @@ export default [
 
 		languageOptions: {
 			globals: {
+				...globals.es2020,
 				...globals.browser,
 				...globals.node
 			},

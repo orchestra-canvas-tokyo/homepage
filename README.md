@@ -29,6 +29,8 @@ npm install # 依存関係をインストール
 npm run dev # 開発環境を立ち上げ
 ```
 
+`.env.example` を元に、必要に応じて `.env.local` などのローカル専用ファイルへ環境変数を設定してください。
+
 ### npm Script一覧
 
 npm scriptとは、npmで設定できる開発時向けのエイリアス、スクリプトです。
@@ -127,7 +129,7 @@ const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
 const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
 	{
 		concertSlug: 'regular-99',
-		status: 'recruitmentClosed'
+		status: 'onlyRecruitmentClosed'
 	}
 ];
 ```
@@ -146,7 +148,32 @@ npm install
 
 ## Contactの仕様
 
-iframeでお手製のconctactアプリケーションを埋め込んでいます。
+`/contact` は `homepage` 内の SvelteKit form action で動作します。
+
+- Cloudflare Turnstile で bot 対策を行います。
+- Resend で送信者向けの確認メールを送ります。
+- カテゴリに応じて、内部の CC / Reply-To を切り替えます。
+- `SLACK_WEBHOOK_URL` が設定されている場合は Slack 通知を送ります。
+- `DB` バインディングが設定されている場合は、`sentAt` / `status` / `name` / `email` / `categoryKey` / `body` を D1 に保存します。
+
+### Contactのセットアップ
+
+公開リポジトリには Turnstile の SecretKey をコミットしません。環境ごとにダッシュボードまたは `.env.local` / `.dev.vars` などのローカル専用設定で投入してください。
+
+- 必須環境変数: `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`
+- 任意環境変数: `TURNSTILE_SITE_KEY`, `SLACK_WEBHOOK_URL`
+- 任意バインディング: `DB` (Cloudflare D1)
+
+`/contact` では公開用 SiteKey `0x4AAAAAAC8aVLMvG7TLd5z2` を既定値として使います。別 widget に切り替える場合のみ `TURNSTILE_SITE_KEY` で上書きしてください。
+
+#### D1 を使う場合
+
+```shell
+# ローカルの未コミット wrangler 設定、または Cloudflare 側の binding 名 `DB` を用いて migration を適用
+npx wrangler d1 migrations apply DB
+```
+
+このリポジトリには `migrations/0001_create_contacts.sql` を含めています。
 
 ## FAQ
 

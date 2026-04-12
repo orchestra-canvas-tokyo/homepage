@@ -3,6 +3,7 @@ node_modules
 /build
 /.svelte-kit
 /package
+.env
 .env.local
 .env.*.local
 vite.config.js.timestamp-*
@@ -10,3 +11,5 @@ vite.config.ts.timestamp-*
 /.wrangler
 .dev.vars
 /coverage
+.codex
+.serena
