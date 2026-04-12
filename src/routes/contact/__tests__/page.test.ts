@@ -92,7 +92,7 @@ describe('/contact page', () => {
 			values: {
 				name: '',
 				email: 'invalid-email',
-				categoryKey: '',
+				categoryKey: 'others',
 				body: ''
 			},
 			errors: {
@@ -110,6 +110,31 @@ describe('/contact page', () => {
 		expect(await screen.findByText('入力内容を確認してください。')).toBeInTheDocument();
 		expect(screen.getByText('メールアドレスの形式を確認してください。')).toBeInTheDocument();
 		expect(screen.getByLabelText('メールアドレス')).toHaveAttribute('aria-invalid', 'true');
+		expect(screen.getByLabelText('種類')).toHaveValue('others');
+	});
+
+	it('送信失敗で再描画された後も種類を復元する', async () => {
+		const { rerender } = render(ContactPage, {
+			props: {
+				data: baseData
+			}
+		});
+
+		await rerender({
+			data: baseData,
+			form: {
+				success: false,
+				message: '入力内容を確認してください。',
+				values: {
+					name: 'Canvas',
+					email: 'contact@example.com',
+					categoryKey: 'advertisement',
+					body: '本文'
+				}
+			} satisfies ContactActionData
+		});
+
+		expect(screen.getByLabelText('種類')).toHaveValue('advertisement');
 	});
 
 	it('Turnstile token を付与して submit する', async () => {

@@ -260,16 +260,15 @@
 						<select
 							id="categoryKey"
 							name="categoryKey"
+							value={form?.values?.categoryKey ?? ''}
 							required
 							disabled={isSubmitting}
 							aria-invalid={getFieldError('categoryKey') ? 'true' : undefined}
 							aria-describedby={getFieldError('categoryKey') ? 'categoryKey-error' : undefined}
 						>
-							<option value="" selected={(form?.values?.categoryKey ?? '') === ''} hidden></option>
+							<option value="" hidden></option>
 							{#each Object.entries(categories) as [key, description]}
-								<option value={key} selected={(form?.values?.categoryKey ?? '') === key}>
-									{description}
-								</option>
+								<option value={key}>{description}</option>
 							{/each}
 						</select>
 						{#if getFieldError('categoryKey')}
@@ -312,30 +311,6 @@
 			<button type="submit" disabled={isSubmitting || !isCaptchaReady}>
 				{isSubmitting ? '送信中...' : '送信'}
 			</button>
-
-			{#if !isCaptchaReady}
-				<p class="field-hint">Turnstile を確認中です。数秒おいてから送信してください。</p>
-			{/if}
-
-			<p class="turnstile-description">
-				このサイトは Cloudflare Turnstile によって保護されており、Cloudflare の
-				<a
-					href="https://www.cloudflare.com/privacypolicy/"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					プライバシーポリシー
-				</a>
-				と
-				<a
-					href="https://www.cloudflare.com/website-terms/"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					利用規約
-				</a>
-				が適用されます。
-			</p>
 		</form>
 	{:else}
 		<p class="error" role="alert">
@@ -461,8 +436,7 @@
 	}
 
 	.field-error,
-	.field-hint,
-	.turnstile-description {
+	.field-hint {
 		margin: 0;
 		font-size: 0.8em;
 		line-height: 1.9em;
@@ -472,8 +446,7 @@
 		color: #ffb4b4;
 	}
 
-	.field-hint,
-	.turnstile-description {
+	.field-hint {
 		color: rgb(255 255 255 / 76%);
 	}
 
