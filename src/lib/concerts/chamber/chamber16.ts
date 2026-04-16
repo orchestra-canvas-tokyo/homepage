@@ -15,9 +15,17 @@ export const concert: Concert = {
 		name: '青葉区民文化センター フィリアホール',
 		url: 'https://www.philiahall.com/html/access/'
 	},
-	// programs: [
-	// 	{ composer: '●', title: '●' }
-	// ],
+	programs: [
+		{ composer: 'モーツァルト', title: 'クラリネット五重奏曲' },
+		{ composer: 'ボロディン', title: '弦楽四重奏曲第2番' },
+		{ composer: 'フィンジ', title: '間奏曲' },
+		{ composer: 'パーカー', title: 'ニューヨークのロンドン子' },
+		{ composer: 'アレンスキー', title: 'ピアノ三重奏曲第1番より第1, 4楽章' },
+		{ composer: 'ブラームス', title: 'ピアノ四重奏曲第3番より第1, 2楽章' },
+		{ composer: 'ブラームス', title: 'ピアノ四重奏曲第1番より第3, 4楽章' },
+		{ composer: 'ブルッフ', title: '8つの小品より第2, 3, 6, 7曲' },
+		{ composer: 'グリーグ', title: '組曲「ホルベアの時代から」' }
+	],
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/66352?uid=hp'
