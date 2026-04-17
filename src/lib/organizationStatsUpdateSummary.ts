@@ -38,21 +38,37 @@ export type OrganizationStatsUpdateSummary =
 
 export type OrganizationStatsSlackSummaryOptions = {
 	failedSteps?: string[];
+	generatedAt?: Date;
 	runUrl?: string;
+	summaryDate?: string;
 	workflowStatus?: string;
 };
 
 export type OrganizationStatsSlackColor = 'good' | 'warning' | 'danger';
+type SlackMarkdownTextObject = {
+	type: 'mrkdwn';
+	text: string;
+};
+
+type SlackSectionBlock = {
+	type: 'section';
+	text: SlackMarkdownTextObject;
+};
+
+type SlackContextBlock = {
+	type: 'context';
+	elements: SlackMarkdownTextObject[];
+};
+
+type SlackDividerBlock = {
+	type: 'divider';
+};
+
+export type OrganizationStatsSlackBlock = SlackSectionBlock | SlackContextBlock | SlackDividerBlock;
 
 export type OrganizationStatsSlackPayload = {
 	text: string;
-	attachments: [
-		{
-			color: OrganizationStatsSlackColor;
-			fallback: string;
-			text: string;
-		}
-	];
+	blocks: OrganizationStatsSlackBlock[];
 };
 
 const fieldLabels = {
@@ -68,6 +84,33 @@ const displayFormatters = {
 } satisfies Record<OrganizationStatsFieldKey, (value: number) => string>;
 
 const organizationStatsKeys = Object.keys(fieldLabels) as OrganizationStatsFieldKey[];
+
+const slackMetricFieldOrder = [
+	'youtubeTotalViewCount',
+	'youtubeSubscriberCount',
+	'totalAttendance'
+] satisfies OrganizationStatsFieldKey[];
+
+const slackMetricLabels = {
+	totalAttendance: '累計来場者数',
+	youtubeSubscriberCount: 'YT登録者数',
+	youtubeTotalViewCount: 'YT総再生回数'
+} satisfies Record<OrganizationStatsFieldKey, string>;
+
+const slackMetricUnits = {
+	totalAttendance: '名',
+	youtubeSubscriberCount: '人',
+	youtubeTotalViewCount: '回'
+} satisfies Record<OrganizationStatsFieldKey, string>;
+
+const slackSummaryIcons = {
+	good: '🟢',
+	warning: '🟡',
+	danger: '🔴'
+} satisfies Record<OrganizationStatsSlackColor, string>;
+
+const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
+const JST_OFFSET_MILLISECONDS = 9 * 60 * 60 * 1000;
 
 const formatRawInteger = (value: number): string => value.toLocaleString('ja-JP');
 
@@ -95,11 +138,124 @@ const formatPersistDecision = (
 	return `公開用JSON: 更新対象あり（${reasons.join(' / ')}）`;
 };
 
-const formatChangedField = (field: OrganizationStatsFieldSummary): string =>
-	`- ${field.label}: ${formatRawInteger(field.previousValue)} -> ${formatRawInteger(field.nextValue)} (${formatSignedInteger(field.delta)}) / 表示: ${field.previousDisplayValue} -> ${field.nextDisplayValue}`;
+const formatJstDate = (date: Date): string =>
+	new Date(date.getTime() + JST_OFFSET_MILLISECONDS).toISOString().slice(0, 10);
 
-const formatCurrentField = (field: OrganizationStatsFieldSummary): string =>
-	`- ${field.label}: ${formatRawInteger(field.nextValue)} / 表示: ${field.nextDisplayValue}`;
+const getDefaultSummaryDate = (generatedAt: Date): string =>
+	formatJstDate(new Date(generatedAt.getTime() - DAY_IN_MILLISECONDS));
+
+const escapeSlackText = (value: string): string =>
+	value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+
+const createMarkdownText = (text: string): SlackMarkdownTextObject => ({
+	type: 'mrkdwn',
+	text
+});
+
+const createSectionBlock = (text: string): SlackSectionBlock => ({
+	type: 'section',
+	text: createMarkdownText(text)
+});
+
+const createContextBlock = (text: string): SlackContextBlock => ({
+	type: 'context',
+	elements: [createMarkdownText(text)]
+});
+
+const getOrderedSlackFields = (
+	summary: Extract<OrganizationStatsUpdateSummary, { status: 'updated' | 'no_change' }>
+): OrganizationStatsFieldSummary[] =>
+	slackMetricFieldOrder.map((key) => {
+		const field = summary.fields.find((summaryField) => summaryField.key === key);
+
+		if (!field) {
+			throw new Error(`Missing organization stats summary field: ${key}`);
+		}
+
+		return field;
+	});
+
+const formatSlackMetricField = (
+	field: OrganizationStatsFieldSummary,
+	highlightChangedValues: boolean
+): string => {
+	const delta = field.changed ? ` (${formatSignedInteger(field.delta)})` : '';
+	const statusIcon = highlightChangedValues && field.changed ? '🟡' : '🟢';
+
+	return `- ${statusIcon} ${slackMetricLabels[field.key]} ${formatRawInteger(field.nextValue)}${slackMetricUnits[field.key]}${delta}`;
+};
+
+const formatFailedStepsDetail = (failedSteps: string[]): string =>
+	failedSteps.length > 0
+		? `GitHub Actions の後続 step に失敗しました (${failedSteps.join(', ')})`
+		: 'GitHub Actions の実行に失敗しました。';
+
+const formatWorkflowStatusDetail = (
+	workflowStatus: string | undefined,
+	failedSteps: string[]
+): string => {
+	if (workflowStatus === 'failure') {
+		return formatFailedStepsDetail(failedSteps);
+	}
+
+	if (workflowStatus && workflowStatus !== 'success') {
+		return `GitHub Actions の実行が ${workflowStatus} で終了しました。`;
+	}
+
+	return 'GitHub Actions の実行に失敗しました。';
+};
+
+const getSlackSummaryLabel = (
+	summary: OrganizationStatsUpdateSummary,
+	options: Pick<OrganizationStatsSlackSummaryOptions, 'workflowStatus'>
+): string => {
+	if (getOrganizationStatsSlackColor(summary, options) === 'danger') {
+		return 'エラー';
+	}
+
+	if (summary.status === 'updated') {
+		return `${summary.fields.filter((field) => field.changed).length}件更新`;
+	}
+
+	return '更新なし';
+};
+
+const createSlackSummaryParts = (
+	summary: OrganizationStatsUpdateSummary,
+	options: OrganizationStatsSlackSummaryOptions
+) => {
+	const generatedAt = options.generatedAt ?? new Date();
+	const failedSteps = options.failedSteps?.filter((step) => step !== '') ?? [];
+	const slackColor = getOrganizationStatsSlackColor(summary, options);
+	const title = `団体情報統計 更新サマリー | ${options.summaryDate ?? getDefaultSummaryDate(generatedAt)} JST`;
+	const summaryLines = [
+		`*サマリー: ${slackSummaryIcons[slackColor]} ${getSlackSummaryLabel(summary, options)}*`
+	];
+	const metricRows =
+		summary.status === 'error'
+			? []
+			: getOrderedSlackFields(summary).map((field) =>
+					formatSlackMetricField(field, summary.shouldPersist)
+				);
+	const persistDecision = summary.status === 'error' ? undefined : formatPersistDecision(summary);
+
+	if (summary.status === 'error') {
+		summaryLines.push(`詳細: ${escapeSlackText(summary.errorMessage)}`);
+	} else if (slackColor === 'danger') {
+		summaryLines.push(
+			`詳細: ${escapeSlackText(formatWorkflowStatusDetail(options.workflowStatus, failedSteps))}`
+		);
+	}
+
+	return {
+		title,
+		generatedAtLine: `生成: ${generatedAt.toISOString()}`,
+		summaryText: summaryLines.join('\n'),
+		metricRows,
+		persistDecision,
+		runLink: options.runUrl ? `<${options.runUrl}|実行ログ>` : undefined
+	};
+};
 
 export const createOrganizationStatsErrorSummary = (
 	errorMessage: string
@@ -167,78 +323,54 @@ export const getOrganizationStatsSlackColor = (
 	return 'good';
 };
 
-export const createOrganizationStatsSlackPayload = (
-	summary: OrganizationStatsUpdateSummary,
-	options: OrganizationStatsSlackSummaryOptions = {}
-): OrganizationStatsSlackPayload => {
-	const text = formatOrganizationStatsSlackSummary(summary, options);
-	const [, ...detailLines] = text.split('\n');
-
-	return {
-		text,
-		attachments: [
-			{
-				color: getOrganizationStatsSlackColor(summary, options),
-				fallback: text,
-				text: detailLines.join('\n')
-			}
-		]
-	};
-};
-
 export const formatOrganizationStatsSlackSummary = (
 	summary: OrganizationStatsUpdateSummary,
 	options: OrganizationStatsSlackSummaryOptions = {}
 ): string => {
-	const lines = ['団体情報の統計更新サマリー'];
-	const failedSteps = options.failedSteps?.filter((step) => step !== '') ?? [];
+	const parts = createSlackSummaryParts(summary, options);
+	const lines = [parts.title, parts.generatedAtLine, '---', parts.summaryText.replaceAll('*', '')];
 
-	if (summary.status === 'error') {
-		lines.push('結果: エラー');
-		lines.push(`詳細: ${summary.errorMessage}`);
-	} else if (options.workflowStatus === 'failure') {
-		lines.push('結果: エラー');
-		lines.push(
-			failedSteps.length > 0
-				? `詳細: GitHub Actions の後続 step に失敗しました (${failedSteps.join(', ')})`
-				: '詳細: GitHub Actions の実行に失敗しました。'
-		);
-
-		if (summary.status === 'updated') {
-			lines.push('取得できた差分:');
-			lines.push(...summary.fields.filter((field) => field.changed).map(formatChangedField));
-		} else {
-			lines.push('取得できた現在値:');
-			lines.push(...summary.fields.map(formatCurrentField));
-		}
-
-		lines.push(formatPersistDecision(summary));
-	} else if (summary.status === 'updated') {
-		const changedFields = summary.fields.filter((field) => field.changed);
-		const unchangedFieldLabels = summary.fields
-			.filter((field) => !field.changed)
-			.map((field) => field.label);
-
-		lines.push(`結果: 更新あり (${changedFields.length}項目)`);
-		lines.push('差分:');
-		lines.push(...changedFields.map(formatChangedField));
-
-		if (unchangedFieldLabels.length > 0) {
-			lines.push(`変更なし: ${unchangedFieldLabels.join(', ')}`);
-		}
-
-		lines.push(formatPersistDecision(summary));
-	} else {
-		lines.push('結果: 更新なし');
-		lines.push(`全${summary.fields.length}項目に差分はありません。`);
-		lines.push('現在値:');
-		lines.push(...summary.fields.map(formatCurrentField));
-		lines.push(formatPersistDecision(summary));
+	if (parts.metricRows.length > 0) {
+		lines.push(...parts.metricRows);
 	}
 
-	if (options.runUrl) {
-		lines.push(`Run: ${options.runUrl}`);
+	if (parts.persistDecision) {
+		lines.push(parts.persistDecision);
+	}
+
+	if (parts.runLink) {
+		lines.push(parts.runLink);
 	}
 
 	return lines.join('\n');
+};
+
+export const formatOrganizationStatsSlackPayload = (
+	summary: OrganizationStatsUpdateSummary,
+	options: OrganizationStatsSlackSummaryOptions = {}
+): OrganizationStatsSlackPayload => {
+	const parts = createSlackSummaryParts(summary, options);
+	const blocks: OrganizationStatsSlackBlock[] = [
+		createSectionBlock(`*${parts.title}*`),
+		createContextBlock(parts.generatedAtLine),
+		{ type: 'divider' },
+		createSectionBlock(parts.summaryText)
+	];
+
+	if (parts.metricRows.length > 0) {
+		blocks.push(createSectionBlock(parts.metricRows.join('\n')));
+	}
+
+	if (parts.persistDecision) {
+		blocks.push(createContextBlock(parts.persistDecision));
+	}
+
+	if (parts.runLink) {
+		blocks.push(createSectionBlock(parts.runLink));
+	}
+
+	return {
+		text: formatOrganizationStatsSlackSummary(summary, options),
+		blocks
+	};
 };
