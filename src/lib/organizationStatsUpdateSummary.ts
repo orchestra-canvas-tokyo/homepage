@@ -36,7 +36,7 @@ export type OrganizationStatsUpdateSummary =
 			errorMessage: string;
 	  };
 
-type OrganizationStatsSlackSummaryOptions = {
+export type OrganizationStatsSlackSummaryOptions = {
 	failedSteps?: string[];
 	generatedAt?: Date;
 	runUrl?: string;
@@ -44,6 +44,7 @@ type OrganizationStatsSlackSummaryOptions = {
 	workflowStatus?: string;
 };
 
+export type OrganizationStatsSlackColor = 'good' | 'warning' | 'danger';
 type SlackMarkdownTextObject = {
 	type: 'mrkdwn';
 	text: string;
@@ -101,6 +102,12 @@ const slackMetricUnits = {
 	youtubeSubscriberCount: '人',
 	youtubeTotalViewCount: '回'
 } satisfies Record<OrganizationStatsFieldKey, string>;
+
+const slackSummaryIcons = {
+	good: '🟢',
+	warning: '🟡',
+	danger: '🔴'
+} satisfies Record<OrganizationStatsSlackColor, string>;
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 const JST_OFFSET_MILLISECONDS = 9 * 60 * 60 * 1000;
@@ -168,10 +175,14 @@ const getOrderedSlackFields = (
 		return field;
 	});
 
-const formatSlackMetricField = (field: OrganizationStatsFieldSummary): string => {
+const formatSlackMetricField = (
+	field: OrganizationStatsFieldSummary,
+	highlightChangedValues: boolean
+): string => {
 	const delta = field.changed ? ` (${formatSignedInteger(field.delta)})` : '';
+	const statusIcon = highlightChangedValues && field.changed ? '🟡' : '🟢';
 
-	return `- ${field.changed ? '🟡' : '🟢'} ${slackMetricLabels[field.key]} ${formatRawInteger(field.nextValue)}${slackMetricUnits[field.key]}${delta}`;
+	return `- ${statusIcon} ${slackMetricLabels[field.key]} ${formatRawInteger(field.nextValue)}${slackMetricUnits[field.key]}${delta}`;
 };
 
 const formatFailedStepsDetail = (failedSteps: string[]): string =>
@@ -179,11 +190,26 @@ const formatFailedStepsDetail = (failedSteps: string[]): string =>
 		? `GitHub Actions の後続 step に失敗しました (${failedSteps.join(', ')})`
 		: 'GitHub Actions の実行に失敗しました。';
 
+const formatWorkflowStatusDetail = (
+	workflowStatus: string | undefined,
+	failedSteps: string[]
+): string => {
+	if (workflowStatus === 'failure') {
+		return formatFailedStepsDetail(failedSteps);
+	}
+
+	if (workflowStatus && workflowStatus !== 'success') {
+		return `GitHub Actions の実行が ${workflowStatus} で終了しました。`;
+	}
+
+	return 'GitHub Actions の実行に失敗しました。';
+};
+
 const getSlackSummaryLabel = (
 	summary: OrganizationStatsUpdateSummary,
 	options: Pick<OrganizationStatsSlackSummaryOptions, 'workflowStatus'>
 ): string => {
-	if (summary.status === 'error' || options.workflowStatus === 'failure') {
+	if (getOrganizationStatsSlackColor(summary, options) === 'danger') {
 		return 'エラー';
 	}
 
@@ -200,16 +226,25 @@ const createSlackSummaryParts = (
 ) => {
 	const generatedAt = options.generatedAt ?? new Date();
 	const failedSteps = options.failedSteps?.filter((step) => step !== '') ?? [];
+	const slackColor = getOrganizationStatsSlackColor(summary, options);
 	const title = `団体情報統計 更新サマリー | ${options.summaryDate ?? getDefaultSummaryDate(generatedAt)} JST`;
-	const summaryLines = [`*サマリー: ${getSlackSummaryLabel(summary, options)}*`];
+	const summaryLines = [
+		`*サマリー: ${slackSummaryIcons[slackColor]} ${getSlackSummaryLabel(summary, options)}*`
+	];
 	const metricRows =
-		summary.status === 'error' ? [] : getOrderedSlackFields(summary).map(formatSlackMetricField);
+		summary.status === 'error'
+			? []
+			: getOrderedSlackFields(summary).map((field) =>
+					formatSlackMetricField(field, summary.shouldPersist)
+				);
 	const persistDecision = summary.status === 'error' ? undefined : formatPersistDecision(summary);
 
 	if (summary.status === 'error') {
 		summaryLines.push(`詳細: ${escapeSlackText(summary.errorMessage)}`);
-	} else if (options.workflowStatus === 'failure') {
-		summaryLines.push(`詳細: ${escapeSlackText(formatFailedStepsDetail(failedSteps))}`);
+	} else if (slackColor === 'danger') {
+		summaryLines.push(
+			`詳細: ${escapeSlackText(formatWorkflowStatusDetail(options.workflowStatus, failedSteps))}`
+		);
 	}
 
 	return {
@@ -268,6 +303,24 @@ export const summarizeOrganizationStatsUpdate = (
 		shouldPersist: shouldPersistOrganizationStats(current, next),
 		persistReasons
 	};
+};
+
+export const getOrganizationStatsSlackColor = (
+	summary: OrganizationStatsUpdateSummary,
+	options: OrganizationStatsSlackSummaryOptions = {}
+): OrganizationStatsSlackColor => {
+	if (
+		summary.status === 'error' ||
+		(options.workflowStatus !== undefined && options.workflowStatus !== 'success')
+	) {
+		return 'danger';
+	}
+
+	if (summary.status === 'updated' && summary.shouldPersist) {
+		return 'warning';
+	}
+
+	return 'good';
 };
 
 export const formatOrganizationStatsSlackSummary = (
