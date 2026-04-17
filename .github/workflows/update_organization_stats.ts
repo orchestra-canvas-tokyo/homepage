@@ -48,6 +48,18 @@ const appendUpdateSummary = async (summary: OrganizationStatsUpdateSummary): Pro
 	await appendGitHubEnv('ORGANIZATION_STATS_UPDATE_SUMMARY', JSON.stringify(summary));
 };
 
+const writeStderrLine = async (message: string): Promise<void> =>
+	new Promise((resolve, reject) => {
+		process.stderr.write(`${message}\n`, (error) => {
+			if (error) {
+				reject(error);
+				return;
+			}
+
+			resolve();
+		});
+	});
+
 const ensureValidIncrease = (
 	label: string,
 	currentValue: number,
@@ -174,7 +186,7 @@ const updateOrganizationStats = async (): Promise<void> => {
 
 updateOrganizationStats().catch(async (error: unknown) => {
 	const message = error instanceof Error ? error.message : String(error);
-	console.error(message);
+	await writeStderrLine(message);
 
 	if (GITHUB_ENV) {
 		await appendGitHubEnv('SHOULD_COMMIT', 'false');

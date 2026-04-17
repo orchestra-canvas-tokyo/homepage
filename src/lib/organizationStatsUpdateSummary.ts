@@ -36,10 +36,23 @@ export type OrganizationStatsUpdateSummary =
 			errorMessage: string;
 	  };
 
-type OrganizationStatsSlackSummaryOptions = {
+export type OrganizationStatsSlackSummaryOptions = {
 	failedSteps?: string[];
 	runUrl?: string;
 	workflowStatus?: string;
+};
+
+export type OrganizationStatsSlackColor = 'good' | 'warning' | 'danger';
+
+export type OrganizationStatsSlackPayload = {
+	text: string;
+	attachments: [
+		{
+			color: OrganizationStatsSlackColor;
+			fallback: string;
+			text: string;
+		}
+	];
 };
 
 const fieldLabels = {
@@ -133,6 +146,43 @@ export const summarizeOrganizationStatsUpdate = (
 		fields,
 		shouldPersist: shouldPersistOrganizationStats(current, next),
 		persistReasons
+	};
+};
+
+export const getOrganizationStatsSlackColor = (
+	summary: OrganizationStatsUpdateSummary,
+	options: OrganizationStatsSlackSummaryOptions = {}
+): OrganizationStatsSlackColor => {
+	if (
+		summary.status === 'error' ||
+		(options.workflowStatus !== undefined && options.workflowStatus !== 'success')
+	) {
+		return 'danger';
+	}
+
+	if (summary.status === 'updated' && summary.shouldPersist) {
+		return 'warning';
+	}
+
+	return 'good';
+};
+
+export const createOrganizationStatsSlackPayload = (
+	summary: OrganizationStatsUpdateSummary,
+	options: OrganizationStatsSlackSummaryOptions = {}
+): OrganizationStatsSlackPayload => {
+	const text = formatOrganizationStatsSlackSummary(summary, options);
+	const [, ...detailLines] = text.split('\n');
+
+	return {
+		text,
+		attachments: [
+			{
+				color: getOrganizationStatsSlackColor(summary, options),
+				fallback: text,
+				text: detailLines.join('\n')
+			}
+		]
 	};
 };
 

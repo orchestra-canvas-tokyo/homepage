@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+	createOrganizationStatsSlackPayload,
 	createOrganizationStatsErrorSummary,
 	formatOrganizationStatsSlackSummary,
+	getOrganizationStatsSlackColor,
 	summarizeOrganizationStatsUpdate
 } from '../organizationStatsUpdateSummary';
 
@@ -80,6 +82,88 @@ describe('organization stats update summary', () => {
 		expect(text).toContain('Run: https://example.com/runs/1');
 	});
 
+	it('returns warning only when changed values require a persisted JSON update', () => {
+		const warningColor = getOrganizationStatsSlackColor(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 8001,
+					youtubeSubscriberCount: 16050,
+					youtubeTotalViewCount: 6704321
+				}
+			)
+		);
+		const goodColor = getOrganizationStatsSlackColor(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 7999,
+					youtubeSubscriberCount: 15999,
+					youtubeTotalViewCount: 6699999
+				}
+			)
+		);
+		const verificationOnlyColor = getOrganizationStatsSlackColor(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: false
+				},
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890
+				}
+			)
+		);
+
+		expect(warningColor).toBe('warning');
+		expect(goodColor).toBe('good');
+		expect(verificationOnlyColor).toBe('good');
+	});
+
+	it('creates a Slack payload with full preview text and colored attachment details', () => {
+		const payload = createOrganizationStatsSlackPayload(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 8001,
+					youtubeSubscriberCount: 16050,
+					youtubeTotalViewCount: 6704321
+				}
+			),
+			{
+				runUrl: 'https://example.com/runs/1'
+			}
+		);
+
+		expect(payload.text).toContain('結果: 更新あり (3項目)');
+		expect(payload.attachments).toHaveLength(1);
+		expect(payload.attachments[0]).toMatchObject({
+			color: 'warning',
+			fallback: payload.text
+		});
+		expect(payload.attachments[0].text).toContain('結果: 更新あり (3項目)');
+		expect(payload.attachments[0].text).not.toContain('団体情報の統計更新サマリー');
+	});
+
 	it('formats workflow failures as errors while preserving fetched values', () => {
 		const text = formatOrganizationStatsSlackSummary(
 			summarizeOrganizationStatsUpdate(
@@ -104,6 +188,52 @@ describe('organization stats update summary', () => {
 		expect(text).toContain('結果: エラー');
 		expect(text).toContain('Create or update main PR');
 		expect(text).toContain('取得できた差分:');
+	});
+
+	it('returns danger for non-success workflow states and direct errors', () => {
+		const failedWorkflowColor = getOrganizationStatsSlackColor(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 7868,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890
+				}
+			),
+			{
+				workflowStatus: 'failure'
+			}
+		);
+		const cancelledWorkflowColor = getOrganizationStatsSlackColor(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890
+				}
+			),
+			{
+				workflowStatus: 'cancelled'
+			}
+		);
+		const errorColor = getOrganizationStatsSlackColor(
+			createOrganizationStatsErrorSummary('Attendance CSV is empty.')
+		);
+
+		expect(failedWorkflowColor).toBe('danger');
+		expect(cancelledWorkflowColor).toBe('danger');
+		expect(errorColor).toBe('danger');
 	});
 
 	it('formats update errors directly', () => {
