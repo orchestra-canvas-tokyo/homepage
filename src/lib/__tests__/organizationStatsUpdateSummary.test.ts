@@ -4,6 +4,7 @@ import {
 	createOrganizationStatsErrorSummary,
 	formatOrganizationStatsSlackPayload,
 	formatOrganizationStatsSlackSummary,
+	getOrganizationStatsSlackColor,
 	summarizeOrganizationStatsUpdate
 } from '../organizationStatsUpdateSummary';
 
@@ -80,7 +81,7 @@ describe('organization stats update summary', () => {
 
 		expect(payload.text).toContain('団体情報統計 更新サマリー | 2026-04-09 JST');
 		expect(payload.text).toContain('生成: 2026-04-10T02:50:24.893Z');
-		expect(payload.text).toContain('サマリー: 3件更新');
+		expect(payload.text).toContain('サマリー: 🟡 3件更新');
 		expect(payload.text).toContain('- 🟡 YT総再生回数 6,704,321回 (+96,431)');
 		expect(payload.text).toContain('- 🟡 YT登録者数 16,050人 (+1,050)');
 		expect(payload.text).toContain('- 🟡 累計来場者数 8,001名 (+134)');
@@ -110,7 +111,7 @@ describe('organization stats update summary', () => {
 				type: 'section',
 				text: {
 					type: 'mrkdwn',
-					text: '*サマリー: 3件更新*'
+					text: '*サマリー: 🟡 3件更新*'
 				}
 			}
 		]);
@@ -136,11 +137,90 @@ describe('organization stats update summary', () => {
 			}
 		);
 
-		expect(text).toContain('サマリー: 更新なし');
+		expect(text).toContain('サマリー: 🟢 更新なし');
 		expect(text).toContain('- 🟢 YT総再生回数 6,607,890回');
 		expect(text).toContain('- 🟢 YT登録者数 15,000人');
 		expect(text).toContain('- 🟢 累計来場者数 7,867名');
 		expect(text).toContain('公開用JSON: 更新対象あり（登録者数検証フラグを確定）');
+	});
+
+	it('keeps summary and metric markers green when raw values changed but JSON is not persisted', () => {
+		const payload = formatOrganizationStatsSlackPayload(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 7999,
+					youtubeSubscriberCount: 15999,
+					youtubeTotalViewCount: 6699999
+				}
+			),
+			{
+				generatedAt
+			}
+		);
+
+		expect(payload.text).toContain('サマリー: 🟢 3件更新');
+		expect(payload.text).toContain('- 🟢 YT総再生回数 6,699,999回 (+92,109)');
+		expect(payload.text).toContain('- 🟢 YT登録者数 15,999人 (+999)');
+		expect(payload.text).toContain('- 🟢 累計来場者数 7,999名 (+132)');
+		expect(payload.text).toContain('公開用JSON: 変更なし');
+	});
+
+	it('returns warning only when changed values require a persisted JSON update', () => {
+		const warningColor = getOrganizationStatsSlackColor(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 8001,
+					youtubeSubscriberCount: 16050,
+					youtubeTotalViewCount: 6704321
+				}
+			)
+		);
+		const goodColor = getOrganizationStatsSlackColor(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 7999,
+					youtubeSubscriberCount: 15999,
+					youtubeTotalViewCount: 6699999
+				}
+			)
+		);
+		const verificationOnlyColor = getOrganizationStatsSlackColor(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: false
+				},
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890
+				}
+			)
+		);
+
+		expect(warningColor).toBe('warning');
+		expect(goodColor).toBe('good');
+		expect(verificationOnlyColor).toBe('good');
 	});
 
 	it('formats workflow failures as errors while preserving fetched values', () => {
@@ -165,9 +245,55 @@ describe('organization stats update summary', () => {
 			}
 		);
 
-		expect(payload.text).toContain('サマリー: エラー');
+		expect(payload.text).toContain('サマリー: 🔴 エラー');
 		expect(payload.text).toContain('Create or update main PR');
-		expect(payload.text).toContain('- 🟡 累計来場者数 7,868名 (+1)');
+		expect(payload.text).toContain('- 🟢 累計来場者数 7,868名 (+1)');
+	});
+
+	it('returns danger for non-success workflow states and direct errors', () => {
+		const failedWorkflowColor = getOrganizationStatsSlackColor(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 7868,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890
+				}
+			),
+			{
+				workflowStatus: 'failure'
+			}
+		);
+		const cancelledWorkflowColor = getOrganizationStatsSlackColor(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890
+				}
+			),
+			{
+				workflowStatus: 'cancelled'
+			}
+		);
+		const errorColor = getOrganizationStatsSlackColor(
+			createOrganizationStatsErrorSummary('Attendance CSV is empty.')
+		);
+
+		expect(failedWorkflowColor).toBe('danger');
+		expect(cancelledWorkflowColor).toBe('danger');
+		expect(errorColor).toBe('danger');
 	});
 
 	it('formats update errors directly', () => {
@@ -178,7 +304,7 @@ describe('organization stats update summary', () => {
 			}
 		);
 
-		expect(payload.text).toContain('サマリー: エラー');
+		expect(payload.text).toContain('サマリー: 🔴 エラー');
 		expect(payload.text).toContain('Attendance CSV is empty.');
 		expect(payload.blocks).toHaveLength(4);
 	});

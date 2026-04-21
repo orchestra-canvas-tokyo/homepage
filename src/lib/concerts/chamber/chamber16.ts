@@ -24,7 +24,7 @@ export const concert: Concert = {
 		{ composer: 'ブラームス', title: 'ピアノ四重奏曲第3番より第1, 2楽章' },
 		{ composer: 'ブラームス', title: 'ピアノ四重奏曲第1番より第3, 4楽章' },
 		{ composer: 'ブルッフ', title: '8つの小品より第2, 3, 6, 7曲' },
-		{ composer: 'グリーグ', title: '組曲「ホルベアの時代から」' }
+		{ composer: 'グリーグ', title: '組曲『ホルベアの時代より』' }
 	],
 	ticket: {
 		description: '入場無料',
