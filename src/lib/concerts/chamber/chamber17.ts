@@ -15,9 +15,13 @@ export const concert: Concert = {
 		name: '国分寺市立いずみホール Aホール',
 		url: 'https://www.kokubunji-izumihall.jp/access/'
 	},
-	// programs: [
-	// 	{ composer: '●', title: '●' }
-	// ],
+	programs: [
+		{ composer: 'ホルスト (編曲：小林健太郎)', title: '吹奏楽のための第1組曲' },
+		{ composer: 'ブラームス', title: 'クラリネット五重奏曲' },
+		{ composer: 'クルークハルト', title: '木管五重奏曲' },
+		{ composer: 'フェルヘルスト', title: 'ファイアホース' },
+		{ composer: 'ブルーメル', title: '木管五重奏曲' }
+	],
 	ticket: {
 		description: '入場無料',
 		url: 'https://teket.jp/1776/66353?uid=hp'
