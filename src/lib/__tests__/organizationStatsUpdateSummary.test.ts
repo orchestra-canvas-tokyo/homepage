@@ -223,6 +223,69 @@ describe('organization stats update summary', () => {
 		expect(verificationOnlyColor).toBe('good');
 	});
 
+	it('formats successful direct main and production updates', () => {
+		const text = formatOrganizationStatsSlackSummary(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 8001,
+					youtubeSubscriberCount: 16050,
+					youtubeTotalViewCount: 6704321
+				}
+			),
+			{
+				generatedAt,
+				mainBranchUpdate: {
+					status: 'pushed'
+				},
+				productionPromotion: {
+					status: 'merged'
+				}
+			}
+		);
+
+		expect(text).toContain('- main: 直接コミット完了');
+		expect(text).toContain('- production: main の最新コミットを自動マージ');
+	});
+
+	it('formats production skip reasons when the stats commit stays only on main', () => {
+		const text = formatOrganizationStatsSlackSummary(
+			summarizeOrganizationStatsUpdate(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890,
+					youtubeSubscriberCountVerified: true
+				},
+				{
+					totalAttendance: 8001,
+					youtubeSubscriberCount: 16050,
+					youtubeTotalViewCount: 6704321
+				}
+			),
+			{
+				generatedAt,
+				mainBranchUpdate: {
+					status: 'pushed'
+				},
+				productionPromotion: {
+					status: 'skipped',
+					reason: 'not_caught_up'
+				}
+			}
+		);
+
+		expect(text).toContain('- main: 直接コミット完了');
+		expect(text).toContain(
+			'- production: スキップ（実行開始時点で production が main と同一内容ではありません）'
+		);
+	});
+
 	it('formats workflow failures as errors while preserving fetched values', () => {
 		const payload = formatOrganizationStatsSlackPayload(
 			summarizeOrganizationStatsUpdate(
@@ -241,13 +304,24 @@ describe('organization stats update summary', () => {
 			{
 				generatedAt,
 				workflowStatus: 'failure',
-				failedSteps: ['Create or update main PR']
+				failedSteps: ['Merge to production'],
+				mainBranchUpdate: {
+					status: 'pushed'
+				},
+				productionPromotion: {
+					status: 'skipped',
+					reason: 'production_moved'
+				}
 			}
 		);
 
 		expect(payload.text).toContain('サマリー: 🔴 エラー');
-		expect(payload.text).toContain('Create or update main PR');
+		expect(payload.text).toContain('Merge to production');
 		expect(payload.text).toContain('- 🟢 累計来場者数 7,868名 (+1)');
+		expect(payload.text).toContain('- main: 直接コミット完了');
+		expect(payload.text).toContain(
+			'- production: スキップ（実行中に production が更新されました）'
+		);
 	});
 
 	it('returns danger for non-success workflow states and direct errors', () => {
