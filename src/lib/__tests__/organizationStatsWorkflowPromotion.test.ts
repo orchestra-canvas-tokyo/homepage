@@ -15,7 +15,7 @@ const execFileAsync = promisify(execFile);
 const temporaryDirectories: string[] = [];
 
 const runGit = async (cwd: string, args: string[]): Promise<string> => {
-	const { stdout } = await execFileAsync('git', args, {
+	const { stdout } = await execFileAsync('git', ['-c', 'commit.gpgsign=false', ...args], {
 		cwd,
 		env: {
 			...process.env,
