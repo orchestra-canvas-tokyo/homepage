@@ -33,10 +33,12 @@ jobs:
         if: github.ref_name == github.event.repository.default_branch
         run: |
           git fetch origin main production
-          echo "PRE_UPDATE_MAIN_SHA=$(git rev-parse origin/main)" >> "$GITHUB_ENV"
-          echo "PRE_UPDATE_MAIN_TREE_SHA=$(git rev-parse origin/main^{tree})" >> "$GITHUB_ENV"
-          echo "PRE_UPDATE_PRODUCTION_SHA=$(git rev-parse origin/production)" >> "$GITHUB_ENV"
-          echo "PRE_UPDATE_PRODUCTION_TREE_SHA=$(git rev-parse origin/production^{tree})" >> "$GITHUB_ENV"
+          {
+            echo "PRE_UPDATE_MAIN_SHA=$(git rev-parse origin/main)"
+            echo "PRE_UPDATE_MAIN_TREE_SHA=$(git rev-parse 'origin/main^{tree}')"
+            echo "PRE_UPDATE_PRODUCTION_SHA=$(git rev-parse origin/production)"
+            echo "PRE_UPDATE_PRODUCTION_TREE_SHA=$(git rev-parse 'origin/production^{tree}')"
+          } >> "$GITHUB_ENV"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -77,8 +79,10 @@ jobs:
           CURRENT_MAIN_SHA="$(git rev-parse origin/main)"
           if [ "$CURRENT_MAIN_SHA" != "$PRE_UPDATE_MAIN_SHA" ]; then
             echo "main moved while the workflow was running; skipping direct commit."
-            echo "MAIN_BRANCH_UPDATE_STATUS=skipped" >> "$GITHUB_ENV"
-            echo "MAIN_BRANCH_UPDATE_SKIP_REASON=main_moved" >> "$GITHUB_ENV"
+            {
+              echo "MAIN_BRANCH_UPDATE_STATUS=skipped"
+              echo "MAIN_BRANCH_UPDATE_SKIP_REASON=main_moved"
+            } >> "$GITHUB_ENV"
             exit 0
           fi
 
@@ -88,16 +92,20 @@ jobs:
 
           PUSHED_MAIN_SHA="$(git rev-parse HEAD)"
           if git push origin HEAD:main; then
-            echo "MAIN_BRANCH_UPDATE_STATUS=pushed" >> "$GITHUB_ENV"
-            echo "PUSHED_MAIN_SHA=${PUSHED_MAIN_SHA}" >> "$GITHUB_ENV"
+            {
+              echo "MAIN_BRANCH_UPDATE_STATUS=pushed"
+              echo "PUSHED_MAIN_SHA=${PUSHED_MAIN_SHA}"
+            } >> "$GITHUB_ENV"
             exit 0
           fi
 
           git fetch origin main
           if [ "$(git rev-parse origin/main)" != "$PRE_UPDATE_MAIN_SHA" ]; then
             echo "main moved before the push completed; skipping direct commit."
-            echo "MAIN_BRANCH_UPDATE_STATUS=skipped" >> "$GITHUB_ENV"
-            echo "MAIN_BRANCH_UPDATE_SKIP_REASON=main_moved" >> "$GITHUB_ENV"
+            {
+              echo "MAIN_BRANCH_UPDATE_STATUS=skipped"
+              echo "MAIN_BRANCH_UPDATE_SKIP_REASON=main_moved"
+            } >> "$GITHUB_ENV"
             exit 0
           fi
 
@@ -109,8 +117,10 @@ jobs:
         run: |
           if [ "$PRE_UPDATE_MAIN_TREE_SHA" != "$PRE_UPDATE_PRODUCTION_TREE_SHA" ]; then
             echo "production was not aligned with main at workflow start; skipping auto-merge."
-            echo "PRODUCTION_PROMOTION_STATUS=skipped" >> "$GITHUB_ENV"
-            echo "PRODUCTION_PROMOTION_SKIP_REASON=not_caught_up" >> "$GITHUB_ENV"
+            {
+              echo "PRODUCTION_PROMOTION_STATUS=skipped"
+              echo "PRODUCTION_PROMOTION_SKIP_REASON=not_caught_up"
+            } >> "$GITHUB_ENV"
             exit 0
           fi
 
@@ -119,16 +129,20 @@ jobs:
           CURRENT_MAIN_SHA="$(git rev-parse origin/main)"
           if [ "$CURRENT_MAIN_SHA" != "$PUSHED_MAIN_SHA" ]; then
             echo "main advanced after the stats commit; skipping production merge."
-            echo "PRODUCTION_PROMOTION_STATUS=skipped" >> "$GITHUB_ENV"
-            echo "PRODUCTION_PROMOTION_SKIP_REASON=main_moved" >> "$GITHUB_ENV"
+            {
+              echo "PRODUCTION_PROMOTION_STATUS=skipped"
+              echo "PRODUCTION_PROMOTION_SKIP_REASON=main_moved"
+            } >> "$GITHUB_ENV"
             exit 0
           fi
 
           CURRENT_PRODUCTION_SHA="$(git rev-parse origin/production)"
           if [ "$CURRENT_PRODUCTION_SHA" != "$PRE_UPDATE_PRODUCTION_SHA" ]; then
             echo "production advanced while the workflow was running; skipping auto-merge."
-            echo "PRODUCTION_PROMOTION_STATUS=skipped" >> "$GITHUB_ENV"
-            echo "PRODUCTION_PROMOTION_SKIP_REASON=production_moved" >> "$GITHUB_ENV"
+            {
+              echo "PRODUCTION_PROMOTION_STATUS=skipped"
+              echo "PRODUCTION_PROMOTION_SKIP_REASON=production_moved"
+            } >> "$GITHUB_ENV"
             exit 0
           fi
 
@@ -144,8 +158,10 @@ jobs:
           git fetch origin production
           if [ "$(git rev-parse origin/production)" != "$PRE_UPDATE_PRODUCTION_SHA" ]; then
             echo "production advanced before the merge push completed; skipping auto-merge."
-            echo "PRODUCTION_PROMOTION_STATUS=skipped" >> "$GITHUB_ENV"
-            echo "PRODUCTION_PROMOTION_SKIP_REASON=production_moved" >> "$GITHUB_ENV"
+            {
+              echo "PRODUCTION_PROMOTION_STATUS=skipped"
+              echo "PRODUCTION_PROMOTION_SKIP_REASON=production_moved"
+            } >> "$GITHUB_ENV"
             exit 0
           fi
 
