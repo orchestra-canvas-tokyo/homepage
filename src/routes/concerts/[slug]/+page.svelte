@@ -52,9 +52,9 @@
 	{#if data.flyers}
 		<div class="flyer-container">
 			{#if data.flyers.length > 1}
-				<Slider slides={data.flyers} />
+				<Slider slides={data.flyers} linkSlides={true} />
 			{:else}
-				<Flyer src={data.flyers[0].src} alt={data.flyers[0].alt} />
+				<Flyer src={data.flyers[0].src} alt={data.flyers[0].alt} href={data.flyers[0].src} />
 			{/if}
 		</div>
 	{/if}
