@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: organization-stats-main
@@ -26,7 +25,20 @@ jobs:
 
       - name: Reset local main branch to origin/main
         if: github.ref_name == github.event.repository.default_branch
-        run: git checkout -B main origin/main
+        run: |
+          git fetch origin main production
+          git checkout -B main origin/main
+
+      - name: Capture branch baseline
+        if: github.ref_name == github.event.repository.default_branch
+        run: |
+          git fetch origin main production
+          {
+            echo "PRE_UPDATE_MAIN_SHA=$(git rev-parse origin/main)"
+            echo "PRE_UPDATE_MAIN_TREE_SHA=$(git rev-parse 'origin/main^{tree}')"
+            echo "PRE_UPDATE_PRODUCTION_SHA=$(git rev-parse origin/production)"
+            echo "PRE_UPDATE_PRODUCTION_TREE_SHA=$(git rev-parse 'origin/production^{tree}')"
+          } >> "$GITHUB_ENV"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -56,49 +68,104 @@ jobs:
             exit 1
           fi
 
-      - name: Commit and push stats branch
-        id: commit_and_push_stats_branch
+      - name: Commit and push to main
+        id: commit_and_push_to_main
         if: env.SHOULD_COMMIT == 'true' && github.ref_name == github.event.repository.default_branch
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git checkout -B chore/update-organization-stats
-          git add src/lib/organizationStats.json
-          git commit -m "chore(stats): update organization figures"
-          git push --force-with-lease origin chore/update-organization-stats
+          git fetch origin main production
 
-      - name: Create or update main PR
-        id: create_or_update_main_pr
-        if: env.SHOULD_COMMIT == 'true' && github.ref_name == github.event.repository.default_branch
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          BODY_FILE="$(mktemp)"
-          cat <<EOF > "$BODY_FILE"
-          ## Summary
-          - update the shared organization stats consumed by \`/about/concepts\` and \`/support-us\`
-          - refresh figures from the published attendance CSV and the YouTube channel statistics API
-
-          ## Updated figures
-          - total attendance: ${TOTAL_ATTENDANCE} (${DISPLAY_TOTAL_ATTENDANCE})
-          - YouTube subscribers: ${YOUTUBE_SUBSCRIBER_COUNT} (${DISPLAY_YOUTUBE_SUBSCRIBER_COUNT})
-          - YouTube total views: ${YOUTUBE_TOTAL_VIEW_COUNT} (${DISPLAY_YOUTUBE_TOTAL_VIEW_COUNT})
-          EOF
-
-          EXISTING_PR_NUMBER="$(gh pr list --base main --head chore/update-organization-stats --state open --json number --jq '.[0].number')"
-
-          if [ -n "$EXISTING_PR_NUMBER" ]; then
-            gh pr edit "$EXISTING_PR_NUMBER" \
-              --title "chore(stats): update organization figures" \
-              --body-file "$BODY_FILE"
+          CURRENT_MAIN_SHA="$(git rev-parse origin/main)"
+          if [ "$CURRENT_MAIN_SHA" != "$PRE_UPDATE_MAIN_SHA" ]; then
+            echo "main moved while the workflow was running; skipping direct commit."
+            {
+              echo "MAIN_BRANCH_UPDATE_STATUS=skipped"
+              echo "MAIN_BRANCH_UPDATE_SKIP_REASON=main_moved"
+            } >> "$GITHUB_ENV"
             exit 0
           fi
 
-          gh pr create \
-            --base main \
-            --head chore/update-organization-stats \
-            --title "chore(stats): update organization figures" \
-            --body-file "$BODY_FILE"
+          git checkout -B main origin/main
+          git add src/lib/organizationStats.json
+          git commit -m "chore(stats): update organization figures"
+
+          PUSHED_MAIN_SHA="$(git rev-parse HEAD)"
+          if git push origin HEAD:main; then
+            {
+              echo "MAIN_BRANCH_UPDATE_STATUS=pushed"
+              echo "PUSHED_MAIN_SHA=${PUSHED_MAIN_SHA}"
+            } >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          git fetch origin main
+          if [ "$(git rev-parse origin/main)" != "$PRE_UPDATE_MAIN_SHA" ]; then
+            echo "main moved before the push completed; skipping direct commit."
+            {
+              echo "MAIN_BRANCH_UPDATE_STATUS=skipped"
+              echo "MAIN_BRANCH_UPDATE_SKIP_REASON=main_moved"
+            } >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          exit 1
+
+      - name: Merge to production
+        id: merge_to_production
+        if: env.SHOULD_COMMIT == 'true' && github.ref_name == github.event.repository.default_branch && env.MAIN_BRANCH_UPDATE_STATUS == 'pushed'
+        run: |
+          if [ "$PRE_UPDATE_MAIN_TREE_SHA" != "$PRE_UPDATE_PRODUCTION_TREE_SHA" ]; then
+            echo "production was not aligned with main at workflow start; skipping auto-merge."
+            {
+              echo "PRODUCTION_PROMOTION_STATUS=skipped"
+              echo "PRODUCTION_PROMOTION_SKIP_REASON=not_caught_up"
+            } >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          git fetch origin main production
+
+          CURRENT_MAIN_SHA="$(git rev-parse origin/main)"
+          if [ "$CURRENT_MAIN_SHA" != "$PUSHED_MAIN_SHA" ]; then
+            echo "main advanced after the stats commit; skipping production merge."
+            {
+              echo "PRODUCTION_PROMOTION_STATUS=skipped"
+              echo "PRODUCTION_PROMOTION_SKIP_REASON=main_moved"
+            } >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          CURRENT_PRODUCTION_SHA="$(git rev-parse origin/production)"
+          if [ "$CURRENT_PRODUCTION_SHA" != "$PRE_UPDATE_PRODUCTION_SHA" ]; then
+            echo "production advanced while the workflow was running; skipping auto-merge."
+            {
+              echo "PRODUCTION_PROMOTION_STATUS=skipped"
+              echo "PRODUCTION_PROMOTION_SKIP_REASON=production_moved"
+            } >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          git checkout -B production origin/production
+          RELEASE_DATE="$(TZ=Asia/Tokyo date '+%Y/%m/%d')"
+          git merge --no-ff origin/main -m "production release ${RELEASE_DATE}"
+
+          if git push origin HEAD:production; then
+            echo "PRODUCTION_PROMOTION_STATUS=merged" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          git fetch origin production
+          if [ "$(git rev-parse origin/production)" != "$PRE_UPDATE_PRODUCTION_SHA" ]; then
+            echo "production advanced before the merge push completed; skipping auto-merge."
+            {
+              echo "PRODUCTION_PROMOTION_STATUS=skipped"
+              echo "PRODUCTION_PROMOTION_SKIP_REASON=production_moved"
+            } >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          exit 1
 
       - name: Post Slack summary
         if: always() && github.ref_name == github.event.repository.default_branch
@@ -111,6 +178,6 @@ jobs:
           GITHUB_RUN_ID: ${{ github.run_id }}
           UPDATE_ORGANIZATION_STATS_OUTCOME: ${{ steps.update_organization_stats.outcome }}
           VALIDATE_CHANGED_FILES_OUTCOME: ${{ steps.validate_changed_files.outcome }}
-          COMMIT_AND_PUSH_STATS_BRANCH_OUTCOME: ${{ steps.commit_and_push_stats_branch.outcome }}
-          CREATE_OR_UPDATE_MAIN_PR_OUTCOME: ${{ steps.create_or_update_main_pr.outcome }}
+          COMMIT_AND_PUSH_TO_MAIN_OUTCOME: ${{ steps.commit_and_push_to_main.outcome }}
+          MERGE_TO_PRODUCTION_OUTCOME: ${{ steps.merge_to_production.outcome }}
         run: node .github/workflows/post_organization_stats_slack_summary.ts

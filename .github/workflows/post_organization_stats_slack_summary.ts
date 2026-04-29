@@ -3,6 +3,10 @@ import {
 	formatOrganizationStatsSlackPayload,
 	type OrganizationStatsUpdateSummary
 } from '../../src/lib/organizationStatsUpdateSummary.ts';
+import {
+	type OrganizationStatsMainBranchUpdate,
+	type OrganizationStatsProductionPromotion
+} from '../../src/lib/organizationStatsWorkflowPromotion.ts';
 
 const SLACK_WEBHOOK_URL = process.env.SLACK_ORGANIZATION_STATS_WEBHOOK_URL;
 
@@ -29,11 +33,51 @@ const getFailedSteps = (): string[] =>
 	[
 		['Update organization stats', process.env.UPDATE_ORGANIZATION_STATS_OUTCOME],
 		['Validate changed files', process.env.VALIDATE_CHANGED_FILES_OUTCOME],
-		['Commit and push stats branch', process.env.COMMIT_AND_PUSH_STATS_BRANCH_OUTCOME],
-		['Create or update main PR', process.env.CREATE_OR_UPDATE_MAIN_PR_OUTCOME]
+		['Commit and push to main', process.env.COMMIT_AND_PUSH_TO_MAIN_OUTCOME],
+		['Merge to production', process.env.MERGE_TO_PRODUCTION_OUTCOME]
 	]
 		.filter(([, outcome]) => outcome === 'failure')
 		.map(([name]) => name);
+
+const parseMainBranchUpdate = (): OrganizationStatsMainBranchUpdate => {
+	if (process.env.MAIN_BRANCH_UPDATE_STATUS === 'pushed') {
+		return {
+			status: 'pushed'
+		};
+	}
+
+	if (process.env.MAIN_BRANCH_UPDATE_STATUS === 'skipped') {
+		return {
+			status: 'skipped',
+			reason: 'main_moved'
+		};
+	}
+
+	return {
+		status: 'not_attempted'
+	};
+};
+
+const parseProductionPromotion = (): OrganizationStatsProductionPromotion => {
+	if (process.env.PRODUCTION_PROMOTION_STATUS === 'merged') {
+		return {
+			status: 'merged'
+		};
+	}
+
+	if (process.env.PRODUCTION_PROMOTION_STATUS === 'skipped') {
+		const reason = process.env.PRODUCTION_PROMOTION_SKIP_REASON;
+
+		return {
+			status: 'skipped',
+			reason: reason === 'main_moved' || reason === 'production_moved' ? reason : 'not_caught_up'
+		};
+	}
+
+	return {
+		status: 'not_attempted'
+	};
+};
 
 const getRunUrl = (): string | undefined => {
 	const serverUrl = process.env.GITHUB_SERVER_URL;
@@ -56,6 +100,8 @@ const postSlackSummary = async (): Promise<void> => {
 	const payload = formatOrganizationStatsSlackPayload(summary, {
 		failedSteps: getFailedSteps(),
 		runUrl: getRunUrl(),
+		mainBranchUpdate: parseMainBranchUpdate(),
+		productionPromotion: parseProductionPromotion(),
 		workflowStatus: process.env.WORKFLOW_JOB_STATUS
 	});
 	const response = await fetch(SLACK_WEBHOOK_URL, {
