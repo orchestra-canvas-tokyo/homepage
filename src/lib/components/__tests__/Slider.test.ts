@@ -50,6 +50,31 @@ describe('基本機能', () => {
 		const slideElements = container.querySelectorAll('swiper-slide');
 		expect(slideElements.length).toBe(testSlides.length);
 	});
+
+	it('linkSlidesがtrueの場合、各スライド画像へのリンクが生成される', () => {
+		// Arrange: リンクを有効化
+
+		// Act: コンポーネントをレンダリング
+		const { container } = render(Slider, {
+			props: {
+				slides: testSlides,
+				linkSlides: true
+			}
+		});
+
+		// Assert: 各スライドが画像URLへリンクしていることを確認
+		const links = container.querySelectorAll('a.flyer-link');
+		expect(links.length).toBe(testSlides.length);
+
+		links.forEach((link, index) => {
+			expect(link.getAttribute('href')).toBe(testSlides[index].src);
+		});
+
+		const slideElements = container.querySelectorAll('swiper-slide');
+		slideElements.forEach((slideElement) => {
+			expect(slideElement.outerHTML).not.toContain('lazy="true"');
+		});
+	});
 });
 
 describe('スライドデータの処理', () => {

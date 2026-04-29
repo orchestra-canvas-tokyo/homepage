@@ -6,13 +6,15 @@
 		alt,
 		lazy = false,
 		width = undefined,
-		height = undefined
+		height = undefined,
+		href = undefined
 	}: {
 		src: string;
 		alt: string;
 		lazy?: boolean;
 		width?: number;
 		height?: number;
+		href?: string;
 	} = $props();
 
 	const commonOptions = [
@@ -31,10 +33,11 @@
 		// '/' 始まりの場合は除去したパスを指定する
 		return `https://www.orch-canvas.tokyo/cdn-cgi/image/${optionsString}/${src.startsWith('/') ? src.slice(1) : src}`;
 	}
+
+	const linkLabel = $derived(alt ? `${alt}を開く` : '画像を開く');
 </script>
 
-<div class="flyer-container" style="position: relative;">
-	<div class="spinner"></div>
+{#snippet flyerImage()}
 	{#if useCloudflareImages === true}
 		<img
 			src={getCloudflareSrc(src, [...commonOptions, ['height', defaultHeight.toString()]])}
@@ -47,6 +50,17 @@
 	{:else if useCloudflareImages === false}
 		<img {src} {alt} loading={lazy ? 'lazy' : undefined} {width} {height} />
 	{/if}
+{/snippet}
+
+<div class="flyer-container" style="position: relative;">
+	<div class="spinner"></div>
+	{#if href}
+		<a class="flyer-link" {href} aria-label={linkLabel}>
+			{@render flyerImage()}
+		</a>
+	{:else}
+		{@render flyerImage()}
+	{/if}
 </div>
 
 <style>
@@ -55,6 +69,14 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	.flyer-link {
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		border-bottom: none;
+		line-height: 0;
 	}
 
 	.spinner {

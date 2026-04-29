@@ -7,6 +7,12 @@ import {
 	type OrganizationStats,
 	type PersistedOrganizationStats
 } from './organizationStats.ts';
+import {
+	type OrganizationStatsMainBranchUpdate,
+	type OrganizationStatsMainBranchUpdateSkipReason,
+	type OrganizationStatsProductionPromotion,
+	type OrganizationStatsProductionPromotionSkipReason
+} from './organizationStatsWorkflowPromotion.ts';
 
 export type OrganizationStatsFieldKey = keyof OrganizationStats;
 
@@ -39,6 +45,8 @@ export type OrganizationStatsUpdateSummary =
 export type OrganizationStatsSlackSummaryOptions = {
 	failedSteps?: string[];
 	generatedAt?: Date;
+	mainBranchUpdate?: OrganizationStatsMainBranchUpdate;
+	productionPromotion?: OrganizationStatsProductionPromotion;
 	runUrl?: string;
 	summaryDate?: string;
 	workflowStatus?: string;
@@ -205,6 +213,58 @@ const formatWorkflowStatusDetail = (
 	return 'GitHub Actions の実行に失敗しました。';
 };
 
+const formatMainBranchUpdateSkipReason = (
+	reason: OrganizationStatsMainBranchUpdateSkipReason
+): string => {
+	if (reason === 'main_moved') {
+		return '実行中に main が更新されました';
+	}
+
+	return reason;
+};
+
+const formatProductionPromotionSkipReason = (
+	reason: OrganizationStatsProductionPromotionSkipReason
+): string => {
+	if (reason === 'not_caught_up') {
+		return '実行開始時点で production が main と同一内容ではありません';
+	}
+
+	if (reason === 'main_moved') {
+		return 'production 反映前に main が更新されました';
+	}
+
+	return '実行中に production が更新されました';
+};
+
+const formatMainBranchUpdate = (
+	mainBranchUpdate: OrganizationStatsMainBranchUpdate
+): string | undefined => {
+	if (mainBranchUpdate.status === 'not_attempted') {
+		return undefined;
+	}
+
+	if (mainBranchUpdate.status === 'pushed') {
+		return 'main: 直接コミット完了';
+	}
+
+	return `main: スキップ（${formatMainBranchUpdateSkipReason(mainBranchUpdate.reason)}）`;
+};
+
+const formatProductionPromotion = (
+	productionPromotion: OrganizationStatsProductionPromotion
+): string | undefined => {
+	if (productionPromotion.status === 'not_attempted') {
+		return undefined;
+	}
+
+	if (productionPromotion.status === 'merged') {
+		return 'production: main の最新コミットを自動マージ';
+	}
+
+	return `production: スキップ（${formatProductionPromotionSkipReason(productionPromotion.reason)}）`;
+};
+
 const getSlackSummaryLabel = (
 	summary: OrganizationStatsUpdateSummary,
 	options: Pick<OrganizationStatsSlackSummaryOptions, 'workflowStatus'>
@@ -231,6 +291,10 @@ const createSlackSummaryParts = (
 	const summaryLines = [
 		`*サマリー: ${slackSummaryIcons[slackColor]} ${getSlackSummaryLabel(summary, options)}*`
 	];
+	const branchStatusLines = [
+		options.mainBranchUpdate ? formatMainBranchUpdate(options.mainBranchUpdate) : undefined,
+		options.productionPromotion ? formatProductionPromotion(options.productionPromotion) : undefined
+	].filter((line): line is string => line !== undefined);
 	const metricRows =
 		summary.status === 'error'
 			? []
@@ -246,6 +310,8 @@ const createSlackSummaryParts = (
 			`詳細: ${escapeSlackText(formatWorkflowStatusDetail(options.workflowStatus, failedSteps))}`
 		);
 	}
+
+	summaryLines.push(...branchStatusLines.map((line) => `- ${line}`));
 
 	return {
 		title,

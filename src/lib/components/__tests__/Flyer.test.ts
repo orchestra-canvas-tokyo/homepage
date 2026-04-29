@@ -96,6 +96,22 @@ describe('基本構造', () => {
 		expect(container.childElementCount).toBe(1);
 		expect(container.firstElementChild?.tagName).toBe('DIV');
 	});
+
+	it('hrefが指定された場合、画像へのリンクが生成される', () => {
+		// Arrange: リンク先を指定
+		const src = '/test-image.jpg';
+		const alt = 'テスト画像';
+
+		// Act: コンポーネントをレンダリング
+		render(Flyer, {
+			props: { src, alt, href: src }
+		});
+
+		// Assert: 画像がリンクで開けることを確認
+		const link = screen.getByRole('link', { name: `${alt}を開く` });
+		expect(link).toHaveAttribute('href', src);
+		expect(link).toContainElement(screen.getByAltText(alt));
+	});
 });
 
 describe('遅延読み込み機能', () => {

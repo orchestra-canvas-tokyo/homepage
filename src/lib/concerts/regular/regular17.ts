@@ -1,7 +1,8 @@
 import { getConcertShortName } from '../generateContentsToDisplay';
 import type { Concert } from '../types';
 import pricingNoticePdf from '$lib/documents/公演チケット価格改定のお知らせ.pdf';
-// import flyer from './images/flyers/regular-17.png';
+import flyer from './images/flyers/regular-17.jpg';
+import flyerBack from './images/flyers/regular-17-back.jpg';
 
 const type = 'regular';
 const number = 17;
@@ -16,7 +17,10 @@ export const concert: Concert = {
 		url: pricingNoticePdf,
 		linkText: '詳細はこちら（PDF）'
 	},
-	// flyer: flyer,
+	flyers: [
+		{ src: flyer, alt: 'フライヤー' },
+		{ src: flyerBack, alt: 'フライヤー（裏面）' }
+	],
 	dateTime: { date: '2026-9-12', time: '12:30開場 13:30開演' },
 	place: {
 		name: '横浜みなとみらいホール 大ホール',
