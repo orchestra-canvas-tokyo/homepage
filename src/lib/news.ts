@@ -288,5 +288,10 @@ export const newsItems: {
 		url: '/concerts/regular-17',
 		date: '2026/3/14',
 		content: '第17回定期演奏会のチケットを発売しました。'
+	},
+	{
+		url: '/concerts/regular-17',
+		date: '2026/4/29',
+		content: '第17回定期演奏会のフライヤーを公開しました。'
 	}
 ];

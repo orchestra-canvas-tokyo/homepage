@@ -12,7 +12,7 @@
 	let { data }: { data: PageServerData } = $props();
 
 	const nonRegularDisplayingConcerts: string[] = [];
-	const newConcerts: string[] = [];
+	const newConcerts: string[] = ['regular-17'];
 	const nonNewSlideshowItems = $derived.by(() =>
 		data.concerts
 			.filter((concert) => {
