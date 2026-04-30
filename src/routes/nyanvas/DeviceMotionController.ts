@@ -32,9 +32,12 @@ export class DeviceMotionController {
 		};
 
 		const isDeviceMotionEventWithRequestPermission = (
-			unknownDeviceMotionEvent: unknown
-		): unknownDeviceMotionEvent is deviceMotionEventWithRequestPermission =>
-			this.isWithRequestPermission;
+			eventConstructor: unknown
+		): eventConstructor is deviceMotionEventWithRequestPermission =>
+			typeof eventConstructor === 'function' &&
+			eventConstructor !== null &&
+			'requestPermission' in eventConstructor &&
+			typeof eventConstructor.requestPermission === 'function';
 
 		if (!isDeviceMotionEventWithRequestPermission(unknownDeviceMotionEvent)) {
 			// 許可取得が不要な環境
