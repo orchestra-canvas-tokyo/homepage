@@ -24,8 +24,7 @@ export const concert: Concert = {
 	performers: [
 		{
 			title: '管弦楽',
-			name: 'Orchestra Canvas Tokyo',
-			url: 'https://www.orch-canvas.tokyo/'
+			name: 'Orchestra Canvas Tokyo'
 		}
 	],
 	programs: [
@@ -54,10 +53,6 @@ export const concert: Concert = {
 		{
 			title: '東音企画 公演情報',
 			url: 'https://concertmanagement.to-on.com/concerts/12148'
-		},
-		{
-			title: 'Orchestra Canvas Tokyo X告知投稿',
-			url: 'https://x.com/Orch_canvas/status/2049466088057192859?s=20'
 		}
 	],
 	showLinkToProgramNote: false
