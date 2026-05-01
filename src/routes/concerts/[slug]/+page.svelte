@@ -72,14 +72,22 @@
 		<dt>場所</dt>
 		<dd>
 			<p>{data.place.name}</p>
-			<p><a href={data.place.url} target="_blank">交通アクセス<OpenInNewIcon /></a></p>
+			{#if data.place.url}
+				<p>
+					<a href={data.place.url} target="_blank" rel="noopener noreferrer">
+						交通アクセス<OpenInNewIcon />
+					</a>
+				</p>
+			{/if}
 		</dd>
 		{#if data.conductor}
 			<dt>指揮</dt>
 			<dd>
 				{#if data.conductor.url}
 					<p>
-						<a href={data.conductor.url} target="_blank">{data.conductor.name}<OpenInNewIcon /></a>
+						<a href={data.conductor.url} target="_blank" rel="noopener noreferrer">
+							{data.conductor.name}<OpenInNewIcon />
+						</a>
 					</p>
 				{:else}
 					<p>{data.conductor.name}</p>
@@ -90,11 +98,31 @@
 			<dt>{data.soloist.title || '独奏'}</dt>
 			<dd>
 				{#if data.soloist.url}
-					<p><a href={data.soloist.url} target="_blank">{data.soloist.name}<OpenInNewIcon /></a></p>
+					<p>
+						<a href={data.soloist.url} target="_blank" rel="noopener noreferrer">
+							{data.soloist.name}<OpenInNewIcon />
+						</a>
+					</p>
 				{:else}
 					<p>{data.soloist.name}</p>
 				{/if}
 			</dd>
+		{/if}
+		{#if data.performers}
+			{#each data.performers as performer}
+				<dt>{performer.title}</dt>
+				<dd>
+					{#if performer.url}
+						<p>
+							<a href={performer.url} target="_blank" rel="noopener noreferrer">
+								{performer.name}<OpenInNewIcon />
+							</a>
+						</p>
+					{:else}
+						<p>{performer.name}</p>
+					{/if}
+				</dd>
+			{/each}
 		{/if}
 		<dt>曲目</dt>
 		<dd>
@@ -118,7 +146,6 @@
 					{/each}
 				</dl>
 			{:else}
-				<!-- 室内楽演奏会 -->
 				<div class="programs chamber-programs">
 					{#each data.programs as program}
 						{#if program.arranger}
@@ -151,7 +178,7 @@
 			{/each}
 		{/if}
 		{#if data.ticket}
-			<dt>チケット</dt>
+			<dt>{data.ticket.label || 'チケット'}</dt>
 			{#if typeof data.ticket.description === 'string'}
 				<dd>{data.ticket.description}</dd>
 			{:else}
@@ -162,7 +189,21 @@
 				</dd>
 			{/if}
 		{/if}
-		{#if data.showLinkToProgramNote}
+		{#if data.relatedLinks}
+			<dt>関連リンク</dt>
+			<dd>
+				<ul class="related-links">
+					{#each data.relatedLinks as link}
+						<li>
+							<a href={link.url} target="_blank" rel="noopener noreferrer">
+								{link.title}<OpenInNewIcon />
+							</a>
+						</li>
+					{/each}
+				</ul>
+			</dd>
+		{/if}
+		{#if data.showLinkToProgramNote && data.number}
 			<dt>曲目解説</dt>
 			<dl>
 				<p>
@@ -282,6 +323,13 @@
 	.chamber-programs {
 		display: flex;
 		flex-direction: column;
+	}
+	.related-links {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding-left: 1.2em;
+		margin: 0;
 	}
 	@media (max-width: 950px) {
 		.programs:not(.chamber-programs) {

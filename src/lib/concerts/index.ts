@@ -4,7 +4,7 @@ import { type Concert } from './types';
 // globの第一引数は動的に作成不可
 // また、このファイルはviteによるビルド？コンパイル？時に動的に生成されるため、
 // globで読み込まれるファイルからインポートすることはできない。
-const rawConcerts = import.meta.glob(['./regular/*.ts', './chamber/*.ts'], {
+const rawConcerts = import.meta.glob(['./regular/*.ts', './chamber/*.ts', './participation/*.ts'], {
 	eager: true
 }) as Record<string, Record<'concert', Concert>>;
 

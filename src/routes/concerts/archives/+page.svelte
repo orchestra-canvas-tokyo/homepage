@@ -27,6 +27,15 @@
 			)
 			.sort((a, b) => (dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1))
 	);
+	// 参加公演も同様に
+	const participationConcerts = $derived.by(() =>
+		data.concerts
+			.filter(
+				(concert) =>
+					concert.type === 'participation' && dayjs(concert.dateTime.date).isBefore(dayjs())
+			)
+			.sort((a, b) => (dayjs(b.dateTime.date).isAfter(dayjs(a.dateTime.date)) ? -1 : 1))
+	);
 
 	const yearlyFirstRegularConcerts = $derived.by((): YearlyFirstConcerts => {
 		const yearlyFirstConcerts: YearlyFirstConcerts = {};
@@ -51,6 +60,21 @@
 
 		// 各年の最初の室内楽演奏会を抽出
 		for (const concert of chamberConcerts) {
+			const concertYear = dayjs(concert.dateTime.date).year();
+			if (concertYear !== currentYear) {
+				currentYear = concertYear;
+				yearlyFirstConcerts[concert.slug] = concertYear;
+			}
+		}
+
+		return yearlyFirstConcerts;
+	});
+
+	const yearlyFirstParticipationConcerts = $derived.by((): YearlyFirstConcerts => {
+		const yearlyFirstConcerts: YearlyFirstConcerts = {};
+		let currentYear: number | null = null;
+
+		for (const concert of participationConcerts) {
 			const concertYear = dayjs(concert.dateTime.date).year();
 			if (concertYear !== currentYear) {
 				currentYear = concertYear;
@@ -94,7 +118,7 @@
 		};
 	});
 
-	// ページ遷移前後で定期・室内楽の選択状態が保持されるようにする
+	// ページ遷移前後で演奏会種別の選択状態が保持されるようにする
 	// SvelteKitのSnapshotを用いており、これは内部的にはSessionStorage
 	let checkedConcertType = $state<string>('regular');
 	export const snapshot: Snapshot<string> = {
@@ -145,6 +169,14 @@
 				bind:group={checkedConcertType}
 			/>
 			<label for="chamber">室内楽演奏会</label>
+			<input
+				type="radio"
+				id="participation"
+				name="concertType"
+				value="participation"
+				bind:group={checkedConcertType}
+			/>
+			<label for="participation">参加公演</label>
 		</div>
 		<div
 			id="tab-panel-regular"
@@ -168,6 +200,20 @@
 				<Concert {concert} yearlyFirstConcert={yearlyFirstChamberConcerts} />
 			{/each}
 		</div>
+		<div
+			id="tab-panel-participation"
+			class="tab-panel {checkedConcertType === 'participation' ? 'active' : ''}"
+		>
+			<YearAnchors
+				yearlyFirstConcerts={yearlyFirstParticipationConcerts}
+				concertType={'participation'}
+			/>
+			<div class="spacer"></div>
+
+			{#each participationConcerts as concert}
+				<Concert {concert} yearlyFirstConcert={yearlyFirstParticipationConcerts} />
+			{/each}
+		</div>
 	</div>
 </article>
 
@@ -185,6 +231,7 @@
 
 	.radio-group {
 		display: flex;
+		flex-wrap: wrap;
 		gap: 30px;
 	}
 	.radio-group input {
