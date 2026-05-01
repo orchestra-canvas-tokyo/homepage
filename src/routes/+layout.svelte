@@ -99,7 +99,7 @@
 			lang: 'en',
 			children: [
 				...upcomingConcerts.map((concert) => ({
-					title: concert.title,
+					title: concert.navigationTitle ?? concert.title,
 					url: `/concerts/${concert.slug}`,
 					lang: 'ja' as const
 				})),

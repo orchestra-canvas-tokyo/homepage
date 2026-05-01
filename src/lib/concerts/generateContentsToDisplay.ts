@@ -29,7 +29,8 @@ export function getConcertDateDayToDisplay(concert: Concert) {
 export function getConcertShortName(type: ConcertType) {
 	return {
 		regular: '定期',
-		chamber: '室内楽'
+		chamber: '室内楽',
+		participation: '参加公演'
 	}[type];
 }
 
