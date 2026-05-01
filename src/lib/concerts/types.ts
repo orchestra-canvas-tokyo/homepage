@@ -1,5 +1,5 @@
 /** 演奏会種別(ソースコード上で指定されるslug)の定義 */
-export type ConcertType = 'regular' | 'chamber';
+export type ConcertType = 'regular' | 'chamber' | 'participation';
 
 /** フライヤーに関する情報 */
 export interface Flyer {
@@ -18,15 +18,21 @@ export interface Soloist extends People {
 	title?: string; // e.g. "ヴァイオリン独奏"
 }
 
+/** 出演者・出演団体に関する情報 */
+export interface Performer extends People {
+	title: string; // e.g. "管弦楽"
+}
+
 /** アンコール種別の定義 */
 export type EncoreType = 'standard' | 'soloist';
 
 /** いち演奏会に関する情報をまとめたインターフェース */
 export interface Concert {
 	type: ConcertType;
-	number: number;
+	number?: number;
 	slug: string;
 	title: string;
+	navigationTitle?: string; // ヘッダーメニューなど、省スペース表示に使うタイトル
 	// 演奏会に関する臨時のお知らせ（未指定なら表示しない）
 	message?: {
 		title: string;
@@ -46,6 +52,7 @@ export interface Concert {
 	};
 	conductor?: People;
 	soloist?: Soloist;
+	performers?: Performer[];
 	programs?: {
 		// 未定の場合はprograms=undefinedとする
 		composer: string;
@@ -64,12 +71,17 @@ export interface Concert {
 		};
 	}[];
 	ticket?: {
+		label?: string; // 未指定時は「チケット」
 		// 未定の場合はdescriptionに"未定"を指定
 		//   ※ 非公開演奏会でチケット販売情報がない場合があるため、
 		//      ticket=undefinedでは対応できない
 		description: string | string[]; // 複数行にまたがる場合、各行を要素とする配列で指定
 		url?: string;
 	};
+	relatedLinks?: {
+		title: string;
+		url: string;
+	}[];
 	showLinkToProgramNote?: boolean; // blogへのリンクを表示するかどうか
 	youtubePlaylistId?: string;
 }

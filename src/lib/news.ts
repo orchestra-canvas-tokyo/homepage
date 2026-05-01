@@ -293,5 +293,10 @@ export const newsItems: {
 		url: '/concerts/regular-17',
 		date: '2026/4/29',
 		content: '第17回定期演奏会のフライヤーを公開しました。'
+	},
+	{
+		url: '/concerts/participation-lfj-2026',
+		date: '2026/5/1',
+		content: 'LFJエリアコンサート＠丸の内への出演情報を公開しました。'
 	}
 ];
