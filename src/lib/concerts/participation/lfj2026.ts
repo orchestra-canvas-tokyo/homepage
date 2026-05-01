@@ -1,4 +1,5 @@
 import type { Concert } from '../types';
+import flyer from './images/flyers/lfj-2026.png';
 
 const type = 'participation';
 
@@ -7,6 +8,7 @@ export const concert: Concert = {
 	slug: 'participation-lfj-2026',
 	title: 'ラ・フォル・ジュルネTOKYO2026 LFJエリアコンサート＠丸の内「独奏とオーケストラの祭典」',
 	navigationTitle: 'LFJエリアコンサート＠丸の内',
+	flyers: [{ src: flyer, alt: 'LFJエリアコンサート＠丸の内「独奏とオーケストラの祭典」チラシ' }],
 	dateTime: { date: '2026-5-3', day: '日・祝', time: '11:00〜11:40' },
 	place: {
 		name: '丸ビル 1階 マルキューブ',
