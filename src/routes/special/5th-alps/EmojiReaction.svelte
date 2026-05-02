@@ -1,21 +1,28 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { ReactionOption } from './data';
 
 	type Floater = {
 		id: string;
 		emoji: string;
+		x: number;
+		drift: number;
 	};
 
 	let {
 		options,
-		heading = 'あなたの拍手で、アルプスを彩ってください。'
+		heading = 'あなたの拍手で、アルペンを彩ってください。',
+		triggerSelector
 	}: {
 		options: ReactionOption[];
 		heading?: string;
+		triggerSelector?: string;
 	} = $props();
 
 	let counts = $state<Record<string, number>>({});
 	let floaters = $state<Floater[]>([]);
+	let hasTriggeredArrivalBurst = false;
+	const timers: number[] = [];
 
 	$effect(() => {
 		for (const option of options) {
@@ -23,22 +30,61 @@
 		}
 	});
 
-	const react = (emoji: string) => {
-		counts[emoji] = (counts[emoji] ?? 0) + 1;
-
+	const emitFloater = (emoji: string) => {
 		const floater = {
 			id:
 				typeof crypto !== 'undefined' && 'randomUUID' in crypto
 					? crypto.randomUUID()
 					: `${Date.now()}-${Math.random()}`,
-			emoji
+			emoji,
+			x: 10 + Math.random() * 80,
+			drift: -56 + Math.random() * 112
 		};
 		floaters = [...floaters, floater];
 
-		window.setTimeout(() => {
+		const timer = window.setTimeout(() => {
 			floaters = floaters.filter((current) => current.id !== floater.id);
-		}, 900);
+		}, 1100);
+		timers.push(timer);
 	};
+
+	const react = (emoji: string) => {
+		counts[emoji] = (counts[emoji] ?? 0) + 1;
+		emitFloater(emoji);
+	};
+
+	const triggerArrivalBurst = () => {
+		if (hasTriggeredArrivalBurst) return;
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+		hasTriggeredArrivalBurst = true;
+
+		options.slice(0, 10).forEach((option, index) => {
+			const delay = Math.min(1800, index * 220 + Math.random() * 420);
+			const timer = window.setTimeout(() => emitFloater(option.emoji), delay);
+			timers.push(timer);
+		});
+	};
+
+	onMount(() => {
+		if (!triggerSelector) return;
+
+		const watchArrival = () => {
+			const target = document.querySelector(triggerSelector);
+			if (target && target.getBoundingClientRect().top <= 0) {
+				triggerArrivalBurst();
+				window.removeEventListener('scroll', watchArrival);
+			}
+		};
+
+		watchArrival();
+		window.addEventListener('scroll', watchArrival, { passive: true });
+
+		return () => {
+			window.removeEventListener('scroll', watchArrival);
+			timers.forEach((timer) => window.clearTimeout(timer));
+		};
+	});
 </script>
 
 <aside class="reaction-panel" aria-label="Emoji Reaction">
@@ -57,18 +103,16 @@
 	</div>
 	<div class="floaters" aria-hidden="true">
 		{#each floaters as floater (floater.id)}
-			<span>{floater.emoji}</span>
+			<span style="--x: {floater.x}%; --drift: {floater.drift}px">{floater.emoji}</span>
 		{/each}
 	</div>
 </aside>
 
 <style>
 	.reaction-panel {
-		position: fixed;
-		right: 18px;
-		bottom: 18px;
-		z-index: 650;
-		width: min(330px, calc(100dvw - 36px));
+		position: relative;
+		z-index: 1;
+		width: min(430px, 100%);
 		padding: 14px;
 		color: #fff9e9;
 		background: rgba(9, 12, 18, 0.86);
@@ -87,7 +131,7 @@
 
 	.reaction-buttons {
 		display: grid;
-		grid-template-columns: repeat(5, minmax(0, 1fr));
+		grid-template-columns: repeat(7, minmax(0, 1fr));
 		gap: 6px;
 	}
 
@@ -137,7 +181,7 @@
 
 	.floaters span {
 		position: absolute;
-		right: 32px;
+		left: var(--x);
 		bottom: 38px;
 		font-size: 1.6rem;
 		animation: float-reaction 0.9s ease-out forwards;
@@ -153,21 +197,24 @@
 		}
 		to {
 			opacity: 0;
-			transform: translateY(-72px) scale(1.12);
+			transform: translate(var(--drift), -86px) scale(1.12);
 		}
 	}
 
 	@media (max-width: 700px) {
 		.reaction-panel {
-			position: static;
-			width: auto;
-			margin: 18px 18px 68px;
+			width: 100%;
+			box-sizing: border-box;
 			padding: 12px;
 		}
 
 		.reaction-panel p {
 			margin-bottom: 8px;
 			font-size: 0.76rem;
+		}
+
+		.reaction-buttons {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
 		}
 	}
 

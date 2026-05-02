@@ -125,7 +125,7 @@
 <div class="slideshow" bind:this={slideshowEl}>
 	<a href="/special/5th-alps" class="anniversary-link">
 		<span class="en">special</span>
-		<strong>OCT 5周年 × アルプス</strong>
+		<strong>OCT 5周年 × アルペン</strong>
 	</a>
 	<Splide
 		hasTrack={false}

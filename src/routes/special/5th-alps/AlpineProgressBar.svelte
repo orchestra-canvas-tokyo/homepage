@@ -1,18 +1,28 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let { stages }: { stages: string[] } = $props();
+	let { stages, targetSelector }: { stages: string[]; targetSelector: string } = $props();
 
 	let progress = $state(0);
+	let hasArrived = $state(false);
 	const activeStage = $derived(
 		stages[Math.min(stages.length - 1, Math.round(progress * (stages.length - 1)))]
 	);
 
 	onMount(() => {
 		const updateProgress = () => {
-			const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-			const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-			progress = scrollableHeight > 0 ? Math.min(1, Math.max(0, scrollTop / scrollableHeight)) : 0;
+			const target = document.querySelector(targetSelector);
+			const scrollTop =
+				window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
+			const targetTop = target
+				? scrollTop + target.getBoundingClientRect().top
+				: document.documentElement.scrollHeight - window.innerHeight;
+			const progressTarget = Math.max(1, targetTop);
+
+			const hasReachedTarget = scrollTop >= progressTarget - 1;
+
+			progress = hasReachedTarget ? 1 : Math.min(1, Math.max(0, scrollTop / progressTarget));
+			hasArrived = hasReachedTarget;
 		};
 
 		updateProgress();
@@ -26,7 +36,7 @@
 	});
 </script>
 
-<aside class="progress" aria-label="ページスクロール進捗">
+<aside class="progress" class:arrived={hasArrived} aria-label="ページスクロール進捗">
 	<div class="progress-heading en">alpine route</div>
 	<div class="track" style="--progress: {progress * 100}%">
 		<div class="ridge"></div>
@@ -54,6 +64,13 @@
 		align-items: center;
 		color: #f9f3df;
 		pointer-events: none;
+	}
+
+	.progress.arrived {
+		position: relative;
+		top: auto;
+		right: auto;
+		justify-self: center;
 	}
 
 	.progress-heading {
@@ -147,6 +164,20 @@
 			background: rgba(9, 12, 18, 0.86);
 			border-top: 1px solid rgba(239, 202, 128, 0.28);
 			backdrop-filter: blur(12px);
+		}
+
+		.progress.arrived {
+			position: relative;
+			right: auto;
+			bottom: auto;
+			left: auto;
+			box-sizing: border-box;
+			width: min(100%, 420px);
+			margin: 0 auto 18px;
+			padding: 10px 14px;
+			background: rgba(9, 12, 18, 0.68);
+			border: 1px solid rgba(239, 202, 128, 0.28);
+			border-radius: 8px;
 		}
 
 		.progress-heading {

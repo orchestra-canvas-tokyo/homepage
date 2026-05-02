@@ -6,7 +6,13 @@
 	import Flyer from '$lib/components/Flyer.svelte';
 	import OpenInNewIcon from '$lib/components/OpenInNewIcon.svelte';
 	import AlpineProgressBar from './AlpineProgressBar.svelte';
+	import CountUpNumber from './CountUpNumber.svelte';
 	import EmojiReaction from './EmojiReaction.svelte';
+	import logo from '../../logo.svg';
+	import instagramIcon from '../../instagram-brands.svg';
+	import facebookIcon from '../../facebook-brands.svg';
+	import xIcon from '../../x-brands.svg';
+	import youtubeIcon from '../../youtube-brands.svg';
 	import {
 		audienceComments,
 		numberCardDefinitions,
@@ -19,6 +25,9 @@
 	} from './data';
 
 	let { data }: { data: PageServerData } = $props();
+
+	let shareCopyElement = $state<HTMLTextAreaElement | null>(null);
+	let hasCopiedShareText = $state(false);
 
 	const firstFlyer = $derived(data.firstConcert.flyers?.[0]);
 	const alpsFlyer = $derived(data.alpsConcert.flyers?.[0]);
@@ -43,24 +52,92 @@
 			'https://www.orch-canvas.tokyo/special/5th-alps'
 		)}`
 	);
-	const numberValues: Record<AnniversaryNumberCardKey, string> = $derived({
-		concerts: '17+',
-		programs: '80+',
-		attendance: data.stats.totalAttendance.replace('名', '+'),
-		youtubeViews: data.stats.youtubeTotalViewCount.replace('回', '+'),
-		youtubeSubscribers: data.stats.youtubeSubscriberCount.replace('人', '+'),
-		snsFollowers: '12,000+'
+	const numberValues: Record<
+		AnniversaryNumberCardKey,
+		{ value: number; suffix: string; decimals?: number }
+	> = $derived({
+		concerts: { value: 17, suffix: '+' },
+		programs: { value: 80, suffix: '+' },
+		attendance: {
+			value: Number(data.stats.totalAttendance.replaceAll(',', '').replace('名', '')),
+			suffix: '+'
+		},
+		youtubeViews: {
+			value: Math.floor(data.rawStats.youtubeTotalViewCount / 100_000) * 10,
+			suffix: '万+'
+		},
+		youtubeSubscribers: {
+			value: Math.floor(data.rawStats.youtubeSubscriberCount / 1_000) / 10,
+			suffix: '万+',
+			decimals: 1
+		},
+		snsFollowers: { value: 12000, suffix: '+' }
 	});
 	const numberCards = $derived(
 		numberCardDefinitions.map((card) => ({
 			...card,
-			value: numberValues[card.key]
+			countUp: numberValues[card.key]
 		}))
 	);
+	const posterGroupsByYear = $derived(
+		Object.fromEntries(data.timelinePosterGroups.map((group) => [group.year, group.concerts]))
+	);
+	const socialLinks = [
+		{
+			url: 'https://www.youtube.com/channel/UCX2SZ5NViwsaOza3biDNjIw',
+			icon: youtubeIcon,
+			label: 'YouTube'
+		},
+		{
+			url: 'https://www.instagram.com/orchestracanvastokyo/',
+			icon: instagramIcon,
+			label: 'Instagram'
+		},
+		{
+			url: 'https://x.com/Orch_canvas',
+			icon: xIcon,
+			label: 'X'
+		},
+		{
+			url: 'https://www.facebook.com/OrchestraCanvasTokyo',
+			icon: facebookIcon,
+			label: 'Facebook'
+		}
+	];
+
+	const getConcertBadgeLabel = (type: 'regular' | 'chamber' | 'participation', number?: number) => {
+		if (type === 'regular' && number) return `第${number}回\n定期`;
+		if (type === 'chamber' && number) return `第${number}回\n室内楽`;
+		return '参加\n公演';
+	};
+
+	const copyShareText = async () => {
+		let copied = false;
+
+		if (navigator.clipboard) {
+			try {
+				await navigator.clipboard.writeText(shareText);
+				copied = true;
+			} catch {
+				copied = false;
+			}
+		}
+
+		if (!copied && shareCopyElement) {
+			shareCopyElement.select();
+			document.execCommand('copy');
+			shareCopyElement.blur();
+		}
+
+		hasCopiedShareText = true;
+		window.setTimeout(() => {
+			hasCopiedShareText = false;
+		}, 1800);
+	};
 </script>
 
 <Meta
-	title="OCT 5周年 × アルプス 特設ページ"
+	title="OCT 5周年 × アルペン 特設ページ"
 	canonical="/special/5th-alps"
 	description={pageDescription}
 	image={alpsFlyer?.src}
@@ -68,27 +145,30 @@
 	twitterCardType="summary_large_image"
 />
 
-<AlpineProgressBar stages={progressStages} />
-
 <article class="special-page">
 	<section class="hero" aria-labelledby="hero-title">
+		<div class="hero-motion" aria-hidden="true">
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
 		<div class="hero-copy">
 			<p class="eyebrow en">OCT 5th Anniversary</p>
 			<h1 id="hero-title">
 				<span>『第一番』から</span>
 				<span>五年。</span>
 				<span>カンバスは</span>
-				<span>『アルプス』へ。</span>
+				<span>『アルペン』へ。</span>
 			</h1>
-			<div class="hero-dates" aria-label="第1回定期演奏会と第17回定期演奏会の日程">
-				<span>2021.8.29 第1回定期演奏会</span>
-				<span>2026.9.12 第17回定期演奏会《アルプス交響曲》</span>
+			<div class="hero-dates" aria-label="第1回定期演奏会から第17回定期演奏会への歩み">
+				<time datetime="2021-08-29">2021.8.29 第1回定期演奏会</time>
+				<span class="date-arrow" aria-hidden="true"></span>
+				<time datetime="2026-09-12">2026.9.12 第17回定期演奏会《アルプス交響曲》</time>
 			</div>
 			<div class="hero-actions">
 				<a class="button primary" href={ticketUrl} target="_blank" rel="noopener noreferrer">
 					チケット情報を見る<OpenInNewIcon />
 				</a>
-				<a class="button secondary" href="#first-canvas">5年間を振り返る</a>
 			</div>
 		</div>
 		<div class="hero-visual" aria-hidden="true">
@@ -106,11 +186,14 @@
 
 	<section id="concept" class="concept section-band">
 		<p>
-			第1回定期演奏会から五年。OCTの歩みを振り返りながら、次なる挑戦《アルプス交響曲》へ向かう特設ページです。はじまりの「第一番」から、次の大きな景色へ。
+			第1回定期演奏会から五年。OCTの歩みを振り返りながら、次なる挑戦《アルプス交響曲》へ向かうアルペン特設ページです。はじまりの「第一番」から、次の大きな景色へ。
 		</p>
 	</section>
 
 	<section id="first-canvas" class="section two-column first-canvas" aria-labelledby="first-title">
+		{#if firstFlyer}
+			<img class="section-poster-background" src={firstFlyer.src} alt="" loading="lazy" />
+		{/if}
 		<div class="section-copy">
 			<p class="eyebrow en">The First Canvas</p>
 			<h2 id="first-title">はじまりの第1番</h2>
@@ -132,19 +215,23 @@
 					<dd>{data.firstConcert.conductor?.name}</dd>
 				</div>
 				<div>
-					<dt>曲目</dt>
+					<dt>プログラム</dt>
 					<dd>
-						<ul>
+						<div class="program-list">
 							{#each firstPrograms as program}
-								<li>{program.composer}：{program.title}</li>
+								<p>{program.composer} / {program.title}</p>
 							{/each}
-						</ul>
+						</div>
 					</dd>
 				</div>
 			</dl>
 			<div class="inline-actions">
-				<a href="/concerts/regular-1">第1回公演を見る</a>
-				<a href="https://blog.orch-canvas.tokyo/tag/第1回定期演奏会" target="_blank">
+				<a href="/concerts/regular-1">演奏会情報を見る</a>
+				<a
+					href="https://blog.orch-canvas.tokyo/tag/第1回定期"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					曲目解説を読む<OpenInNewIcon />
 				</a>
 			</div>
@@ -163,11 +250,6 @@
 			{:else}
 				<div class="video-placeholder">YouTube Placeholder</div>
 			{/if}
-			{#if firstFlyer}
-				<div class="small-flyer">
-					<Flyer src={firstFlyer.src} alt="第1回定期演奏会のフライヤー" lazy={true} />
-				</div>
-			{/if}
 		</div>
 	</section>
 
@@ -179,16 +261,23 @@
 		<div class="number-grid">
 			{#each numberCards as card}
 				<div class="number-card">
-					<strong>{card.value}</strong>
+					<strong>
+						<CountUpNumber
+							value={card.countUp.value}
+							suffix={card.countUp.suffix}
+							decimals={card.countUp.decimals ?? 0}
+						/>
+					</strong>
 					<span>{card.label}</span>
 					<p>{card.description}</p>
 				</div>
 			{/each}
 		</div>
+		<div class="quote-divider" aria-hidden="true"></div>
 		<div class="comment-grid" aria-label="観客コメント風カード">
 			{#each audienceComments as comment}
 				<figure>
-					<blockquote>「{comment}」</blockquote>
+					<blockquote>{comment}</blockquote>
 				</figure>
 			{/each}
 		</div>
@@ -202,19 +291,38 @@
 		</div>
 		<ol class="timeline">
 			{#each timelineItems as item}
-				<li>
+				{@const posters = posterGroupsByYear[item.year] ?? []}
+				<li class:future={item.year === '2026'}>
 					<div class="timeline-marker">{item.year}</div>
 					<div class="timeline-body">
 						<div class="timeline-copy">
+							{#if item.year === '2026'}
+								<span class="current-location">現在地</span>
+							{/if}
 							<h3>{item.title}</h3>
 							<p>{item.description}</p>
 							<a href={item.actionUrl}>{item.actionLabel}</a>
 						</div>
-						<div class="timeline-visual" aria-label="{item.year}年の写真・フライヤー枠">
-							{#if item.year === '2021' && firstFlyer}
-								<Flyer src={firstFlyer.src} alt="第1回定期演奏会のフライヤー" lazy={true} />
-							{:else if item.year === '2026' && alpsFlyer}
-								<Flyer src={alpsFlyer.src} alt="第17回定期演奏会のフライヤー" lazy={true} />
+						<div class="timeline-badges" aria-label="{item.year}年の演奏会">
+							{#each posters as poster}
+								<a
+									class:featured-badge={poster.slug === 'regular-17'}
+									href="/concerts/{poster.slug}"
+									aria-label="{poster.title}を見る"
+								>
+									{#each getConcertBadgeLabel(poster.type, poster.number).split('\n') as line}
+										<span>{line}</span>
+									{/each}
+								</a>
+							{/each}
+						</div>
+						<div class="poster-strip" aria-label="{item.year}年の演奏会ポスター">
+							{#if posters.length > 0}
+								{#each posters as poster}
+									<a href="/concerts/{poster.slug}" aria-label="{poster.title}を見る">
+										<img src={poster.flyer.src} alt={poster.title} loading="lazy" />
+									</a>
+								{/each}
 							{:else}
 								<div class="poster-placeholder">
 									<span class="en">{item.visualLabel}</span>
@@ -228,18 +336,14 @@
 		</ol>
 	</section>
 
-	<section class="section two-column alps-section" aria-labelledby="alps-title">
+	<section id="next-canvas" class="section two-column alps-section" aria-labelledby="alps-title">
 		<div class="section-copy">
 			<p class="eyebrow en">Next Canvas: Eine Alpensinfonie</p>
-			<h2 id="alps-title">次のカンバスは、アルプスへ。</h2>
+			<h2 id="alps-title">次のカンバスは、アルペンへ。</h2>
 			<p>
 				夜明けから日没まで、巨大な山の一日を描く《アルプス交響曲》。OCTの五年間の歩みは、次の大きな景色へ向かいます。2026年9月12日、私たちはこの山に挑みます。
 			</p>
 			<dl class="concert-facts">
-				<div>
-					<dt>公演</dt>
-					<dd>{data.alpsConcert.title}</dd>
-				</div>
 				<div>
 					<dt>日付</dt>
 					<dd>{alpsDate}</dd>
@@ -249,13 +353,13 @@
 					<dd>{data.alpsConcert.place.name}</dd>
 				</div>
 				<div>
-					<dt>曲目</dt>
+					<dt>プログラム</dt>
 					<dd>
-						<ul>
+						<div class="program-list">
 							{#each alpsPrograms as program}
-								<li>{program.composer}：{program.title}</li>
+								<p>{program.composer} / {program.title}</p>
 							{/each}
-						</ul>
+						</div>
 					</dd>
 				</div>
 			</dl>
@@ -263,17 +367,19 @@
 				<a class="button primary" href={ticketUrl} target="_blank" rel="noopener noreferrer">
 					チケット情報を見る<OpenInNewIcon />
 				</a>
-				<a class="button secondary" href="/concerts/regular-17">公演詳細を見る</a>
-				<a
+				<a class="button secondary" href="/concerts/regular-17">演奏会情報を見る</a>
+				<!-- 曲目解説リンクは本番公開時にリンク先確定後に戻す -->
+				<!-- <a
 					class="button ghost"
 					href="https://blog.orch-canvas.tokyo/tag/第17回定期演奏会"
 					target="_blank"
 				>
 					曲目解説を読む<OpenInNewIcon />
-				</a>
+				</a> -->
 			</div>
 		</div>
 		<div class="alps-visual">
+			<AlpineProgressBar stages={progressStages} targetSelector="#next-canvas" />
 			{#if alpsFlyer}
 				<Flyer
 					src={alpsFlyer.src}
@@ -281,63 +387,40 @@
 					lazy={true}
 				/>
 			{/if}
-			<div class="reaction-summary" aria-label="リアクション集計の試作表示">
-				{#each reactionOptions as option}
-					<span>{option.emoji} {option.initialCount}</span>
-				{/each}
-			</div>
-		</div>
-	</section>
-
-	<section class="section interactive" aria-labelledby="interactive-title">
-		<div class="section-heading">
-			<p class="eyebrow en">Interactive Contents</p>
-			<h2 id="interactive-title">Webならではの余韻</h2>
-		</div>
-		<div class="interactive-grid">
-			<div>
-				<h3>Emoji Reaction</h3>
-				<p>
-					右下のリアクションUIは、クリックでカウントが増えるローカル状態の試作です。永続化や投稿機能は持たせず、レビューで体験を確認するための軽量実装にしています。
-				</p>
-			</div>
-			<div>
-				<h3>Alpine Progress Bar</h3>
-				<p>
-					ページのスクロール進捗を山登りに見立て、ふもとから日没まで進みます。特設ページらしい話題性を出しつつ、本文の読みやすさを優先しています。
-				</p>
-			</div>
+			<EmojiReaction options={reactionOptions} triggerSelector="#next-canvas" />
 		</div>
 	</section>
 
 	<section class="footer-cta" aria-labelledby="footer-title">
 		<p class="eyebrow en">OCT 5th Anniversary</p>
-		<h2 id="footer-title">OCT 5周年 × アルプス特設ページ</h2>
+		<h2 id="footer-title">OCT 5周年 × アルペン特設ページ</h2>
 		<div class="footer-actions">
 			<a class="button primary" href={ticketUrl} target="_blank" rel="noopener noreferrer">
 				チケット情報を見る<OpenInNewIcon />
 			</a>
-			<a class="button secondary" href="/concerts/regular-17">公演詳細を見る</a>
-			<a
-				class="button secondary"
-				href="https://www.youtube.com/channel/UCX2SZ5NViwsaOza3biDNjIw"
-				target="_blank"
-			>
-				YouTubeで聴く<OpenInNewIcon />
-			</a>
+			<a class="button secondary" href="/concerts/regular-17">演奏会情報を見る</a>
 			<a class="button secondary" href={shareUrl} target="_blank" rel="noopener noreferrer">
 				SNSでシェアする<OpenInNewIcon />
 			</a>
-			<a class="button ghost" href="/">公式サイトへ</a>
+		</div>
+		<div class="social-actions" aria-label="公式SNS">
+			{#each socialLinks as link}
+				<a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.label}>
+					<img src={link.icon} alt="" />
+				</a>
+			{/each}
 		</div>
 		<div class="share-copy">
 			<h3>Share Text</h3>
-			<p>{shareText}</p>
+			<textarea bind:this={shareCopyElement} readonly value={shareText} aria-label="SNSシェア文"
+			></textarea>
+			<button type="button" onclick={copyShareText}>
+				{hasCopiedShareText ? 'コピーしました' : 'シェア文をコピー'}
+			</button>
 		</div>
+		<img class="footer-logo" src={logo} alt="Orchestra Canvas Tokyo" />
 	</section>
 </article>
-
-<EmojiReaction options={reactionOptions} />
 
 <style>
 	.special-page {
@@ -403,6 +486,54 @@
 		background: radial-gradient(circle, rgba(239, 202, 128, 0.16), transparent 68%);
 	}
 
+	.hero-motion {
+		position: absolute;
+		inset: 0;
+		opacity: 0.42;
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	.hero-motion span {
+		position: absolute;
+		inset-inline: -12%;
+		height: 28%;
+		background:
+			linear-gradient(100deg, transparent 0%, rgba(137, 194, 217, 0.16) 45%, transparent 76%),
+			repeating-linear-gradient(
+				-8deg,
+				transparent 0,
+				transparent 22px,
+				rgba(255, 248, 232, 0.08) 22px,
+				rgba(255, 248, 232, 0.08) 23px
+			);
+		filter: blur(0.4px);
+		transform: translateX(-8%);
+		animation: hero-motion 14s linear infinite;
+	}
+
+	.hero-motion span:nth-child(1) {
+		top: 14%;
+	}
+
+	.hero-motion span:nth-child(2) {
+		top: 44%;
+		animation-delay: -5s;
+		opacity: 0.72;
+	}
+
+	.hero-motion span:nth-child(3) {
+		top: 68%;
+		animation-delay: -9s;
+		opacity: 0.48;
+	}
+
+	@keyframes hero-motion {
+		to {
+			transform: translateX(8%);
+		}
+	}
+
 	.hero-copy,
 	.hero-visual,
 	.section-copy,
@@ -459,20 +590,41 @@
 	}
 
 	.hero-dates {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.1fr);
+		gap: 12px;
+		align-items: center;
 		margin: 28px 0;
 		color: rgba(255, 248, 232, 0.82);
 		font-size: 0.92rem;
 		line-height: 1.5;
 	}
 
-	.hero-dates span {
+	.hero-dates time {
 		padding: 8px 12px;
 		background: rgba(255, 255, 255, 0.08);
 		border: 1px solid var(--line);
 		border-radius: 6px;
+	}
+
+	.date-arrow {
+		position: relative;
+		display: block;
+		width: clamp(34px, 5vw, 66px);
+		height: 1px;
+		background: linear-gradient(90deg, var(--gold), rgba(255, 248, 232, 0.35));
+	}
+
+	.date-arrow::after {
+		position: absolute;
+		top: 50%;
+		right: 0;
+		width: 8px;
+		height: 8px;
+		content: '';
+		border-top: 1px solid rgba(255, 248, 232, 0.78);
+		border-right: 1px solid rgba(255, 248, 232, 0.78);
+		transform: translateY(-50%) rotate(45deg);
 	}
 
 	.hero-actions,
@@ -514,21 +666,44 @@
 		background: rgba(255, 255, 255, 0.1);
 	}
 
-	.button.ghost {
-		color: var(--ink);
-		background: transparent;
-	}
-
 	.hero-visual {
 		position: relative;
 		min-height: min(46dvh, 480px);
 		border: 1px solid rgba(255, 248, 232, 0.13);
 		border-radius: 8px;
 		background:
-			linear-gradient(180deg, rgba(137, 194, 217, 0.2), transparent 40%),
-			linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(20, 63, 53, 0.28));
-		box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.06);
+			linear-gradient(180deg, rgba(137, 194, 217, 0.08), transparent 38%),
+			linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(7, 9, 13, 0.72));
+		box-shadow:
+			inset 0 0 90px rgba(0, 0, 0, 0.48),
+			0 24px 70px rgba(0, 0, 0, 0.34);
 		overflow: hidden;
+	}
+
+	.hero-visual::before,
+	.hero-visual::after {
+		position: absolute;
+		z-index: 2;
+		content: '';
+		pointer-events: none;
+	}
+
+	.hero-visual::before {
+		inset: 16px;
+		border: 1px solid rgba(255, 248, 232, 0.12);
+		border-radius: 6px;
+	}
+
+	.hero-visual::after {
+		top: 50%;
+		left: 50%;
+		width: 58px;
+		aspect-ratio: 1;
+		background:
+			linear-gradient(90deg, transparent 42%, rgba(239, 202, 128, 0.92) 42%), rgba(9, 12, 18, 0.68);
+		clip-path: polygon(32% 24%, 78% 50%, 32% 76%);
+		filter: drop-shadow(0 0 28px rgba(239, 202, 128, 0.45));
+		transform: translate(-50%, -50%);
 	}
 
 	.sun {
@@ -611,11 +786,12 @@
 	.scroll-cue {
 		position: absolute;
 		bottom: 26px;
-		left: clamp(22px, 5vw, 72px);
+		left: 50%;
 		z-index: 2;
 		color: rgba(255, 248, 232, 0.66);
 		font-size: 0.66rem;
 		letter-spacing: 0.2em;
+		transform: translateX(-50%);
 	}
 
 	.scroll-cue::after {
@@ -635,7 +811,10 @@
 	}
 
 	.concept {
-		background: rgba(255, 255, 255, 0.06);
+		padding-block: clamp(120px, 15vw, 210px);
+		background:
+			linear-gradient(180deg, rgba(7, 9, 13, 0), rgba(239, 202, 128, 0.08), rgba(7, 9, 13, 0)),
+			rgba(255, 255, 255, 0.045);
 		border-block: 1px solid var(--line);
 	}
 
@@ -658,15 +837,58 @@
 		max-width: 760px;
 	}
 
+	.first-canvas {
+		position: relative;
+		background:
+			linear-gradient(
+				105deg,
+				rgba(7, 9, 13, 0.92) 0%,
+				rgba(7, 9, 13, 0.78) 54%,
+				rgba(20, 63, 53, 0.5) 100%
+			),
+			rgba(255, 255, 255, 0.025);
+		overflow: hidden;
+	}
+
+	.first-canvas::before {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		content: '';
+		background:
+			linear-gradient(115deg, rgba(7, 9, 13, 0.96), rgba(7, 9, 13, 0.52) 62%, rgba(7, 9, 13, 0.9)),
+			radial-gradient(circle at 78% 20%, rgba(239, 202, 128, 0.16), transparent 26rem);
+	}
+
+	.section-poster-background {
+		position: absolute;
+		right: max(-80px, -6vw);
+		bottom: -14%;
+		z-index: 0;
+		width: min(48vw, 520px);
+		min-width: 280px;
+		height: auto;
+		opacity: 0.26;
+		filter: brightness(0.48) saturate(0.82);
+		transform: rotate(-9deg);
+		transform-origin: center;
+	}
+
+	.first-canvas .section-copy,
+	.first-canvas .media-stack {
+		position: relative;
+		z-index: 1;
+	}
+
 	.concert-facts {
 		display: grid;
 		gap: 12px;
 		margin: 32px 0;
 	}
 
-	.concert-facts div {
+	.concert-facts > div {
 		display: grid;
-		grid-template-columns: 5.6em minmax(0, 1fr);
+		grid-template-columns: 6.4em minmax(0, 1fr);
 		gap: 16px;
 		padding-bottom: 12px;
 		border-bottom: 1px solid var(--line);
@@ -675,6 +897,7 @@
 	dt {
 		color: var(--gold);
 		font-weight: 700;
+		white-space: nowrap;
 	}
 
 	dd {
@@ -683,9 +906,15 @@
 		line-height: 1.75;
 	}
 
-	dd ul {
+	.program-list {
+		display: grid;
+		gap: 0.45rem;
+	}
+
+	.program-list p {
 		margin: 0;
-		padding-left: 1.1em;
+		color: var(--ink);
+		line-height: 1.65;
 	}
 
 	.media-stack {
@@ -716,15 +945,7 @@
 		color: var(--muted);
 	}
 
-	.small-flyer {
-		width: min(220px, 58%);
-		justify-self: end;
-		transform: rotate(2deg);
-	}
-
-	.small-flyer :global(img),
-	.alps-visual :global(img),
-	.timeline-visual :global(img) {
+	.alps-visual :global(img) {
 		width: 100%;
 		height: auto;
 		border-radius: 4px;
@@ -744,7 +965,6 @@
 
 	.number-card,
 	.comment-grid figure,
-	.interactive-grid > div,
 	.share-copy {
 		margin: 0;
 		padding: clamp(18px, 3vw, 28px);
@@ -772,14 +992,40 @@
 		font-size: 0.9rem;
 	}
 
+	.quote-divider {
+		width: min(220px, 42vw);
+		height: 1px;
+		margin: clamp(42px, 7vw, 78px) auto clamp(24px, 4vw, 38px);
+		background: linear-gradient(90deg, transparent, rgba(239, 202, 128, 0.72), transparent);
+	}
+
 	.comment-grid {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 14px;
-		margin-top: 28px;
+	}
+
+	.comment-grid figure {
+		position: relative;
+		min-height: 9rem;
+		padding-top: clamp(34px, 5vw, 54px);
+		background:
+			linear-gradient(140deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)), var(--panel);
+	}
+
+	.comment-grid figure::before {
+		position: absolute;
+		top: 8px;
+		left: 18px;
+		content: '“';
+		color: rgba(239, 202, 128, 0.46);
+		font-family: Georgia, serif;
+		font-size: clamp(3.8rem, 8vw, 6rem);
+		line-height: 1;
 	}
 
 	blockquote {
+		position: relative;
 		margin: 0;
 		color: var(--ink);
 		line-height: 1.8;
@@ -804,7 +1050,7 @@
 		position: absolute;
 		top: 18px;
 		bottom: 18px;
-		left: 58px;
+		left: 38px;
 		width: 1px;
 		content: '';
 		background: linear-gradient(var(--gold), var(--alpine), var(--ember));
@@ -815,6 +1061,23 @@
 		display: grid;
 		grid-template-columns: 116px minmax(0, 1fr);
 		gap: 22px;
+	}
+
+	.timeline li.future::before {
+		position: absolute;
+		top: -24px;
+		left: 38px;
+		z-index: 1;
+		width: 1px;
+		height: 64px;
+		content: '';
+		background: repeating-linear-gradient(
+			180deg,
+			rgba(239, 202, 128, 0.92) 0,
+			rgba(239, 202, 128, 0.92) 8px,
+			transparent 8px,
+			transparent 15px
+		);
 	}
 
 	.timeline-marker {
@@ -833,7 +1096,7 @@
 
 	.timeline-body {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(160px, 220px);
+		grid-template-columns: minmax(0, 1fr) auto;
 		gap: 20px;
 		align-items: stretch;
 		padding: 20px;
@@ -846,15 +1109,84 @@
 		margin: 0 0 16px;
 	}
 
-	.timeline-visual {
+	.current-location {
+		display: inline-flex;
+		margin-bottom: 10px;
+		padding: 4px 9px;
+		color: #130f0a;
+		background: var(--gold);
+		border-radius: 999px;
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+	}
+
+	.timeline-badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		align-content: flex-start;
+		justify-content: flex-end;
+		max-width: 250px;
+	}
+
+	.timeline-badges a {
 		display: grid;
-		min-height: 180px;
+		width: 52px;
+		aspect-ratio: 1;
 		place-items: center;
+		color: var(--ink);
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 248, 232, 0.2);
+		border-radius: 50%;
+		font-size: 0.66rem;
+		font-weight: 700;
+		line-height: 1.15;
+		text-align: center;
+		letter-spacing: 0.04em;
+	}
+
+	.timeline-badges a span {
+		display: block;
+	}
+
+	.timeline-badges .featured-badge {
+		width: 76px;
+		color: #130f0a;
+		background: linear-gradient(135deg, var(--gold), #f8dfa2);
+		border-color: rgba(255, 255, 255, 0.52);
+		box-shadow: 0 12px 32px rgba(239, 202, 128, 0.26);
+		font-size: 0.78rem;
+	}
+
+	.poster-strip {
+		grid-column: 1 / -1;
+		display: flex;
+		gap: 12px;
+		overflow-x: auto;
+		padding: 10px 4px 4px;
+		scroll-snap-type: x mandatory;
+		scrollbar-color: rgba(239, 202, 128, 0.5) rgba(255, 255, 255, 0.08);
+	}
+
+	.poster-strip a {
+		display: block;
+		flex: 0 0 clamp(92px, 10vw, 128px);
+		scroll-snap-align: start;
+	}
+
+	.poster-strip img {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: 4px;
+		box-shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
 	}
 
 	.poster-placeholder {
 		display: grid;
-		width: min(150px, 100%);
+		flex: 0 0 132px;
+		width: 132px;
 		aspect-ratio: 0.7;
 		place-items: center;
 		padding: 16px;
@@ -901,32 +1233,6 @@
 		width: min(360px, 84%);
 	}
 
-	.reaction-summary {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-		justify-content: center;
-	}
-
-	.reaction-summary span {
-		padding: 8px 11px;
-		background: rgba(255, 255, 255, 0.09);
-		border: 1px solid var(--line);
-		border-radius: 999px;
-		font-weight: 700;
-		letter-spacing: 0;
-	}
-
-	.interactive-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 16px;
-	}
-
-	.interactive-grid p {
-		margin-bottom: 0;
-	}
-
 	.footer-cta {
 		text-align: center;
 	}
@@ -949,9 +1255,65 @@
 		text-transform: uppercase;
 	}
 
-	.share-copy p {
-		margin-bottom: 0;
+	.share-copy textarea {
+		box-sizing: border-box;
+		width: 100%;
+		min-height: 8.5rem;
+		resize: vertical;
+		padding: 12px;
+		color: var(--ink);
+		background: rgba(9, 12, 18, 0.42);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		font: inherit;
+		line-height: 1.65;
 		white-space: pre-wrap;
+	}
+
+	.share-copy button {
+		min-height: 40px;
+		margin-top: 12px;
+		padding: 9px 14px;
+		color: #15100a;
+		background: var(--gold);
+		border: 0;
+		border-radius: 6px;
+		font: inherit;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	.social-actions {
+		display: flex;
+		gap: 12px;
+		justify-content: center;
+		margin: 0 auto 24px;
+	}
+
+	.social-actions a {
+		display: grid;
+		width: 44px;
+		aspect-ratio: 1;
+		place-items: center;
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid var(--line);
+		border-radius: 50%;
+	}
+
+	.social-actions img {
+		width: 20px;
+		height: 20px;
+		object-fit: contain;
+		filter: invert(1);
+	}
+
+	.footer-logo {
+		display: block;
+		width: min(180px, 42vw);
+		height: auto;
+		margin: 34px auto 0;
+		opacity: 0.78;
+		filter: invert(1);
 	}
 
 	@media (max-width: 1100px) {
@@ -962,10 +1324,6 @@
 
 		.hero-visual {
 			min-height: 360px;
-		}
-
-		.small-flyer {
-			justify-self: center;
 		}
 	}
 
@@ -979,13 +1337,17 @@
 			padding-top: 48px;
 		}
 
+		.scroll-cue {
+			top: calc(100dvh - var(--header-height) - 150px);
+			bottom: auto;
+		}
+
 		h1 {
 			font-size: clamp(2rem, 12vw, 3.6rem);
 		}
 
 		.number-grid,
-		.comment-grid,
-		.interactive-grid {
+		.comment-grid {
 			grid-template-columns: 1fr;
 		}
 
@@ -996,6 +1358,10 @@
 		.timeline li {
 			grid-template-columns: 62px minmax(0, 1fr);
 			gap: 14px;
+		}
+
+		.timeline li.future::before {
+			left: 30px;
 		}
 
 		.timeline-marker {
@@ -1009,8 +1375,9 @@
 			padding: 16px;
 		}
 
-		.timeline-visual {
-			min-height: 120px;
+		.timeline-badges {
+			justify-content: flex-start;
+			max-width: none;
 		}
 
 		.poster-placeholder {
@@ -1041,7 +1408,7 @@
 			box-sizing: border-box;
 		}
 
-		.concert-facts div {
+		.concert-facts > div {
 			grid-template-columns: 1fr;
 			gap: 4px;
 		}
@@ -1049,9 +1416,31 @@
 		.hero-visual {
 			min-height: 280px;
 		}
+
+		.hero-dates {
+			grid-template-columns: 1fr;
+		}
+
+		.scroll-cue {
+			top: calc(100dvh - 190px);
+		}
+
+		.date-arrow {
+			width: 1px;
+			height: 32px;
+			margin-inline: 18px;
+		}
+
+		.date-arrow::after {
+			top: auto;
+			right: 50%;
+			bottom: 0;
+			transform: translateX(50%) rotate(135deg);
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.hero-motion span,
 		.scroll-cue::after {
 			animation: none;
 		}

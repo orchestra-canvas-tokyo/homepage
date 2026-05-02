@@ -21,6 +21,23 @@ export type TimelineItem = {
 	visualLabel: string;
 };
 
+export type TimelinePosterItem = {
+	title: string;
+	slug: string;
+	type: 'regular' | 'chamber' | 'participation';
+	number?: number;
+	date: string;
+	flyer: {
+		src: string;
+		alt: string;
+	};
+};
+
+export type TimelinePosterGroup = {
+	year: string;
+	concerts: TimelinePosterItem[];
+};
+
 export type ReactionOption = {
 	emoji: string;
 	label: string;
@@ -28,7 +45,7 @@ export type ReactionOption = {
 };
 
 export const pageDescription =
-	'第1回定期演奏会から五年。Orchestra Canvas Tokyoの歩みを振り返りながら、第17回定期演奏会《アルプス交響曲》へ向かう特設ページです。';
+	'第1回定期演奏会から五年。Orchestra Canvas Tokyoの歩みを振り返りながら、第17回定期演奏会《アルプス交響曲》へ向かうアルペン特設ページです。';
 
 export const numberCardDefinitions: AnniversaryNumberCard[] = [
 	{
@@ -65,7 +82,7 @@ export const numberCardDefinitions: AnniversaryNumberCard[] = [
 
 export const audienceComments = [
 	'動画で知って、初めて会場に足を運びました。',
-	'第1回から聴いています。次のアルプスも楽しみです。',
+	'第1回から聴いています。次のアルペンも楽しみです。',
 	'OCTの演奏で、オーケストラが少し身近になりました。'
 ];
 
@@ -112,26 +129,28 @@ export const timelineItems: TimelineItem[] = [
 	},
 	{
 		year: '2026',
-		title: 'アルプスへ',
+		title: 'アルペンへ',
 		description: '第17回定期演奏会《アルプス交響曲》。五年の歩みは次の大きな景色へ向かいます。',
-		actionLabel: '公演詳細へ',
+		actionLabel: '演奏会情報へ',
 		actionUrl: '/concerts/regular-17',
 		visualLabel: 'Eine Alpensinfonie'
 	}
 ];
 
 export const reactionOptions: ReactionOption[] = [
-	{ emoji: '👏', label: '拍手', initialCount: 128 },
-	{ emoji: '⛰', label: 'アルプス', initialCount: 84 },
-	{ emoji: '🎺', label: '金管', initialCount: 52 },
-	{ emoji: '🎵', label: '音楽', initialCount: 47 },
-	{ emoji: '🎈', label: 'お祝い', initialCount: 36 }
+	{ emoji: '🎉', label: 'お祝い', initialCount: 128 },
+	{ emoji: '🎵', label: '音楽', initialCount: 84 },
+	{ emoji: '🏔️', label: 'アルペン', initialCount: 72 },
+	{ emoji: '🎻', label: '弦楽器', initialCount: 58 },
+	{ emoji: '📯', label: 'ホルン', initialCount: 53 },
+	{ emoji: '🎺', label: '金管', initialCount: 47 },
+	{ emoji: '🥁', label: '打楽器', initialCount: 36 }
 ];
 
 export const progressStages = ['ふもと', '登山開始', '中腹', '山頂', '日没'];
 
 export const shareText = `『第一番』から五年。
-カンバスは『アルプス』へ。
+カンバスは『アルペン』へ。
 Orchestra Canvas Tokyo 第1回定期演奏会から5年、そして第17回定期演奏会《アルプス交響曲》へ。
 
 #オケキャン #OrchestraCanvasTokyo #OCT5周年 #アルプス交響曲`;
