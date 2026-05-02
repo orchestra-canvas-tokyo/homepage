@@ -19,6 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **演奏会追加**: `npm run add:concert` - Hygenテンプレートを使用した演奏会ページの対話的作成
 - **コマンド引数**: `npm run add:concert -- --type regular|chamber --number 999`
+- **参加公演追加**: `participation` は外部主催公演への出演用。Hygenテンプレートではなく、既存の `src/lib/concerts/participation/` の実装に合わせて追加する
 
 ## データベースコマンド（Cloudflare D1）
 
@@ -44,11 +45,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### 演奏会データアーキテクチャ
 
-- 演奏会データは`src/lib/concerts/{regular,chamber}/`のTypeScriptファイルに格納
+- 演奏会データは`src/lib/concerts/{regular,chamber,participation}/`のTypeScriptファイルに格納
 - 各演奏会は`Concert`インターフェースに準拠したオブジェクトをエクスポート
 - `src/lib/concerts/index.ts`でimport.meta.globを使用してすべての演奏会ファイルを動的読み込み
 - 演奏会の型定義は`src/lib/concerts/types.ts`に記載
 - 演奏会は自動的に日付でソートされ、各ページに表示
+
+### 参加公演データの扱い
+
+- `type: 'participation'` は、LFJエリアコンサートのような外部主催イベントにOCTが出演する場合に使う
+- 参加公演はナンバリングしないため、`number` は省略可能。曲目解説リンクも通常は `showLinkToProgramNote: false` にする
+- 長い正式名称は `title` に残し、ヘッダーメニューなど省スペース表示には `navigationTitle` を使う
+- 指揮者・独奏者以外の出演者や出演団体は `performers` に `{ title, name, url? }` で入れる
+- 入場無料などチケット以外の表示名が必要な場合は `ticket.label` を使う
+- 外部情報は `relatedLinks` に入れる。主催者・会場・招聘元などの公式公開情報を優先し、自団体サイトやSNS告知リンクは明示要望がない限り増やしすぎない
+- 参加公演はアーカイブの「参加公演」タブに表示される。トップページのスライドショーには、明示的に `src/routes/+page.svelte` 側で対象にしない限り出さない
 
 ### コンポーネント構造
 
@@ -76,6 +87,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - 新しい演奏会追加時は既存のConcertインターフェースを使用
 - コンポーネントとアセットの同一場所配置パターンに従う
+- 演奏会フライヤーは各演奏会ディレクトリ配下の `images/flyers/` に置き、演奏会データの `flyers` 配列からimportする
+- 定期演奏会のフライヤー公開では、演奏会データ、`src/lib/news.ts`、トップページの `newConcerts` を確認する
+- 参加公演のフライヤーは演奏会詳細ページには表示されるが、トップページには自動掲載されない
 - 新しいコンポーネントは`src/lib/components/__tests__/`でテスト
 - 新しい演奏会やお知らせ追加時は`src/lib/news.ts`も更新
 - ドキュメント用にTSDoc形式のコメントを積極的に使用
+
+## メンテナンス知見
+
+### パッケージ更新
+
+- まず `npm update` で `package.json` の既存範囲内を更新する
+- `npm audit` に残る脆弱性は内容を確認する。`0.x` 系の minor jump が semver-major 扱いになることがある
+- 依存更新でlintルールが厳しくなった場合は、該当する最小のソース修正だけを同じPRに含める
+- 標準確認は `npm audit --json`、`npm run check`、`npm run lint`、`npm run test`、`npm run build`
+- `npm run check` は既存のSvelte警告が残ることがある。2026-05時点では `src/routes/+page.svelte` と `src/routes/concerts/archives/Concert.svelte` の警告は既知として扱う
+
+### 団体統計の自動更新
+
+- 団体統計は `.github/workflows/fetch_view_count.yaml` から `src/lib/organizationStats.json` を更新する
+- stats-only更新は `main` へ直接コミットし、`main` と `production` の実行開始時点のtreeが一致し、かつ両ブランチが実行中に進んでいない場合だけ `production` へ自動マージする
+- 通常の `main` -> `production` リリースPR作成ワークフローは `src/lib/organizationStats.json` のみのpushを無視する
+- 昇格ガードやSlackサマリーの表示文言を変える場合は、`src/lib/organizationStatsWorkflowPromotion.ts` と `src/lib/organizationStatsUpdateSummary.ts` のテストも更新する
