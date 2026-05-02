@@ -7,7 +7,7 @@
 	import OpenInNewIcon from '$lib/components/OpenInNewIcon.svelte';
 	import AlpineProgressBar from './AlpineProgressBar.svelte';
 	import CountUpNumber from './CountUpNumber.svelte';
-	import EmojiReaction from './EmojiReaction.svelte';
+	import alpsHero from './alps-hero.jpg';
 	import logo from '../../logo.svg';
 	import instagramIcon from '../../instagram-brands.svg';
 	import facebookIcon from '../../facebook-brands.svg';
@@ -18,7 +18,6 @@
 		numberCardDefinitions,
 		pageDescription,
 		progressStages,
-		reactionOptions,
 		shareText,
 		timelineItems,
 		type AnniversaryNumberCardKey
@@ -134,6 +133,8 @@
 		concerts.filter(
 			(concert) => concert.slug !== 'participation-lfj-2026' && concert.slug !== 'regular-17'
 		);
+	const getTimelineBadgeItems = (concerts: TimelineConcert[]) =>
+		concerts.filter((concert) => concert.slug !== 'regular-17');
 	const getFeaturedTimelineConcert = (concerts: TimelineConcert[]) =>
 		concerts.find((concert) => concert.slug === 'regular-17');
 	const formatTimelineDate = (date: string) => dayjs(date).locale('ja').format('YYYY.M.D');
@@ -173,12 +174,7 @@
 />
 
 <article class="special-page">
-	<section class="hero" aria-labelledby="hero-title">
-		<div class="hero-motion" aria-hidden="true">
-			<span></span>
-			<span></span>
-			<span></span>
-		</div>
+	<section class="hero" aria-labelledby="hero-title" style={`--hero-bg-url: url("${alpsHero}")`}>
 		<div class="hero-copy">
 			<p class="eyebrow en">OCT 5th Anniversary</p>
 			<h1 id="hero-title">
@@ -198,23 +194,6 @@
 				</a>
 			</div>
 		</div>
-		<div class="hero-visual" aria-hidden="true">
-			<div class="sun"></div>
-			<div class="staff staff-a"></div>
-			<div class="staff staff-b"></div>
-			<div class="mountain mountain-back"></div>
-			<div class="mountain mountain-front"></div>
-			<div class="note note-a">♪</div>
-			<div class="note note-b">♩</div>
-			<div class="note note-c">♬</div>
-		</div>
-		<a class="scroll-cue en" href="#concept">scroll</a>
-	</section>
-
-	<section id="concept" class="concept section-band">
-		<p>
-			第1回定期演奏会から五年。OCTの歩みを振り返りながら、次なる挑戦《アルプス交響曲》へ向かうアルペン特設ページです。はじまりの「第一番」から、次の大きな景色へ。
-		</p>
 	</section>
 
 	<section id="first-canvas" class="section two-column first-canvas" aria-labelledby="first-title">
@@ -224,9 +203,10 @@
 		<div class="section-copy">
 			<p class="eyebrow en">The First Canvas</p>
 			<h2 id="first-title">はじまりの第1番</h2>
-			<p>
-				2021年8月29日。Orchestra Canvas
-				Tokyoは、第1回定期演奏会を開催しました。プログラムに並んだ「第1番」は、OCTにとって最初の一筆でした。その一音から、五年。Canvasは今も広がり続けています。
+			<p class="lead-lines">
+				<span>2021年8月29日。Orchestra Canvas Tokyoは、第1回定期演奏会を開催しました。</span>
+				<span>プログラムに並んだ「第1番」は、OCTにとって最初の一筆でした。</span>
+				<span>その一音から、五年。Canvasは今も広がり続けています。</span>
 			</p>
 			<dl class="concert-facts">
 				<div>
@@ -304,7 +284,8 @@
 		<div class="comment-grid" aria-label="観客コメント風カード">
 			{#each audienceComments as comment}
 				<figure>
-					<blockquote>{comment}</blockquote>
+					<blockquote>{comment.body}</blockquote>
+					<figcaption>{comment.source}</figcaption>
 				</figure>
 			{/each}
 		</div>
@@ -319,19 +300,16 @@
 		<ol class="timeline">
 			{#each timelineItems as item}
 				{@const posters = posterGroupsByYear[item.year] ?? []}
+				{@const badgeItems = getTimelineBadgeItems(posters)}
 				{@const posterStripItems = getTimelinePosterItems(posters)}
 				{@const featuredConcert = getFeaturedTimelineConcert(posters)}
 				<li class:future={item.year === '2026'}>
 					<div class="timeline-rail">
 						<div class="timeline-marker">{item.year}</div>
-						{#if posters.length > 0}
+						{#if badgeItems.length > 0}
 							<div class="timeline-badges" aria-label="{item.year}年の演奏会">
-								{#each posters as poster}
-									<a
-										class:featured-badge={poster.slug === 'regular-17'}
-										href="/concerts/{poster.slug}"
-										aria-label="{poster.title}を見る"
-									>
+								{#each badgeItems as poster}
+									<a href="/concerts/{poster.slug}" aria-label="{poster.title}を見る">
 										{#each getConcertBadgeLabel(poster).split('\n') as line}
 											<span>{line}</span>
 										{/each}
@@ -349,22 +327,6 @@
 							<p>{item.description}</p>
 							<a href={item.actionUrl}>{item.actionLabel}</a>
 						</div>
-						{#if featuredConcert}
-							<a
-								class="timeline-feature-card"
-								href="/concerts/{featuredConcert.slug}"
-								aria-label="{featuredConcert.title}を見る"
-							>
-								<img src={featuredConcert.flyer.src} alt={featuredConcert.title} loading="lazy" />
-								<span>
-									<small class="en">Next Canvas</small>
-									<strong>{featuredConcert.title}</strong>
-									<time datetime={featuredConcert.date}
-										>{formatTimelineDate(featuredConcert.date)}</time
-									>
-								</span>
-							</a>
-						{/if}
 						{#if posterStripItems.length > 0 || !featuredConcert}
 							<div class="poster-strip" aria-label="{item.year}年の演奏会ポスター">
 								{#if posterStripItems.length > 0}
@@ -383,6 +345,40 @@
 						{/if}
 					</div>
 				</li>
+				{#if featuredConcert}
+					<li class="timeline-feature-item">
+						<div class="timeline-rail">
+							<div class="timeline-badges timeline-feature-badges" aria-label="第17回定期演奏会">
+								<a
+									class="featured-badge"
+									href="/concerts/{featuredConcert.slug}"
+									aria-label="{featuredConcert.title}を見る"
+								>
+									{#each getConcertBadgeLabel(featuredConcert).split('\n') as line}
+										<span>{line}</span>
+									{/each}
+								</a>
+							</div>
+						</div>
+						<div class="timeline-body timeline-feature-body">
+							<a
+								class="timeline-feature-card"
+								href="/concerts/{featuredConcert.slug}"
+								aria-label="{featuredConcert.title}を見る"
+							>
+								<img src={featuredConcert.flyer.src} alt={featuredConcert.title} loading="lazy" />
+								<span>
+									<small class="en">17th Regular Concert</small>
+									<strong>{featuredConcert.title}《アルプス交響曲》</strong>
+									<time datetime={featuredConcert.date}
+										>{formatTimelineDate(featuredConcert.date)} / {data.alpsConcert.place
+											.name}</time
+									>
+								</span>
+							</a>
+						</div>
+					</li>
+				{/if}
 			{/each}
 		</ol>
 	</section>
@@ -391,8 +387,11 @@
 		<div class="section-copy">
 			<p class="eyebrow en">Next Canvas: Eine Alpensinfonie</p>
 			<h2 id="alps-title">次のカンバスは、アルペンへ。</h2>
-			<p>
-				夜明けから日没まで、巨大な山の一日を描く《アルプス交響曲》。OCTの五年間の歩みは、次の大きな景色へ向かいます。2026年9月12日、私たちはこの山に挑みます。
+			<p class="lead-lines">
+				<span
+					>夜明けから日没まで、巨大な山の一日を描く《アルプス交響曲》。OCTの五年間の歩みは、次の大きな景色へ向かいます。</span
+				>
+				<span>2026年9月12日、私たちはこの山に挑みます。</span>
 			</p>
 			<dl class="concert-facts">
 				<div>
@@ -430,7 +429,6 @@
 			</div>
 		</div>
 		<div class="alps-visual">
-			<AlpineProgressBar stages={progressStages} targetSelector="#next-canvas" />
 			{#if alpsFlyer}
 				<Flyer
 					src={alpsFlyer.src}
@@ -438,7 +436,7 @@
 					lazy={true}
 				/>
 			{/if}
-			<EmojiReaction options={reactionOptions} triggerSelector="#next-canvas" />
+			<AlpineProgressBar stages={progressStages} targetSelector="#next-canvas" />
 		</div>
 	</section>
 
@@ -510,19 +508,34 @@
 	}
 
 	.section,
-	.section-band,
 	.footer-cta {
-		padding: clamp(72px, 10vw, 132px) clamp(22px, 5vw, 72px);
+		padding: clamp(96px, 13vw, 188px) clamp(22px, 5vw, 72px);
+	}
+
+	.section + .section,
+	.section + .footer-cta {
+		margin-top: clamp(44px, 7vw, 96px);
 	}
 
 	.hero {
 		position: relative;
 		display: grid;
 		min-height: calc(100dvh - var(--header-height));
-		grid-template-columns: minmax(0, 1.05fr) minmax(300px, 0.95fr);
-		gap: clamp(32px, 6vw, 76px);
+		grid-template-columns: minmax(0, 980px);
+		justify-content: center;
 		align-items: center;
-		padding: clamp(40px, 6vw, 78px) clamp(22px, 5vw, 72px) clamp(48px, 6vw, 78px);
+		padding: clamp(64px, 7vw, 96px) clamp(22px, 5vw, 72px);
+		text-align: center;
+		background-image:
+			linear-gradient(180deg, rgba(7, 9, 13, 0.58), rgba(7, 9, 13, 0.76)),
+			linear-gradient(90deg, rgba(7, 9, 13, 0.74), rgba(7, 9, 13, 0.28), rgba(7, 9, 13, 0.76)),
+			var(--hero-bg-url);
+		background-position:
+			center,
+			center,
+			center 42%;
+		background-size: cover, cover, cover;
+		background-attachment: scroll, scroll, fixed;
 		overflow: hidden;
 	}
 
@@ -534,71 +547,25 @@
 	}
 
 	.hero::before {
-		inset: 10% 12% auto auto;
-		width: 42%;
+		inset: auto 8% 10% 8%;
+		width: auto;
 		height: 1px;
 		background: linear-gradient(90deg, transparent, rgba(239, 202, 128, 0.6), transparent);
-		transform: rotate(-8deg);
 	}
 
 	.hero::after {
-		right: 8%;
-		bottom: 12%;
-		width: 44%;
-		height: 44%;
-		background: radial-gradient(circle, rgba(239, 202, 128, 0.16), transparent 68%);
-	}
-
-	.hero-motion {
-		position: absolute;
 		inset: 0;
-		opacity: 0.42;
-		overflow: hidden;
-		pointer-events: none;
-	}
-
-	.hero-motion span {
-		position: absolute;
-		inset-inline: -12%;
-		height: 28%;
-		background:
-			linear-gradient(100deg, transparent 0%, rgba(137, 194, 217, 0.16) 45%, transparent 76%),
-			repeating-linear-gradient(
-				-8deg,
-				transparent 0,
-				transparent 22px,
-				rgba(255, 248, 232, 0.08) 22px,
-				rgba(255, 248, 232, 0.08) 23px
-			);
-		filter: blur(0.4px);
-		transform: translateX(-8%);
-		animation: hero-motion 14s linear infinite;
-	}
-
-	.hero-motion span:nth-child(1) {
-		top: 14%;
-	}
-
-	.hero-motion span:nth-child(2) {
-		top: 44%;
-		animation-delay: -5s;
-		opacity: 0.72;
-	}
-
-	.hero-motion span:nth-child(3) {
-		top: 68%;
-		animation-delay: -9s;
-		opacity: 0.48;
-	}
-
-	@keyframes hero-motion {
-		to {
-			transform: translateX(8%);
-		}
+		background: repeating-linear-gradient(
+			110deg,
+			transparent 0,
+			transparent 34px,
+			rgba(255, 248, 232, 0.035) 34px,
+			rgba(255, 248, 232, 0.035) 35px
+		);
+		mask-image: linear-gradient(180deg, transparent, #000 24%, #000 68%, transparent);
 	}
 
 	.hero-copy,
-	.hero-visual,
 	.section-copy,
 	.section-heading,
 	.footer-cta > * {
@@ -624,7 +591,7 @@
 		display: grid;
 		gap: 0.18em;
 		margin: 0;
-		font-size: clamp(2.35rem, 4vw, 3.6rem);
+		font-size: clamp(2.5rem, 5.8vw, 5.4rem);
 		line-height: 1.08;
 		letter-spacing: 0.02em;
 		word-break: keep-all;
@@ -652,27 +619,35 @@
 		line-height: 1.9;
 	}
 
+	.lead-lines span {
+		display: block;
+	}
+
 	.hero-dates {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.1fr);
 		gap: 12px;
 		align-items: center;
-		margin: 28px 0;
+		max-width: 820px;
+		margin: 34px auto;
 		color: rgba(255, 248, 232, 0.82);
 		font-size: 0.92rem;
 		line-height: 1.5;
 	}
 
 	.hero-dates time {
+		text-align: center;
 		padding: 8px 12px;
-		background: rgba(255, 255, 255, 0.08);
+		background: rgba(9, 12, 18, 0.48);
 		border: 1px solid var(--line);
 		border-radius: 6px;
+		backdrop-filter: blur(8px);
 	}
 
 	.date-arrow {
 		position: relative;
 		display: block;
+		justify-self: center;
 		width: clamp(34px, 5vw, 66px);
 		height: 1px;
 		background: linear-gradient(90deg, var(--gold), rgba(255, 248, 232, 0.35));
@@ -698,6 +673,10 @@
 		flex-wrap: wrap;
 		gap: 12px;
 		align-items: center;
+	}
+
+	.hero-actions {
+		justify-content: center;
 	}
 
 	.button,
@@ -729,166 +708,6 @@
 		background: rgba(255, 255, 255, 0.1);
 	}
 
-	.hero-visual {
-		position: relative;
-		min-height: min(46dvh, 480px);
-		border: 1px solid rgba(255, 248, 232, 0.13);
-		border-radius: 8px;
-		background:
-			linear-gradient(180deg, rgba(137, 194, 217, 0.08), transparent 38%),
-			linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(7, 9, 13, 0.72));
-		box-shadow:
-			inset 0 0 90px rgba(0, 0, 0, 0.48),
-			0 24px 70px rgba(0, 0, 0, 0.34);
-		overflow: hidden;
-	}
-
-	.hero-visual::before,
-	.hero-visual::after {
-		position: absolute;
-		z-index: 2;
-		content: '';
-		pointer-events: none;
-	}
-
-	.hero-visual::before {
-		inset: 16px;
-		border: 1px solid rgba(255, 248, 232, 0.12);
-		border-radius: 6px;
-	}
-
-	.hero-visual::after {
-		top: 50%;
-		left: 50%;
-		width: 58px;
-		aspect-ratio: 1;
-		background:
-			linear-gradient(90deg, transparent 42%, rgba(239, 202, 128, 0.92) 42%), rgba(9, 12, 18, 0.68);
-		clip-path: polygon(32% 24%, 78% 50%, 32% 76%);
-		filter: drop-shadow(0 0 28px rgba(239, 202, 128, 0.45));
-		transform: translate(-50%, -50%);
-	}
-
-	.sun {
-		position: absolute;
-		top: 16%;
-		right: 20%;
-		width: clamp(88px, 12vw, 150px);
-		aspect-ratio: 1;
-		background: radial-gradient(circle, #fff2b7 0%, #efca80 38%, rgba(239, 202, 128, 0) 70%);
-		border-radius: 50%;
-		filter: blur(0.5px);
-	}
-
-	.mountain {
-		position: absolute;
-		right: -8%;
-		bottom: 0;
-		left: -8%;
-		clip-path: polygon(0 100%, 18% 56%, 32% 74%, 49% 34%, 66% 66%, 81% 46%, 100% 100%);
-	}
-
-	.mountain-back {
-		height: 56%;
-		background: linear-gradient(145deg, rgba(137, 194, 217, 0.42), rgba(20, 63, 53, 0.35));
-	}
-
-	.mountain-front {
-		height: 42%;
-		background: linear-gradient(145deg, rgba(20, 63, 53, 0.92), rgba(9, 12, 18, 0.95));
-	}
-
-	.staff {
-		position: absolute;
-		left: 8%;
-		width: 86%;
-		height: 54px;
-		background: repeating-linear-gradient(
-			180deg,
-			rgba(255, 248, 232, 0.18) 0,
-			rgba(255, 248, 232, 0.18) 1px,
-			transparent 1px,
-			transparent 12px
-		);
-		border-radius: 50%;
-		transform: rotate(-10deg);
-	}
-
-	.staff-a {
-		top: 18%;
-	}
-
-	.staff-b {
-		top: 36%;
-		left: 20%;
-		width: 70%;
-		transform: rotate(8deg);
-	}
-
-	.note {
-		position: absolute;
-		color: rgba(255, 248, 232, 0.74);
-		font-size: clamp(1.7rem, 4vw, 3.1rem);
-	}
-
-	.note-a {
-		top: 24%;
-		left: 18%;
-	}
-
-	.note-b {
-		top: 48%;
-		right: 24%;
-	}
-
-	.note-c {
-		top: 58%;
-		left: 34%;
-	}
-
-	.scroll-cue {
-		position: absolute;
-		bottom: 26px;
-		left: 50%;
-		z-index: 2;
-		color: rgba(255, 248, 232, 0.66);
-		font-size: 0.66rem;
-		letter-spacing: 0.2em;
-		transform: translateX(-50%);
-	}
-
-	.scroll-cue::after {
-		display: block;
-		width: 1px;
-		height: 42px;
-		margin: 8px auto 0;
-		content: '';
-		background: linear-gradient(var(--gold), transparent);
-		animation: cue 1.8s ease-in-out infinite;
-	}
-
-	@keyframes cue {
-		50% {
-			transform: translateY(8px);
-		}
-	}
-
-	.concept {
-		padding-block: clamp(120px, 15vw, 210px);
-		background:
-			linear-gradient(180deg, rgba(7, 9, 13, 0), rgba(239, 202, 128, 0.08), rgba(7, 9, 13, 0)),
-			rgba(255, 255, 255, 0.045);
-		border-block: 1px solid var(--line);
-	}
-
-	.concept p {
-		max-width: 900px;
-		margin: 0 auto;
-		color: var(--ink);
-		font-size: clamp(1.08rem, 2.2vw, 1.5rem);
-		line-height: 1.9;
-	}
-
 	.two-column {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
@@ -902,6 +721,7 @@
 
 	.first-canvas {
 		position: relative;
+		margin-top: clamp(34px, 7vw, 104px);
 		background:
 			linear-gradient(
 				105deg,
@@ -1029,6 +849,7 @@
 	.number-card,
 	.comment-grid figure,
 	.share-copy {
+		box-sizing: border-box;
 		margin: 0;
 		padding: clamp(18px, 3vw, 28px);
 		background: var(--panel);
@@ -1070,7 +891,7 @@
 
 	.comment-grid figure {
 		position: relative;
-		min-height: 9rem;
+		min-height: 7.2rem;
 		padding-top: clamp(34px, 5vw, 54px);
 		background:
 			linear-gradient(140deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)), var(--panel);
@@ -1092,6 +913,14 @@
 		margin: 0;
 		color: var(--ink);
 		line-height: 1.8;
+	}
+
+	figcaption {
+		margin-top: 14px;
+		color: rgba(239, 202, 128, 0.78);
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
 	}
 
 	.prototype-note {
@@ -1234,6 +1063,42 @@
 		font-size: 0.78rem;
 	}
 
+	.timeline-feature-badges .featured-badge {
+		animation: badge-pulse 2.4s ease-in-out infinite;
+	}
+
+	.timeline-feature-item {
+		margin-top: -8px;
+	}
+
+	.timeline-feature-item .timeline-rail {
+		padding-top: 6px;
+	}
+
+	.timeline-feature-body {
+		background:
+			linear-gradient(135deg, rgba(239, 202, 128, 0.13), rgba(137, 194, 217, 0.06)),
+			rgba(255, 255, 255, 0.048);
+		border-color: rgba(239, 202, 128, 0.28);
+	}
+
+	@keyframes badge-pulse {
+		0%,
+		100% {
+			box-shadow:
+				0 0 0 4px rgba(239, 202, 128, 0.14),
+				0 14px 34px rgba(239, 202, 128, 0.34);
+			transform: scale(1);
+		}
+
+		52% {
+			box-shadow:
+				0 0 0 11px rgba(239, 202, 128, 0),
+				0 18px 46px rgba(239, 202, 128, 0.46);
+			transform: scale(1.035);
+		}
+	}
+
 	.timeline-feature-card {
 		display: grid;
 		grid-template-columns: clamp(92px, 14vw, 132px) minmax(0, 1fr);
@@ -1266,6 +1131,7 @@
 		color: var(--gold);
 		font-size: 0.74rem;
 		letter-spacing: 0.08em;
+		line-height: 1.55;
 	}
 
 	.timeline-feature-card strong {
@@ -1347,6 +1213,9 @@
 	}
 
 	.footer-cta {
+		display: grid;
+		justify-items: center;
+		padding-block: clamp(116px, 16vw, 220px);
 		background: #030303;
 		text-align: center;
 	}
@@ -1372,8 +1241,11 @@
 	}
 
 	.share-copy {
+		position: relative;
 		max-width: 780px;
+		width: min(100%, 780px);
 		margin-inline: auto;
+		padding-bottom: 68px;
 		text-align: left;
 	}
 
@@ -1401,14 +1273,17 @@
 	}
 
 	.share-copy button {
-		min-height: 40px;
-		margin-top: 12px;
-		padding: 9px 14px;
+		position: absolute;
+		right: 16px;
+		bottom: 16px;
+		min-height: 32px;
+		padding: 6px 10px;
 		color: var(--gold);
 		background: transparent;
 		border: 1px solid rgba(239, 202, 128, 0.72);
 		border-radius: 6px;
 		font: inherit;
+		font-size: 0.78rem;
 		font-weight: 700;
 		cursor: pointer;
 	}
@@ -1439,21 +1314,16 @@
 
 	.footer-logo {
 		display: block;
-		width: min(180px, 42vw);
+		width: min(290px, 66vw);
 		height: auto;
-		margin: 34px auto 0;
-		opacity: 0.78;
+		margin: clamp(52px, 8vw, 86px) auto 0;
+		opacity: 0.92;
 		filter: brightness(0) invert(1);
 	}
 
 	@media (max-width: 1100px) {
-		.hero,
 		.two-column {
 			grid-template-columns: 1fr;
-		}
-
-		.hero-visual {
-			min-height: 360px;
 		}
 	}
 
@@ -1463,17 +1333,23 @@
 		}
 
 		.hero {
-			min-height: auto;
-			padding-top: 48px;
+			min-height: calc(100svh - var(--header-height));
+			padding-top: 56px;
+			background-attachment: scroll;
+			background-position:
+				center,
+				center,
+				center top;
 		}
 
-		.scroll-cue {
-			top: calc(100dvh - var(--header-height) - 150px);
-			bottom: auto;
+		.hero-dates time {
+			justify-self: center;
+			width: min(100%, 24rem);
+			box-sizing: border-box;
 		}
 
 		h1 {
-			font-size: clamp(2rem, 12vw, 3.6rem);
+			font-size: clamp(2.2rem, 10.4vw, 3.25rem);
 		}
 
 		.number-grid,
@@ -1521,11 +1397,30 @@
 		.poster-placeholder {
 			width: 120px;
 		}
+
+		.section-poster-background {
+			top: 22px;
+			right: -86px;
+			bottom: auto;
+			width: min(76vw, 330px);
+			opacity: 0.22;
+			transform: rotate(-7deg);
+		}
+
+		.comment-grid figure {
+			min-height: 0;
+			padding: 32px 18px 18px;
+		}
+
+		.comment-grid figure::before {
+			top: 3px;
+			left: 14px;
+			font-size: 3.4rem;
+		}
 	}
 
 	@media (max-width: 560px) {
 		.section,
-		.section-band,
 		.footer-cta,
 		.hero {
 			padding-inline: 18px;
@@ -1559,22 +1454,15 @@
 			gap: 4px;
 		}
 
-		.hero-visual {
-			min-height: 280px;
-		}
-
 		.hero-dates {
 			grid-template-columns: 1fr;
-		}
-
-		.scroll-cue {
-			top: calc(100dvh - 190px);
 		}
 
 		.date-arrow {
 			width: 1px;
 			height: 32px;
-			margin-inline: 18px;
+			justify-self: center;
+			margin-inline: 0;
 		}
 
 		.date-arrow::after {
@@ -1586,8 +1474,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.hero-motion span,
-		.scroll-cue::after {
+		.timeline-feature-badges .featured-badge {
 			animation: none;
 		}
 	}

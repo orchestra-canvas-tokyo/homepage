@@ -12,6 +12,11 @@ export type AnniversaryNumberCard = {
 	description: string;
 };
 
+export type AudienceComment = {
+	body: string;
+	source: string;
+};
+
 export type TimelineItem = {
 	year: string;
 	title: string;
@@ -80,10 +85,19 @@ export const numberCardDefinitions: AnniversaryNumberCard[] = [
 	}
 ];
 
-export const audienceComments = [
-	'動画で知って、初めて会場に足を運びました。',
-	'第1回から聴いています。次のアルペンも楽しみです。',
-	'OCTの演奏で、オーケストラが少し身近になりました。'
+export const audienceComments: AudienceComment[] = [
+	{
+		body: '動画で知って、初めて会場に足を運びました。',
+		source: 'YouTubeより'
+	},
+	{
+		body: '第1回から聴いています。次のアルペンも楽しみです。',
+		source: 'teketより'
+	},
+	{
+		body: 'OCTの演奏で、オーケストラが少し身近になりました。',
+		source: 'SNSより'
+	}
 ];
 
 export const timelineItems: TimelineItem[] = [
@@ -135,16 +149,6 @@ export const timelineItems: TimelineItem[] = [
 		actionUrl: '/concerts/regular-17',
 		visualLabel: 'Eine Alpensinfonie'
 	}
-];
-
-export const reactionOptions: ReactionOption[] = [
-	{ emoji: '🎉', label: 'お祝い', initialCount: 128 },
-	{ emoji: '🎵', label: '音楽', initialCount: 84 },
-	{ emoji: '🏔️', label: 'アルペン', initialCount: 72 },
-	{ emoji: '🎻', label: '弦楽器', initialCount: 58 },
-	{ emoji: '📯', label: 'ホルン', initialCount: 53 },
-	{ emoji: '🎺', label: '金管', initialCount: 47 },
-	{ emoji: '🥁', label: '打楽器', initialCount: 36 }
 ];
 
 export const progressStages = ['ふもと', '登山開始', '中腹', '山頂', '日没'];
