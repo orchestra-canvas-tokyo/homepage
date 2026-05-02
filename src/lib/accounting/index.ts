@@ -1,36 +1,30 @@
 import term1Pdf from './documents/第1期 決算報告書.pdf';
-import term1Image from './documents/第1期 決算報告書.png';
 import term2Pdf from './documents/第2期 決算報告書.pdf';
-import term2Image from './documents/第2期 決算報告書.png';
 import term3Pdf from './documents/第3期 決算報告書.pdf';
-import term3Image from './documents/第3期 決算報告書.png';
 import term4Pdf from './documents/第4期 決算報告書.pdf';
-import term4Image from './documents/第4期 決算報告書.png';
+import term4ActivityReportPdf from './documents/第4期 活動収支報告書.pdf';
 
-/** 決算報告書情報をまとめた配列 */
+/** 決算報告についての情報をまとめた配列 */
 export const reports: {
 	duration: string;
 	pdf: string;
-	image: string;
+	activityReportPdf?: string;
 }[] = [
 	{
 		duration: '2021/4/1～2022/3/31',
-		pdf: term1Pdf,
-		image: term1Image
+		pdf: term1Pdf
 	},
 	{
 		duration: '2022/4/1～2023/3/31',
-		pdf: term2Pdf,
-		image: term2Image
+		pdf: term2Pdf
 	},
 	{
 		duration: '2023/4/1～2024/3/31',
-		pdf: term3Pdf,
-		image: term3Image
+		pdf: term3Pdf
 	},
 	{
 		duration: '2024/4/1～2025/3/31',
 		pdf: term4Pdf,
-		image: term4Image
+		activityReportPdf: term4ActivityReportPdf
 	}
 ];
