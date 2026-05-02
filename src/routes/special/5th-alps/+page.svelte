@@ -24,6 +24,8 @@
 		type AnniversaryNumberCardKey
 	} from './data';
 
+	type TimelineConcert = PageServerData['timelinePosterGroups'][number]['concerts'][number];
+
 	let { data }: { data: PageServerData } = $props();
 
 	let shareCopyElement = $state<HTMLTextAreaElement | null>(null);
@@ -47,11 +49,28 @@
 			: undefined
 	);
 	const ticketUrl = $derived(data.alpsConcert.ticket?.url ?? '/concerts/regular-17');
-	const shareUrl = $derived(
-		`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(
-			'https://www.orch-canvas.tokyo/special/5th-alps'
-		)}`
-	);
+	const sharePageUrl = 'https://www.orch-canvas.tokyo/special/5th-alps';
+	const shareLinks = $derived([
+		{
+			url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(
+				sharePageUrl
+			)}`,
+			icon: xIcon,
+			label: 'Xでシェア'
+		},
+		{
+			url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sharePageUrl)}`,
+			icon: facebookIcon,
+			label: 'Facebookでシェア'
+		},
+		{
+			url: `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(
+				sharePageUrl
+			)}&text=${encodeURIComponent(shareText)}`,
+			icon: undefined,
+			label: 'LINEでシェア'
+		}
+	]);
 	const numberValues: Record<
 		AnniversaryNumberCardKey,
 		{ value: number; suffix: string; decimals?: number }
@@ -105,11 +124,19 @@
 		}
 	];
 
-	const getConcertBadgeLabel = (type: 'regular' | 'chamber' | 'participation', number?: number) => {
-		if (type === 'regular' && number) return `第${number}回\n定期`;
-		if (type === 'chamber' && number) return `第${number}回\n室内楽`;
+	const getConcertBadgeLabel = (concert: TimelineConcert) => {
+		if (concert.slug === 'participation-lfj-2026') return 'LFJ\n2026';
+		if (concert.type === 'regular' && concert.number) return `第${concert.number}回\n定期`;
+		if (concert.type === 'chamber' && concert.number) return `第${concert.number}回\n室内楽`;
 		return '参加\n公演';
 	};
+	const getTimelinePosterItems = (concerts: TimelineConcert[]) =>
+		concerts.filter(
+			(concert) => concert.slug !== 'participation-lfj-2026' && concert.slug !== 'regular-17'
+		);
+	const getFeaturedTimelineConcert = (concerts: TimelineConcert[]) =>
+		concerts.find((concert) => concert.slug === 'regular-17');
+	const formatTimelineDate = (date: string) => dayjs(date).locale('ja').format('YYYY.M.D');
 
 	const copyShareText = async () => {
 		let copied = false;
@@ -292,8 +319,27 @@
 		<ol class="timeline">
 			{#each timelineItems as item}
 				{@const posters = posterGroupsByYear[item.year] ?? []}
+				{@const posterStripItems = getTimelinePosterItems(posters)}
+				{@const featuredConcert = getFeaturedTimelineConcert(posters)}
 				<li class:future={item.year === '2026'}>
-					<div class="timeline-marker">{item.year}</div>
+					<div class="timeline-rail">
+						<div class="timeline-marker">{item.year}</div>
+						{#if posters.length > 0}
+							<div class="timeline-badges" aria-label="{item.year}年の演奏会">
+								{#each posters as poster}
+									<a
+										class:featured-badge={poster.slug === 'regular-17'}
+										href="/concerts/{poster.slug}"
+										aria-label="{poster.title}を見る"
+									>
+										{#each getConcertBadgeLabel(poster).split('\n') as line}
+											<span>{line}</span>
+										{/each}
+									</a>
+								{/each}
+							</div>
+						{/if}
+					</div>
 					<div class="timeline-body">
 						<div class="timeline-copy">
 							{#if item.year === '2026'}
@@ -303,33 +349,38 @@
 							<p>{item.description}</p>
 							<a href={item.actionUrl}>{item.actionLabel}</a>
 						</div>
-						<div class="timeline-badges" aria-label="{item.year}年の演奏会">
-							{#each posters as poster}
-								<a
-									class:featured-badge={poster.slug === 'regular-17'}
-									href="/concerts/{poster.slug}"
-									aria-label="{poster.title}を見る"
-								>
-									{#each getConcertBadgeLabel(poster.type, poster.number).split('\n') as line}
-										<span>{line}</span>
+						{#if featuredConcert}
+							<a
+								class="timeline-feature-card"
+								href="/concerts/{featuredConcert.slug}"
+								aria-label="{featuredConcert.title}を見る"
+							>
+								<img src={featuredConcert.flyer.src} alt={featuredConcert.title} loading="lazy" />
+								<span>
+									<small class="en">Next Canvas</small>
+									<strong>{featuredConcert.title}</strong>
+									<time datetime={featuredConcert.date}
+										>{formatTimelineDate(featuredConcert.date)}</time
+									>
+								</span>
+							</a>
+						{/if}
+						{#if posterStripItems.length > 0 || !featuredConcert}
+							<div class="poster-strip" aria-label="{item.year}年の演奏会ポスター">
+								{#if posterStripItems.length > 0}
+									{#each posterStripItems as poster}
+										<a href="/concerts/{poster.slug}" aria-label="{poster.title}を見る">
+											<img src={poster.flyer.src} alt={poster.title} loading="lazy" />
+										</a>
 									{/each}
-								</a>
-							{/each}
-						</div>
-						<div class="poster-strip" aria-label="{item.year}年の演奏会ポスター">
-							{#if posters.length > 0}
-								{#each posters as poster}
-									<a href="/concerts/{poster.slug}" aria-label="{poster.title}を見る">
-										<img src={poster.flyer.src} alt={poster.title} loading="lazy" />
-									</a>
-								{/each}
-							{:else}
-								<div class="poster-placeholder">
-									<span class="en">{item.visualLabel}</span>
-									<strong>{item.year}</strong>
-								</div>
-							{/if}
-						</div>
+								{:else}
+									<div class="poster-placeholder">
+										<span class="en">{item.visualLabel}</span>
+										<strong>{item.year}</strong>
+									</div>
+								{/if}
+							</div>
+						{/if}
 					</div>
 				</li>
 			{/each}
@@ -399,9 +450,16 @@
 				チケット情報を見る<OpenInNewIcon />
 			</a>
 			<a class="button secondary" href="/concerts/regular-17">演奏会情報を見る</a>
-			<a class="button secondary" href={shareUrl} target="_blank" rel="noopener noreferrer">
-				SNSでシェアする<OpenInNewIcon />
-			</a>
+		</div>
+		<div class="share-link-actions" aria-label="SNSでシェア">
+			{#each shareLinks as link}
+				<a class="button secondary" href={link.url} target="_blank" rel="noopener noreferrer">
+					{#if link.icon}
+						<img src={link.icon} alt="" />
+					{/if}
+					{link.label}<OpenInNewIcon />
+				</a>
+			{/each}
 		</div>
 		<div class="social-actions" aria-label="公式SNS">
 			{#each socialLinks as link}
@@ -412,7 +470,12 @@
 		</div>
 		<div class="share-copy">
 			<h3>Share Text</h3>
-			<textarea bind:this={shareCopyElement} readonly value={shareText} aria-label="SNSシェア文"
+			<textarea
+				bind:this={shareCopyElement}
+				readonly
+				value={shareText}
+				rows="7"
+				aria-label="SNSシェア文"
 			></textarea>
 			<button type="button" onclick={copyShareText}>
 				{hasCopiedShareText ? 'コピーしました' : 'シェア文をコピー'}
@@ -1063,6 +1126,17 @@
 		gap: 22px;
 	}
 
+	.timeline-rail {
+		position: relative;
+		z-index: 2;
+		display: grid;
+		align-self: start;
+		align-content: start;
+		width: 76px;
+		gap: 8px;
+		justify-items: center;
+	}
+
 	.timeline li.future::before {
 		position: absolute;
 		top: -24px;
@@ -1096,7 +1170,6 @@
 
 	.timeline-body {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
 		gap: 20px;
 		align-items: stretch;
 		padding: 20px;
@@ -1122,28 +1195,28 @@
 	}
 
 	.timeline-badges {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-		align-content: flex-start;
-		justify-content: flex-end;
-		max-width: 250px;
+		display: grid;
+		align-content: start;
+		gap: 6px;
+		justify-items: center;
 	}
 
 	.timeline-badges a {
 		display: grid;
 		width: 52px;
 		aspect-ratio: 1;
-		place-items: center;
+		align-content: center;
+		justify-items: center;
+		gap: 1px;
 		color: var(--ink);
-		background: rgba(255, 255, 255, 0.08);
+		background: rgba(9, 12, 18, 0.9);
 		border: 1px solid rgba(255, 248, 232, 0.2);
 		border-radius: 50%;
 		font-size: 0.66rem;
 		font-weight: 700;
-		line-height: 1.15;
+		line-height: 1;
 		text-align: center;
-		letter-spacing: 0.04em;
+		letter-spacing: 0;
 	}
 
 	.timeline-badges a span {
@@ -1153,14 +1226,54 @@
 	.timeline-badges .featured-badge {
 		width: 76px;
 		color: #130f0a;
-		background: linear-gradient(135deg, var(--gold), #f8dfa2);
+		background: linear-gradient(135deg, #ffe7a3, var(--gold));
 		border-color: rgba(255, 255, 255, 0.52);
-		box-shadow: 0 12px 32px rgba(239, 202, 128, 0.26);
+		box-shadow:
+			0 0 0 4px rgba(239, 202, 128, 0.14),
+			0 14px 34px rgba(239, 202, 128, 0.34);
 		font-size: 0.78rem;
 	}
 
+	.timeline-feature-card {
+		display: grid;
+		grid-template-columns: clamp(92px, 14vw, 132px) minmax(0, 1fr);
+		gap: 16px;
+		align-items: center;
+		padding: 14px;
+		color: var(--ink);
+		background:
+			linear-gradient(135deg, rgba(239, 202, 128, 0.2), rgba(137, 194, 217, 0.08)),
+			rgba(255, 255, 255, 0.065);
+		border: 1px solid rgba(239, 202, 128, 0.34);
+		border-radius: 8px;
+	}
+
+	.timeline-feature-card img {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: 4px;
+		box-shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
+	}
+
+	.timeline-feature-card span {
+		display: grid;
+		gap: 7px;
+	}
+
+	.timeline-feature-card small,
+	.timeline-feature-card time {
+		color: var(--gold);
+		font-size: 0.74rem;
+		letter-spacing: 0.08em;
+	}
+
+	.timeline-feature-card strong {
+		font-size: clamp(1.06rem, 2vw, 1.32rem);
+		line-height: 1.35;
+	}
+
 	.poster-strip {
-		grid-column: 1 / -1;
 		display: flex;
 		gap: 12px;
 		overflow-x: auto;
@@ -1234,12 +1347,28 @@
 	}
 
 	.footer-cta {
+		background: #030303;
 		text-align: center;
 	}
 
 	.footer-actions {
 		justify-content: center;
 		margin: 28px auto;
+	}
+
+	.share-link-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		justify-content: center;
+		margin: -8px auto 28px;
+	}
+
+	.share-link-actions img {
+		width: 16px;
+		height: 16px;
+		object-fit: contain;
+		filter: brightness(0) invert(1);
 	}
 
 	.share-copy {
@@ -1258,8 +1387,9 @@
 	.share-copy textarea {
 		box-sizing: border-box;
 		width: 100%;
-		min-height: 8.5rem;
-		resize: vertical;
+		min-height: 16rem;
+		resize: none;
+		overflow: hidden;
 		padding: 12px;
 		color: var(--ink);
 		background: rgba(9, 12, 18, 0.42);
@@ -1274,9 +1404,9 @@
 		min-height: 40px;
 		margin-top: 12px;
 		padding: 9px 14px;
-		color: #15100a;
-		background: var(--gold);
-		border: 0;
+		color: var(--gold);
+		background: transparent;
+		border: 1px solid rgba(239, 202, 128, 0.72);
 		border-radius: 6px;
 		font: inherit;
 		font-weight: 700;
@@ -1304,7 +1434,7 @@
 		width: 20px;
 		height: 20px;
 		object-fit: contain;
-		filter: invert(1);
+		filter: brightness(0) invert(1);
 	}
 
 	.footer-logo {
@@ -1313,7 +1443,7 @@
 		height: auto;
 		margin: 34px auto 0;
 		opacity: 0.78;
-		filter: invert(1);
+		filter: brightness(0) invert(1);
 	}
 
 	@media (max-width: 1100px) {
@@ -1356,7 +1486,7 @@
 		}
 
 		.timeline li {
-			grid-template-columns: 62px minmax(0, 1fr);
+			grid-template-columns: 70px minmax(0, 1fr);
 			gap: 14px;
 		}
 
@@ -1370,14 +1500,22 @@
 			font-size: 0.78rem;
 		}
 
-		.timeline-body {
-			grid-template-columns: 1fr;
-			padding: 16px;
+		.timeline-rail {
+			width: 60px;
 		}
 
-		.timeline-badges {
-			justify-content: flex-start;
-			max-width: none;
+		.timeline-badges a {
+			width: 46px;
+			font-size: 0.58rem;
+		}
+
+		.timeline-badges .featured-badge {
+			width: 60px;
+			font-size: 0.66rem;
+		}
+
+		.timeline-body {
+			padding: 16px;
 		}
 
 		.poster-placeholder {
@@ -1396,16 +1534,24 @@
 		.hero-actions,
 		.inline-actions,
 		.alps-actions,
-		.footer-actions {
+		.footer-actions,
+		.share-link-actions {
 			align-items: stretch;
 			flex-direction: column;
 		}
 
 		.button,
 		.inline-actions a,
-		.timeline-copy a {
+		.timeline-copy a,
+		.share-link-actions a {
 			width: 100%;
 			box-sizing: border-box;
+		}
+
+		.timeline-feature-card {
+			grid-template-columns: 82px minmax(0, 1fr);
+			gap: 12px;
+			padding: 12px;
 		}
 
 		.concert-facts > div {
