@@ -155,6 +155,6 @@ export const progressStages = ['ふもと', '登山開始', '中腹', '山頂', 
 
 export const shareText = `『第一番』から五年。
 カンバスは『アルペン』へ。
-Orchestra Canvas Tokyo 第1回定期演奏会から5年、そして第17回定期演奏会《アルプス交響曲》へ。
+https://www.orch-canvas.tokyo/special/5th-alps
 
-#オケキャン #OrchestraCanvasTokyo #OCT5周年 #アルプス交響曲`;
+#OrchCanvas #聴こっとOCT #アルプス交響曲`;

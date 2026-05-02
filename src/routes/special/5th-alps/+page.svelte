@@ -51,9 +51,7 @@
 	const sharePageUrl = 'https://www.orch-canvas.tokyo/special/5th-alps';
 	const shareLinks = $derived([
 		{
-			url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(
-				sharePageUrl
-			)}`,
+			url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
 			icon: xIcon,
 			label: 'Xでシェア'
 		},
@@ -178,10 +176,8 @@
 		<div class="hero-copy">
 			<p class="eyebrow en">OCT 5th Anniversary</p>
 			<h1 id="hero-title">
-				<span>『第一番』から</span>
-				<span>五年。</span>
-				<span>カンバスは</span>
-				<span>『アルペン』へ。</span>
+				<span>『第一番』から五年。</span>
+				<span>カンバスは『アルペン』へ。</span>
 			</h1>
 			<div class="hero-dates" aria-label="第1回定期演奏会から第17回定期演奏会への歩み">
 				<time datetime="2021-08-29">2021.8.29 第1回定期演奏会</time>
@@ -349,23 +345,15 @@
 					<li class="timeline-feature-item">
 						<div class="timeline-rail">
 							<div class="timeline-badges timeline-feature-badges" aria-label="第17回定期演奏会">
-								<a
-									class="featured-badge"
-									href="/concerts/{featuredConcert.slug}"
-									aria-label="{featuredConcert.title}を見る"
-								>
+								<div class="featured-badge" aria-label={featuredConcert.title}>
 									{#each getConcertBadgeLabel(featuredConcert).split('\n') as line}
 										<span>{line}</span>
 									{/each}
-								</a>
+								</div>
 							</div>
 						</div>
 						<div class="timeline-body timeline-feature-body">
-							<a
-								class="timeline-feature-card"
-								href="/concerts/{featuredConcert.slug}"
-								aria-label="{featuredConcert.title}を見る"
-							>
+							<div class="timeline-feature-card">
 								<img src={featuredConcert.flyer.src} alt={featuredConcert.title} loading="lazy" />
 								<span>
 									<small class="en">17th Regular Concert</small>
@@ -375,7 +363,7 @@
 											.name}</time
 									>
 								</span>
-							</a>
+							</div>
 						</div>
 					</li>
 				{/if}
@@ -449,22 +437,28 @@
 			</a>
 			<a class="button secondary" href="/concerts/regular-17">演奏会情報を見る</a>
 		</div>
-		<div class="share-link-actions" aria-label="SNSでシェア">
-			{#each shareLinks as link}
-				<a class="button secondary" href={link.url} target="_blank" rel="noopener noreferrer">
-					{#if link.icon}
-						<img src={link.icon} alt="" />
-					{/if}
-					{link.label}<OpenInNewIcon />
-				</a>
-			{/each}
+		<div class="footer-subsection">
+			<h3>SNSでシェア</h3>
+			<div class="share-link-actions" aria-label="SNSでシェア">
+				{#each shareLinks as link}
+					<a class="button secondary" href={link.url} target="_blank" rel="noopener noreferrer">
+						{#if link.icon}
+							<img src={link.icon} alt="" />
+						{/if}
+						{link.label}<OpenInNewIcon />
+					</a>
+				{/each}
+			</div>
 		</div>
-		<div class="social-actions" aria-label="公式SNS">
-			{#each socialLinks as link}
-				<a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.label}>
-					<img src={link.icon} alt="" />
-				</a>
-			{/each}
+		<div class="footer-subsection">
+			<h3>公式SNS</h3>
+			<div class="social-actions" aria-label="公式SNS">
+				{#each socialLinks as link}
+					<a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.label}>
+						<img src={link.icon} alt="" />
+					</a>
+				{/each}
+			</div>
 		</div>
 		<div class="share-copy">
 			<h3>Share Text</h3>
@@ -479,7 +473,9 @@
 				{hasCopiedShareText ? 'コピーしました' : 'シェア文をコピー'}
 			</button>
 		</div>
-		<img class="footer-logo" src={logo} alt="Orchestra Canvas Tokyo" />
+		<div class="footer-logo-panel">
+			<img class="footer-logo" src={logo} alt="Orchestra Canvas Tokyo" />
+		</div>
 	</section>
 </article>
 
@@ -589,9 +585,9 @@
 
 	h1 {
 		display: grid;
-		gap: 0.18em;
+		gap: 0.22em;
 		margin: 0;
-		font-size: clamp(2.5rem, 5.8vw, 5.4rem);
+		font-size: clamp(2.4rem, 6vw, 5rem);
 		line-height: 1.08;
 		letter-spacing: 0.02em;
 		word-break: keep-all;
@@ -599,6 +595,7 @@
 
 	h1 span {
 		display: block;
+		white-space: nowrap;
 	}
 
 	h2 {
@@ -1030,7 +1027,8 @@
 		justify-items: center;
 	}
 
-	.timeline-badges a {
+	.timeline-badges a,
+	.timeline-badges .featured-badge {
 		display: grid;
 		width: 52px;
 		aspect-ratio: 1;
@@ -1048,7 +1046,8 @@
 		letter-spacing: 0;
 	}
 
-	.timeline-badges a span {
+	.timeline-badges a span,
+	.timeline-badges .featured-badge span {
 		display: block;
 	}
 
@@ -1230,7 +1229,7 @@
 		flex-wrap: wrap;
 		gap: 10px;
 		justify-content: center;
-		margin: -8px auto 28px;
+		margin: 0 auto;
 	}
 
 	.share-link-actions img {
@@ -1238,6 +1237,22 @@
 		height: 16px;
 		object-fit: contain;
 		filter: brightness(0) invert(1);
+	}
+
+	.footer-subsection {
+		display: grid;
+		gap: 14px;
+		width: min(100%, 780px);
+		margin: 0 auto 28px;
+	}
+
+	.footer-subsection h3 {
+		margin: 0;
+		color: var(--gold);
+		font-size: 0.82rem;
+		font-family: var(--english-font-family);
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
 	}
 
 	.share-copy {
@@ -1316,9 +1331,17 @@
 		display: block;
 		width: min(290px, 66vw);
 		height: auto;
-		margin: clamp(52px, 8vw, 86px) auto 0;
+		margin: 0 auto;
 		opacity: 0.92;
 		filter: brightness(0) invert(1);
+	}
+
+	.footer-logo-panel {
+		display: grid;
+		width: min(100%, 780px);
+		min-height: clamp(148px, 18vw, 220px);
+		margin-top: clamp(46px, 7vw, 84px);
+		place-items: center;
 	}
 
 	@media (max-width: 1100px) {
@@ -1349,7 +1372,7 @@
 		}
 
 		h1 {
-			font-size: clamp(2.2rem, 10.4vw, 3.25rem);
+			font-size: clamp(1.55rem, 6.6vw, 3.1rem);
 		}
 
 		.number-grid,
@@ -1380,7 +1403,8 @@
 			width: 60px;
 		}
 
-		.timeline-badges a {
+		.timeline-badges a,
+		.timeline-badges .featured-badge {
 			width: 46px;
 			font-size: 0.58rem;
 		}
