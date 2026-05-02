@@ -53,19 +53,19 @@
 		{
 			url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
 			icon: xIcon,
-			label: 'Xでシェア'
+			label: 'X'
 		},
 		{
 			url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sharePageUrl)}`,
 			icon: facebookIcon,
-			label: 'Facebookでシェア'
+			label: 'Facebook'
 		},
 		{
 			url: `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(
 				sharePageUrl
 			)}&text=${encodeURIComponent(shareText)}`,
 			icon: undefined,
-			label: 'LINEでシェア'
+			label: 'LINE'
 		}
 	]);
 	const numberValues: Record<
@@ -281,7 +281,7 @@
 			{#each audienceComments as comment}
 				<figure>
 					<blockquote>{comment.body}</blockquote>
-					<figcaption>{comment.source}</figcaption>
+					<figcaption>――{comment.source}</figcaption>
 				</figure>
 			{/each}
 		</div>
@@ -321,7 +321,9 @@
 							{/if}
 							<h3>{item.title}</h3>
 							<p>{item.description}</p>
-							<a href={item.actionUrl}>{item.actionLabel}</a>
+							{#if item.year !== '2026'}
+								<a href={item.actionUrl}>{item.actionLabel}</a>
+							{/if}
 						</div>
 						{#if posterStripItems.length > 0 || !featuredConcert}
 							<div class="poster-strip" aria-label="{item.year}年の演奏会ポスター">
@@ -470,7 +472,7 @@
 				aria-label="SNSシェア文"
 			></textarea>
 			<button type="button" onclick={copyShareText}>
-				{hasCopiedShareText ? 'コピーしました' : 'シェア文をコピー'}
+				{hasCopiedShareText ? 'コピー済み' : 'コピー'}
 			</button>
 		</div>
 		<div class="footer-logo-panel">
@@ -916,8 +918,10 @@
 		margin-top: 14px;
 		color: rgba(239, 202, 128, 0.78);
 		font-size: 0.78rem;
+		font-style: italic;
 		font-weight: 700;
 		letter-spacing: 0.08em;
+		text-align: right;
 	}
 
 	.prototype-note {
@@ -1092,9 +1096,9 @@
 
 		52% {
 			box-shadow:
-				0 0 0 11px rgba(239, 202, 128, 0),
-				0 18px 46px rgba(239, 202, 128, 0.46);
-			transform: scale(1.035);
+				0 0 0 18px rgba(239, 202, 128, 0),
+				0 22px 54px rgba(239, 202, 128, 0.56);
+			transform: scale(1.08);
 		}
 	}
 
@@ -1214,13 +1218,15 @@
 	.footer-cta {
 		display: grid;
 		justify-items: center;
-		padding-block: clamp(116px, 16vw, 220px);
+		padding-top: clamp(116px, 16vw, 220px);
+		padding-bottom: clamp(92px, 12vw, 164px);
 		background: #030303;
 		text-align: center;
 	}
 
 	.footer-actions {
 		justify-content: center;
+		width: min(100%, 780px);
 		margin: 28px auto;
 	}
 
@@ -1229,6 +1235,7 @@
 		flex-wrap: wrap;
 		gap: 10px;
 		justify-content: center;
+		width: min(100%, 780px);
 		margin: 0 auto;
 	}
 
@@ -1329,7 +1336,7 @@
 
 	.footer-logo {
 		display: block;
-		width: min(290px, 66vw);
+		width: min(360px, 72vw);
 		height: auto;
 		margin: 0 auto;
 		opacity: 0.92;
@@ -1339,8 +1346,8 @@
 	.footer-logo-panel {
 		display: grid;
 		width: min(100%, 780px);
-		min-height: clamp(148px, 18vw, 220px);
-		margin-top: clamp(46px, 7vw, 84px);
+		min-height: clamp(180px, 20vw, 260px);
+		margin-top: clamp(24px, 4vw, 52px);
 		place-items: center;
 	}
 

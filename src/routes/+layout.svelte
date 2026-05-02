@@ -174,7 +174,7 @@
 
 	// ハンバーガーメニュー
 	let isOpen = $state(false);
-	const transformX = $derived(isOpen ? '0' : '300px');
+	const transformX = $derived(isOpen ? '0' : '100%');
 
 	$effect(() => {
 		if (!browser) return;
@@ -372,6 +372,8 @@
 	@media (max-width: 950px) {
 		#hamburger-menu-button {
 			display: flex;
+			position: relative;
+			z-index: 1001;
 			flex-direction: column;
 			justify-content: space-between;
 			height: 30px;
@@ -493,10 +495,12 @@
 	@media (max-width: 950px) {
 		header nav > ul {
 			position: fixed;
-			top: 110px;
+			inset: 0 0 0 auto;
+			box-sizing: border-box;
+			width: 100dvw;
 			right: 0;
-			padding: 0 30px 30px;
-			height: calc(100dvh - 110px);
+			padding: var(--header-height) var(--window-padding) var(--window-padding);
+			min-height: 100dvh;
 			background-color: var(--background-color);
 			overflow: auto;
 			transform: translateX(var(--translate-x));

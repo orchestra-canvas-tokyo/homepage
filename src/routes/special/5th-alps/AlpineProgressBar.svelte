@@ -56,26 +56,26 @@
 		bottom: 0;
 		left: 0;
 		z-index: 540;
-		height: clamp(30px, 5vw, 54px);
+		height: clamp(42px, 6.4vw, 72px);
 		pointer-events: none;
 		--mountain-shape: polygon(
 			0 100%,
-			0 66%,
-			5% 54%,
-			9% 73%,
-			14% 42%,
-			20% 70%,
-			27% 34%,
-			34% 78%,
-			41% 53%,
-			48% 82%,
-			56% 30%,
-			63% 68%,
-			70% 49%,
-			78% 80%,
-			86% 41%,
-			93% 66%,
-			100% 48%,
+			0 62%,
+			4% 50%,
+			8% 72%,
+			13% 35%,
+			19% 70%,
+			26% 23%,
+			33% 76%,
+			40% 46%,
+			48% 84%,
+			56% 18%,
+			64% 66%,
+			71% 41%,
+			79% 79%,
+			87% 29%,
+			94% 62%,
+			100% 38%,
 			100% 100%
 		);
 	}
@@ -89,38 +89,75 @@
 
 	.ridge {
 		background:
-			linear-gradient(180deg, rgba(255, 248, 232, 0.28), rgba(255, 248, 232, 0.1)),
-			linear-gradient(90deg, rgba(137, 194, 217, 0.2), rgba(239, 202, 128, 0.22));
+			linear-gradient(180deg, rgba(255, 248, 232, 0.14), rgba(255, 248, 232, 0.04)),
+			linear-gradient(90deg, rgba(7, 12, 18, 0.9), rgba(18, 24, 31, 0.86));
 	}
 
 	.fill {
-		right: auto;
-		width: var(--progress);
-		background: linear-gradient(90deg, #efca80 0%, #89c2d9 56%, #f7a56b 100%);
-		box-shadow: 0 0 20px rgba(239, 202, 128, 0.34);
-		transition: width 0.12s linear;
+		background:
+			linear-gradient(180deg, rgba(255, 248, 232, 0.22), rgba(255, 248, 232, 0)),
+			linear-gradient(90deg, #efca80 0%, #89c2d9 56%, #f7a56b 100%);
+		box-shadow: 0 0 22px rgba(239, 202, 128, 0.32);
+		mask-image: linear-gradient(90deg, #000 0 var(--progress), transparent var(--progress) 100%);
+		-webkit-mask-image: linear-gradient(
+			90deg,
+			#000 0 var(--progress),
+			transparent var(--progress) 100%
+		);
+		transition:
+			mask-image 0.12s linear,
+			-webkit-mask-image 0.12s linear;
+	}
+
+	.fill::after {
+		position: absolute;
+		top: 18%;
+		bottom: 6%;
+		left: var(--progress);
+		width: clamp(10px, 1.5vw, 18px);
+		border-radius: 999px;
+		background: linear-gradient(90deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0));
+		box-shadow:
+			0 0 18px rgba(247, 165, 107, 0.45),
+			0 0 30px rgba(137, 194, 217, 0.24);
+		content: '';
+		opacity: 0.62;
+		transform: translateX(-50%);
+		animation: progress-edge-pulse 1.8s ease-in-out infinite;
 	}
 
 	@media (max-width: 700px) {
 		.progress {
-			height: 34px;
+			height: 44px;
 			--mountain-shape: polygon(
 				0 100%,
-				0 70%,
-				11% 52%,
-				21% 74%,
-				33% 38%,
-				47% 78%,
-				61% 48%,
-				75% 80%,
-				100% 54%,
+				0 67%,
+				10% 48%,
+				20% 75%,
+				33% 28%,
+				47% 80%,
+				61% 39%,
+				76% 83%,
+				100% 43%,
 				100% 100%
 			);
 		}
 	}
 
+	@keyframes progress-edge-pulse {
+		0%,
+		100% {
+			opacity: 0.42;
+		}
+		50% {
+			opacity: 0.78;
+		}
+	}
+
 	@media (prefers-reduced-motion: reduce) {
-		.fill {
+		.fill,
+		.fill::after {
+			animation: none;
 			transition: none;
 		}
 	}
