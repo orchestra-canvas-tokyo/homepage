@@ -132,22 +132,22 @@
 						<td>-</td>
 					</tr>
 					<tr>
-						<td>3,000〜4,999</td>
-						<td>2名様</td>
+						<td>3,000〜5,999</td>
+						<td>1名様</td>
 						<td>1年間</td>
 						<td>-</td>
 						<td>-</td>
 					</tr>
 					<tr>
-						<td>5,000〜6,999</td>
-						<td>4名様</td>
+						<td>6,000〜6,999</td>
+						<td>3名様</td>
 						<td>1年間</td>
 						<td>-</td>
 						<td>-</td>
 					</tr>
 					<tr>
 						<td>7,000〜9,999</td>
-						<td>6名様</td>
+						<td>4名様</td>
 						<td>1年間</td>
 						<td>-</td>
 						<td>-</td>
@@ -196,22 +196,22 @@
 						<td colspan="2">-</td>
 					</tr>
 					<tr>
-						<td>3,000〜4,999</td>
-						<td>2名様</td>
+						<td>3,000〜5,999</td>
+						<td>1名様</td>
 						<td>1年間</td>
 						<td>-</td>
 						<td colspan="2">-</td>
 					</tr>
 					<tr>
-						<td>5,000〜6,999</td>
-						<td>4名様</td>
+						<td>6,000〜6,999</td>
+						<td>3名様</td>
 						<td>1年間</td>
 						<td>-</td>
 						<td colspan="2">-</td>
 					</tr>
 					<tr>
 						<td>7,000〜9,999</td>
-						<td>6名様</td>
+						<td>4名様</td>
 						<td>1年間</td>
 						<td>-</td>
 						<td colspan="2">-</td>
