@@ -5,11 +5,12 @@
 
 	let { data }: { data: PageServerData } = $props();
 
-	const items = $derived.by<{ title: string; duration: string; url: string }[]>(() =>
+	const items = $derived.by(() =>
 		data.reports.map((report, index) => ({
 			title: `第${index + 1}期`,
 			duration: report.duration,
-			url: `/about/accounting/fiscal-year-${index + 1}`
+			pdf: report.pdf,
+			activityReportPdf: report.activityReportPdf
 		}))
 	);
 </script>
@@ -38,7 +39,13 @@
 	<h1 class="en">accounting</h1>
 	<h2>決算報告</h2>
 	{#each items as item}
-		<p>> <a href={item.url}>{item.title}</a>（{item.duration}）</p>
+		<p>
+			> {item.title}（{item.duration}）
+			<a href={item.pdf}>決算報告書</a>
+			{#if item.activityReportPdf}
+				<span class="spacer"></span><a href={item.activityReportPdf}>活動収支報告書</a>
+			{/if}
+		</p>
 	{/each}
 </article>
 
@@ -72,5 +79,10 @@
 
 	a {
 		color: var(--main-color);
+	}
+
+	.spacer {
+		display: inline-block;
+		width: 24px;
 	}
 </style>
