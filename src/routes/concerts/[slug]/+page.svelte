@@ -8,6 +8,7 @@
 	import Slider from '$lib/components/Slider.svelte';
 	import Flyer from '$lib/components/Flyer.svelte';
 	import OpenInNewIcon from '$lib/components/OpenInNewIcon.svelte';
+	import FifthAnniversaryAlpsLink from '$lib/components/FifthAnniversaryAlpsLink.svelte';
 
 	let { data }: { data: PageServerData } = $props();
 </script>
@@ -35,6 +36,10 @@
 <article>
 	<h1 class="en">concerts</h1>
 	<h2>{data.title}</h2>
+
+	{#if data.slug === 'regular-17'}
+		<FifthAnniversaryAlpsLink />
+	{/if}
 
 	{#if data.message}
 		<!-- 臨時のお知らせはタイトル直下に表示 -->

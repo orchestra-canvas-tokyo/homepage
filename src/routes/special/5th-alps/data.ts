@@ -81,7 +81,7 @@ export const numberCardDefinitions: AnniversaryNumberCard[] = [
 	{
 		key: 'snsFollowers',
 		label: 'SNSフォロワー数',
-		description: 'SNSで広がるOCTとの接点。レビュー用の仮値です'
+		description: 'SNSで広がるOCTとの接点'
 	}
 ];
 

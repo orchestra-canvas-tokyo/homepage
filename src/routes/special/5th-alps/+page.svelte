@@ -72,8 +72,8 @@
 		AnniversaryNumberCardKey,
 		{ value: number; suffix: string; decimals?: number }
 	> = $derived({
-		concerts: { value: 17, suffix: '+' },
-		programs: { value: 80, suffix: '+' },
+		concerts: { value: data.anniversaryStats.concertCount, suffix: '+' },
+		programs: { value: data.anniversaryStats.programCount, suffix: '+' },
 		attendance: {
 			value: Number(data.stats.totalAttendance.replaceAll(',', '').replace('名', '')),
 			suffix: '+'
@@ -281,11 +281,10 @@
 			{#each audienceComments as comment}
 				<figure>
 					<blockquote>{comment.body}</blockquote>
-					<figcaption>――{comment.source}</figcaption>
+					<figcaption><span class="quote-source-prefix">――</span>{comment.source}</figcaption>
 				</figure>
 			{/each}
 		</div>
-		<p class="prototype-note">掲載コメントとSNSフォロワー数は、役員レビュー用の仮データです。</p>
 	</section>
 
 	<section class="section timeline-section" aria-labelledby="timeline-title">
@@ -924,10 +923,10 @@
 		text-align: right;
 	}
 
-	.prototype-note {
-		margin: 14px 0 0;
-		color: rgba(255, 248, 232, 0.58);
-		font-size: 0.78rem;
+	.quote-source-prefix {
+		display: inline-block;
+		margin-right: 0.35em;
+		letter-spacing: 0;
 	}
 
 	.timeline {

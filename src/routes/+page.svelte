@@ -7,6 +7,7 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import FifthAnniversaryAlpsLink from '$lib/components/FifthAnniversaryAlpsLink.svelte';
 	import { onMount } from 'svelte';
 
 	let { data }: { data: PageServerData } = $props();
@@ -123,10 +124,7 @@
 <Meta title="" canonical="/" />
 
 <div class="slideshow" bind:this={slideshowEl}>
-	<a href="/special/5th-alps" class="anniversary-link">
-		<span class="en">special</span>
-		<strong>OCT 5周年 × アルペン</strong>
-	</a>
+	<FifthAnniversaryAlpsLink variant="floating" />
 	<Splide
 		hasTrack={false}
 		options={{
@@ -173,49 +171,12 @@
 		width: var(--slideshow-width);
 	}
 
-	.anniversary-link {
-		position: absolute;
-		top: 4px;
-		right: 14px;
-		z-index: 20;
-		display: grid;
-		gap: 2px;
-		max-width: min(290px, calc(100% - 28px));
-		padding: 10px 13px;
-		color: var(--main-color);
-		background: rgba(10, 6, 6, 0.76);
-		border: 1px solid rgba(255, 255, 255, 0.22);
-		border-radius: 6px;
-		backdrop-filter: blur(12px);
-		line-height: 1.35;
-	}
-
-	.anniversary-link span {
-		height: auto;
-		color: #efca80;
-		font-size: 0.62rem;
-		letter-spacing: 0.18em;
-	}
-
-	.anniversary-link strong {
-		font-size: 0.88rem;
-		letter-spacing: 0.06em;
-	}
-
 	@media (max-width: 950px) {
 		.slideshow {
 			--slideshow-height: calc(
 				100dvh - var(--header-height) - var(--window-padding) - 26px - var(--mobile-news-height)
 			);
 			--slideshow-width: calc(min(100dvw, 1280px));
-		}
-
-		.anniversary-link {
-			top: auto;
-			bottom: -42px;
-			right: 50%;
-			transform: translateX(50%);
-			text-align: center;
 		}
 	}
 
