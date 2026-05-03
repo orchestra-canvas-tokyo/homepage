@@ -21,8 +21,8 @@ export type TimelineItem = {
 	year: string;
 	title: string;
 	description: string;
-	actionLabel: string;
-	actionUrl: string;
+	actionLabel?: string;
+	actionUrl?: string;
 	visualLabel: string;
 };
 
@@ -32,7 +32,7 @@ export type TimelinePosterItem = {
 	type: 'regular' | 'chamber' | 'participation';
 	number?: number;
 	date: string;
-	flyer: {
+	flyer?: {
 		src: string;
 		alt: string;
 	};
@@ -111,42 +111,42 @@ export const timelineItems: TimelineItem[] = [
 	},
 	{
 		year: '2022',
-		title: '配信で広がるCanvas',
-		description: '会場の熱量を動画でも届け、OCTを知る入口が客席の外へ広がりました。',
-		actionLabel: 'YouTubeへ',
-		actionUrl: 'https://www.youtube.com/channel/UCX2SZ5NViwsaOza3biDNjIw',
+		title: 'マーラーの1番',
+		description:
+			'最初の節目となる第5回定期演奏会ではマーラーの交響曲第1番を演奏。\n大曲に対峙するシーズンを通し、団員のつながりは強固になっていきました。',
+		actionLabel: '第5回定期演奏会を見る',
+		actionUrl: '/concerts/regular-5',
 		visualLabel: 'Streaming'
 	},
 	{
 		year: '2023',
 		title: '音楽の幅を広げる',
-		description: '定期演奏会と室内楽を通じて、編成や時代を横断する企画が増えていきました。',
-		actionLabel: 'アーカイブへ',
-		actionUrl: '/concerts/archives',
+		description: '定期演奏会や室内楽演奏会を通じて、様々な時代や作曲家への経験を深めました。',
 		visualLabel: 'Repertoire'
 	},
 	{
 		year: '2024',
-		title: '客席と画面の向こうへ',
-		description: '来場者とオンライン視聴者の両方に届く、OCTらしい回遊の形が育ちました。',
-		actionLabel: 'OCTについて',
-		actionUrl: '/about/concepts',
+		title: '室内楽演奏会',
+		description:
+			'OCTでは設立当初から室内楽演奏会を精力的に開催。オーケストラの礎となる団員間の交流やアンサンブル力を大事にしてきました。',
 		visualLabel: 'Audience'
 	},
 	{
 		year: '2025',
-		title: '次の挑戦へ',
-		description: '積み重ねた経験を、さらに大きな作品と企画へつなげる準備の年になりました。',
-		actionLabel: 'ニュースへ',
-		actionUrl: '/news',
+		title: '大曲へ',
+		description:
+			'第13回定期演奏会ではブルックナーの交響曲第8番を演奏。\n大曲への挑戦を通し、OCTは着実に成長を重ねていきます。',
+		actionLabel: '演奏会情報を見る',
+		actionUrl: '/concerts/regular-13',
 		visualLabel: 'Next Step'
 	},
 	{
 		year: '2026',
-		title: 'アルペンへ',
-		description: '第17回定期演奏会《アルプス交響曲》。五年の歩みは次の大きな景色へ向かいます。',
-		actionLabel: '演奏会情報へ',
-		actionUrl: '/concerts/regular-17',
+		title: 'CanvasはYouTubeへも',
+		description:
+			'YouTubeのチャンネル登録者数は1.5万人を突破。\n会場の熱量は次第に動画へも広がり、OCTを知る入口が客席の外へ広がっています。',
+		actionLabel: 'YouTubeへ',
+		actionUrl: 'https://www.youtube.com/channel/UCX2SZ5NViwsaOza3biDNjIw',
 		visualLabel: 'Eine Alpensinfonie'
 	}
 ];

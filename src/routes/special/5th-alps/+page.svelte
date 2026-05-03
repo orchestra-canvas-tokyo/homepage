@@ -24,6 +24,7 @@
 	} from './data';
 
 	type TimelineConcert = PageServerData['timelinePosterGroups'][number]['concerts'][number];
+	type TimelineFlyerConcert = TimelineConcert & { flyer: NonNullable<TimelineConcert['flyer']> };
 
 	let { data }: { data: PageServerData } = $props();
 
@@ -127,10 +128,14 @@
 		if (concert.type === 'chamber' && concert.number) return `第${concert.number}回\n室内楽`;
 		return '参加\n公演';
 	};
-	const getTimelinePosterItems = (concerts: TimelineConcert[]) =>
-		concerts.filter(
-			(concert) => concert.slug !== 'participation-lfj-2026' && concert.slug !== 'regular-17'
-		);
+	const hasTimelineFlyer = (concert: TimelineConcert): concert is TimelineFlyerConcert =>
+		Boolean(concert.flyer);
+	const getTimelinePosterItems = (concerts: TimelineConcert[]): TimelineFlyerConcert[] =>
+		concerts
+			.filter(hasTimelineFlyer)
+			.filter(
+				(concert) => concert.slug !== 'participation-lfj-2026' && concert.slug !== 'regular-17'
+			);
 	const getTimelineBadgeItems = (concerts: TimelineConcert[]) =>
 		concerts.filter((concert) => concert.slug !== 'regular-17');
 	const getFeaturedTimelineConcert = (concerts: TimelineConcert[]) =>
@@ -319,8 +324,12 @@
 								<span class="current-location">現在地</span>
 							{/if}
 							<h3>{item.title}</h3>
-							<p>{item.description}</p>
-							{#if item.year !== '2026'}
+							<p class="timeline-description">
+								{#each item.description.split('\n') as line}
+									<span>{line}</span>
+								{/each}
+							</p>
+							{#if item.actionUrl && item.actionLabel}
 								<a href={item.actionUrl}>{item.actionLabel}</a>
 							{/if}
 						</div>
@@ -355,7 +364,9 @@
 						</div>
 						<div class="timeline-body timeline-feature-body">
 							<div class="timeline-feature-card">
-								<img src={featuredConcert.flyer.src} alt={featuredConcert.title} loading="lazy" />
+								{#if featuredConcert.flyer}
+									<img src={featuredConcert.flyer.src} alt={featuredConcert.title} loading="lazy" />
+								{/if}
 								<span>
 									<small class="en">17th Regular Concert</small>
 									<strong>{featuredConcert.title}《アルプス交響曲》</strong>
@@ -1009,6 +1020,10 @@
 
 	.timeline-copy p {
 		margin: 0 0 16px;
+	}
+
+	.timeline-description span {
+		display: block;
 	}
 
 	.current-location {
