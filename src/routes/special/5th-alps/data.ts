@@ -17,6 +17,17 @@ export type AudienceComment = {
 	source: string;
 };
 
+export type OctSlotCategory = 'quick' | 'trial' | 'deep';
+
+export type OctSlotVideo = {
+	category: OctSlotCategory;
+	videoId: string;
+	title: string;
+	durationSeconds: number;
+	durationLabel: string;
+	description?: string;
+};
+
 export type TimelineItem = {
 	year: string;
 	title: string;
@@ -97,6 +108,153 @@ export const audienceComments: AudienceComment[] = [
 	{
 		body: 'OCTの演奏で、オーケストラが少し身近になりました。',
 		source: 'SNSより'
+	}
+];
+
+export const octSlotVideos: OctSlotVideo[] = [
+	{
+		category: 'quick',
+		videoId: 'ieD4kijRPMs',
+		title: 'マーラー / 交響曲第1番 第1楽章より',
+		durationSeconds: 67,
+		durationLabel: '1:07',
+		description: '大きな一歩を短く味わう、OCTらしいマーラーの入口。'
+	},
+	{
+		category: 'quick',
+		videoId: 'LH__P9qkWqM',
+		title: 'ビゼー / 「アルルの女」第2組曲 ファランドール より',
+		durationSeconds: 52,
+		durationLabel: '0:52',
+		description: '勢いのあるフィナーレをサクッと浴びたいときに。'
+	},
+	{
+		category: 'quick',
+		videoId: 'C3JZrge6prU',
+		title: '忙しい人のための「結婚行進曲」',
+		durationSeconds: 16,
+		durationLabel: '0:16',
+		description: '一瞬で気分を切り替える、超短尺のハイライト。'
+	},
+	{
+		category: 'quick',
+		videoId: 'zsjgmnn6yOs',
+		title: 'スメタナ / 連作交響詩《我が祖国》「モルダウ」より',
+		durationSeconds: 59,
+		durationLabel: '0:59',
+		description: '流れる旋律だけをまず聴いてみたい人へ。'
+	},
+	{
+		category: 'quick',
+		videoId: 'iG4cacIzBvs',
+		title: 'ビゼー / 「アルルの女」より「メヌエット」',
+		durationSeconds: 43,
+		durationLabel: '0:43',
+		description: '短い時間で、木管の色合いを楽しめる一曲。'
+	},
+	{
+		category: 'quick',
+		videoId: 'AVz9r9eDH_o',
+		title: '久石 譲 / オーケストラのための「となりのトトロ」より',
+		durationSeconds: 56,
+		durationLabel: '0:56',
+		description: '親しみやすい旋律からOCTの響きに触れる一本。'
+	},
+	{
+		category: 'trial',
+		videoId: 'osafYLL8DsM',
+		title: 'チャイコフスキー / 歌劇《エフゲニー・オネーギン》より ポロネーズ',
+		durationSeconds: 293,
+		durationLabel: '4:53',
+		description: '華やかなオーケストラサウンドを一曲だけ試したいときに。'
+	},
+	{
+		category: 'trial',
+		videoId: 'OyG6i7XK63c',
+		title: 'チャイコフスキー / 歌劇《エフゲニー・オネーギン》より ワルツ',
+		durationSeconds: 397,
+		durationLabel: '6:37',
+		description: '軽やかな流れで、定期演奏会の空気をつかめます。'
+	},
+	{
+		category: 'trial',
+		videoId: 'r02EfwXnhGE',
+		title: 'メンデルスゾーン / 劇付随音楽「真夏の夜の夢」より 結婚行進曲',
+		durationSeconds: 310,
+		durationLabel: '5:10',
+		description: 'よく知られた旋律をOCTの演奏で。'
+	},
+	{
+		category: 'trial',
+		videoId: 'k2Otejum_-Y',
+		title: 'メンデルスゾーン / 劇付随音楽「真夏の夜の夢」より 夜想曲',
+		durationSeconds: 378,
+		durationLabel: '6:18',
+		description: '落ち着いた時間に聴きたい、柔らかな管弦楽。'
+	},
+	{
+		category: 'trial',
+		videoId: 'fAQrDo10CSs',
+		title: 'メンデルスゾーン / 劇付随音楽「真夏の夜の夢」より スケルツォ',
+		durationSeconds: 296,
+		durationLabel: '4:56',
+		description: '軽快な音の動きで、数分だけ集中して聴ける一本。'
+	},
+	{
+		category: 'trial',
+		videoId: 'TrN8xI1lMoE',
+		title: 'メンデルスゾーン / 序曲「真夏の夜の夢」',
+		durationSeconds: 799,
+		durationLabel: '13:19',
+		description: '15分以内で、物語性のある一曲をじっくり手前まで。'
+	},
+	{
+		category: 'deep',
+		videoId: '25eVPkMWyjY',
+		title: 'ストラヴィンスキー / バレエ音楽《火の鳥》組曲（1945年版）',
+		durationSeconds: 1772,
+		durationLabel: '29:32',
+		description: '色彩の変化を追いながら、OCTの大編成を味わう一本。'
+	},
+	{
+		category: 'deep',
+		videoId: '-e3AqNl9r1I',
+		title: 'チャイコフスキー / ヴァイオリン協奏曲 ニ長調 作品35',
+		durationSeconds: 2242,
+		durationLabel: '37:22',
+		description: 'ソリストとオーケストラの対話を腰を据えて。'
+	},
+	{
+		category: 'deep',
+		videoId: 'IPTsWd9SJNc',
+		title: 'シューマン / 交響曲第2番 ハ長調 作品61',
+		durationSeconds: 2500,
+		durationLabel: '41:40',
+		description: '交響曲全体の呼吸を楽しむ、じっくり枠の一曲。'
+	},
+	{
+		category: 'deep',
+		videoId: '29x7jiE_U0M',
+		title: 'メンデルスゾーン / 劇付随音楽「真夏の夜の夢」より',
+		durationSeconds: 1237,
+		durationLabel: '20:37',
+		description: '小品群の流れをまとめて聴きたいときに。'
+	},
+	{
+		category: 'deep',
+		videoId: '8c7INjezBOI',
+		title: 'ブルックナー / 交響曲第8番',
+		durationSeconds: 5126,
+		durationLabel: '1:25:26',
+		description: 'OCTの大曲への挑戦を、時間を取って受け止める一本。'
+	},
+	{
+		category: 'deep',
+		videoId: 's8h-xLJUdDc',
+		title: 'ワーグナー / 楽劇「トリスタンとイゾルデ」より 前奏曲と愛の死',
+		durationSeconds: 1074,
+		durationLabel: '17:54',
+		description: '濃密な響きに浸る、15分を超えるおすすめ。'
 	}
 ];
 

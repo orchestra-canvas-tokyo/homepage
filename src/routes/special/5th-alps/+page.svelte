@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import type { PageServerData } from './$types';
 	import dayjs from 'dayjs';
 	import 'dayjs/locale/ja';
@@ -16,20 +17,33 @@
 	import {
 		audienceComments,
 		numberCardDefinitions,
+		octSlotVideos,
 		pageDescription,
 		progressStages,
 		shareText,
 		timelineItems,
-		type AnniversaryNumberCardKey
+		type AnniversaryNumberCardKey,
+		type OctSlotCategory,
+		type OctSlotVideo
 	} from './data';
 
 	type TimelineConcert = PageServerData['timelinePosterGroups'][number]['concerts'][number];
 	type TimelineFlyerConcert = TimelineConcert & { flyer: NonNullable<TimelineConcert['flyer']> };
+	type OctSlotCategoryOption = {
+		value: OctSlotCategory;
+		label: string;
+		meta: string;
+	};
 
 	let { data }: { data: PageServerData } = $props();
 
 	let shareCopyElement = $state<HTMLTextAreaElement | null>(null);
 	let hasCopiedShareText = $state(false);
+	let selectedOctSlotCategory = $state<OctSlotCategory>('quick');
+	let selectedOctSlotVideo = $state<OctSlotVideo | undefined>(undefined);
+	let highlightedOctSlotTitle = $state('');
+	let isOctSlotSpinning = $state(false);
+	let octSlotSpinTimeout: number | undefined = undefined;
 
 	const firstFlyer = $derived(data.firstConcert.flyers?.[0]);
 	const alpsFlyer = $derived(data.alpsConcert.flyers?.[0]);
@@ -121,6 +135,28 @@
 			label: 'Facebook'
 		}
 	];
+	const octSlotCategoryOptions: OctSlotCategoryOption[] = [
+		{ value: 'quick', label: 'サクッと！', meta: 'Shorts' },
+		{ value: 'trial', label: 'お試し', meta: '15分以内' },
+		{ value: 'deep', label: 'じっくり', meta: '15分超' }
+	];
+	const selectedOctSlotCategoryOption = $derived(
+		octSlotCategoryOptions.find((category) => category.value === selectedOctSlotCategory) ??
+			octSlotCategoryOptions[0]
+	);
+	const octSlotCandidates = $derived(
+		octSlotVideos.filter((video) => video.category === selectedOctSlotCategory)
+	);
+	const selectedOctSlotVideoUrl = $derived(
+		selectedOctSlotVideo
+			? `https://www.youtube.com/watch?v=${selectedOctSlotVideo.videoId}`
+			: undefined
+	);
+	const selectedOctSlotEmbedUrl = $derived(
+		selectedOctSlotVideo
+			? `https://www.youtube-nocookie.com/embed/${selectedOctSlotVideo.videoId}`
+			: undefined
+	);
 
 	const getConcertBadgeLabel = (concert: TimelineConcert) => {
 		if (concert.slug === 'participation-lfj-2026') return 'LFJ\n2026';
@@ -141,6 +177,64 @@
 	const getFeaturedTimelineConcert = (concerts: TimelineConcert[]) =>
 		concerts.find((concert) => concert.slug === 'regular-17');
 	const formatTimelineDate = (date: string) => dayjs(date).locale('ja').format('YYYY.M.D');
+	const getNextOctSlotVideo = (candidates: OctSlotVideo[]) => {
+		if (candidates.length === 0) return undefined;
+		if (candidates.length === 1) return candidates[0];
+
+		const previousVideoId = selectedOctSlotVideo?.videoId;
+		const nextCandidates = candidates.filter((video) => video.videoId !== previousVideoId);
+		return nextCandidates[Math.floor(Math.random() * nextCandidates.length)];
+	};
+	const selectOctSlotCategory = (category: OctSlotCategory) => {
+		selectedOctSlotCategory = category;
+		selectedOctSlotVideo = undefined;
+		highlightedOctSlotTitle = '';
+		isOctSlotSpinning = false;
+		if (octSlotSpinTimeout) {
+			window.clearTimeout(octSlotSpinTimeout);
+			octSlotSpinTimeout = undefined;
+		}
+	};
+	const spinOctSlot = () => {
+		if (isOctSlotSpinning || octSlotCandidates.length === 0) return;
+
+		const nextVideo = getNextOctSlotVideo(octSlotCandidates);
+		if (!nextVideo) return;
+
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			selectedOctSlotVideo = nextVideo;
+			highlightedOctSlotTitle = nextVideo.title;
+			return;
+		}
+
+		isOctSlotSpinning = true;
+		const spinSteps = 12;
+		let step = 0;
+
+		const tick = () => {
+			const candidate = octSlotCandidates[step % octSlotCandidates.length];
+			highlightedOctSlotTitle = candidate?.title ?? '';
+			step += 1;
+
+			if (step < spinSteps) {
+				octSlotSpinTimeout = window.setTimeout(tick, 70 + step * 12);
+				return;
+			}
+
+			selectedOctSlotVideo = nextVideo;
+			highlightedOctSlotTitle = nextVideo.title;
+			isOctSlotSpinning = false;
+			octSlotSpinTimeout = undefined;
+		};
+
+		tick();
+	};
+
+	onDestroy(() => {
+		if (octSlotSpinTimeout) {
+			window.clearTimeout(octSlotSpinTimeout);
+		}
+	});
 
 	const copyShareText = async () => {
 		let copied = false;
@@ -289,6 +383,83 @@
 					<figcaption><span class="quote-source-prefix">――</span>{comment.source}</figcaption>
 				</figure>
 			{/each}
+		</div>
+	</section>
+
+	<section class="section oct-slot-section" aria-labelledby="oct-slot-title">
+		<div class="oct-slot-shell">
+			<div class="oct-slot-copy">
+				<p class="eyebrow en">OCT Slot</p>
+				<h2 id="oct-slot-title">聴こっとOCTスロット</h2>
+				<p>
+					気分に合わせてボタンを選んだら、今日の一本をスロットで。OCTの演奏動画からランダムにおすすめします。
+				</p>
+			</div>
+
+			<div class="oct-slot-machine" aria-live="polite">
+				<div class="oct-slot-categories" aria-label="動画カテゴリ">
+					{#each octSlotCategoryOptions as category}
+						<button
+							type="button"
+							class:active={selectedOctSlotCategory === category.value}
+							aria-pressed={selectedOctSlotCategory === category.value}
+							onclick={() => selectOctSlotCategory(category.value)}
+						>
+							<span>{category.label}</span>
+							<small>{category.meta}</small>
+						</button>
+					{/each}
+				</div>
+
+				<div class="oct-slot-reel" class:spinning={isOctSlotSpinning}>
+					<span class="oct-slot-reel-label en">Now Playing</span>
+					<strong>{highlightedOctSlotTitle || 'ボタンを押してスタート'}</strong>
+				</div>
+
+				<button
+					class="oct-slot-spin-button"
+					type="button"
+					disabled={isOctSlotSpinning || octSlotCandidates.length === 0}
+					onclick={spinOctSlot}
+				>
+					{isOctSlotSpinning ? '選曲中...' : 'ルーレットを回す'}
+				</button>
+
+				{#if octSlotCandidates.length === 0}
+					<p class="oct-slot-empty">このカテゴリの動画は準備中です。</p>
+				{/if}
+			</div>
+
+			{#if selectedOctSlotVideo && selectedOctSlotEmbedUrl && selectedOctSlotVideoUrl}
+				<article class="oct-slot-result">
+					<div class="oct-slot-result-copy">
+						<span class="oct-slot-duration"
+							>{selectedOctSlotCategoryOption.label} / {selectedOctSlotVideo.durationLabel}</span
+						>
+						<h3>{selectedOctSlotVideo.title}</h3>
+						{#if selectedOctSlotVideo.description}
+							<p>{selectedOctSlotVideo.description}</p>
+						{/if}
+						<a
+							class="button secondary"
+							href={selectedOctSlotVideoUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							YouTubeで開く<OpenInNewIcon />
+						</a>
+					</div>
+					<div class="oct-slot-video">
+						<iframe
+							src={selectedOctSlotEmbedUrl}
+							title={selectedOctSlotVideo.title}
+							loading="lazy"
+							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+							allowfullscreen
+						></iframe>
+					</div>
+				</article>
+			{/if}
 		</div>
 	</section>
 
@@ -940,6 +1111,266 @@
 		letter-spacing: 0;
 	}
 
+	.oct-slot-section {
+		padding-block: clamp(74px, 10vw, 138px);
+	}
+
+	.oct-slot-shell {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 0.72fr) minmax(320px, 1fr);
+		gap: clamp(22px, 4vw, 46px);
+		align-items: center;
+		max-width: 1160px;
+		margin-inline: auto;
+		padding: clamp(20px, 4vw, 42px);
+		background:
+			linear-gradient(
+				135deg,
+				rgba(247, 165, 107, 0.2),
+				rgba(137, 194, 217, 0.08) 46%,
+				rgba(239, 202, 128, 0.16)
+			),
+			rgba(5, 8, 12, 0.72);
+		border: 1px solid rgba(239, 202, 128, 0.34);
+		border-radius: 8px;
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 255, 255, 0.045),
+			0 28px 80px rgba(0, 0, 0, 0.28);
+		overflow: hidden;
+	}
+
+	.oct-slot-shell::before {
+		position: absolute;
+		inset: 14px;
+		content: '';
+		border: 1px dashed rgba(239, 202, 128, 0.2);
+		border-radius: 6px;
+		pointer-events: none;
+	}
+
+	.oct-slot-copy,
+	.oct-slot-machine,
+	.oct-slot-result {
+		position: relative;
+		z-index: 1;
+	}
+
+	.oct-slot-copy p {
+		margin-bottom: 0;
+	}
+
+	.oct-slot-machine {
+		display: grid;
+		gap: 14px;
+		min-width: 0;
+		padding: clamp(16px, 3vw, 24px);
+		background:
+			linear-gradient(180deg, rgba(255, 248, 232, 0.1), rgba(255, 248, 232, 0.035)),
+			rgba(9, 12, 18, 0.78);
+		border: 1px solid rgba(255, 248, 232, 0.18);
+		border-radius: 8px;
+	}
+
+	.oct-slot-categories {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 8px;
+	}
+
+	.oct-slot-categories button {
+		display: grid;
+		align-content: center;
+		gap: 3px;
+		min-width: 0;
+		min-height: 52px;
+		padding: 9px 8px;
+		color: var(--ink);
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 248, 232, 0.16);
+		border-radius: 6px;
+		font: inherit;
+		font-size: 0.9rem;
+		font-weight: 700;
+		line-height: 1.25;
+		cursor: pointer;
+	}
+
+	.oct-slot-categories button span,
+	.oct-slot-categories button small {
+		display: block;
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.oct-slot-categories button small {
+		color: var(--muted);
+		font-size: 0.68rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+	}
+
+	.oct-slot-categories button.active {
+		color: #130f0a;
+		background: linear-gradient(135deg, #ffe6a1, var(--gold));
+		border-color: rgba(255, 255, 255, 0.5);
+		box-shadow: 0 10px 24px rgba(239, 202, 128, 0.22);
+	}
+
+	.oct-slot-categories button.active small {
+		color: rgba(19, 15, 10, 0.62);
+	}
+
+	.oct-slot-reel {
+		position: relative;
+		display: grid;
+		min-height: clamp(104px, 14vw, 136px);
+		align-content: center;
+		gap: 8px;
+		padding: clamp(16px, 3vw, 24px);
+		color: #130f0a;
+		background:
+			linear-gradient(90deg, rgba(19, 15, 10, 0.08) 1px, transparent 1px) 0 0 / 18px 100%,
+			linear-gradient(180deg, #fff6d4, #efca80);
+		border: 3px solid rgba(19, 15, 10, 0.34);
+		border-radius: 8px;
+		box-shadow:
+			inset 0 0 0 4px rgba(255, 255, 255, 0.22),
+			0 16px 34px rgba(0, 0, 0, 0.26);
+		overflow: hidden;
+	}
+
+	.oct-slot-reel::before,
+	.oct-slot-reel::after {
+		position: absolute;
+		top: 12px;
+		bottom: 12px;
+		width: 10px;
+		content: '';
+		background: repeating-linear-gradient(
+			180deg,
+			rgba(19, 15, 10, 0.3) 0,
+			rgba(19, 15, 10, 0.3) 5px,
+			transparent 5px,
+			transparent 12px
+		);
+		border-radius: 999px;
+	}
+
+	.oct-slot-reel::before {
+		left: 12px;
+	}
+
+	.oct-slot-reel::after {
+		right: 12px;
+	}
+
+	.oct-slot-reel.spinning strong {
+		animation: oct-slot-reel-blur 0.18s linear infinite;
+	}
+
+	.oct-slot-reel-label {
+		color: rgba(19, 15, 10, 0.68);
+		font-size: 0.68rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.oct-slot-reel strong {
+		display: block;
+		padding-inline: 18px;
+		font-size: clamp(1.08rem, 2.6vw, 1.55rem);
+		line-height: 1.42;
+		letter-spacing: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.oct-slot-spin-button {
+		min-height: 48px;
+		color: #15100a;
+		background: linear-gradient(135deg, var(--ember), var(--gold));
+		border: 1px solid rgba(255, 255, 255, 0.35);
+		border-radius: 6px;
+		font: inherit;
+		font-weight: 800;
+		letter-spacing: 0.04em;
+		cursor: pointer;
+		box-shadow: 0 14px 28px rgba(247, 165, 107, 0.2);
+	}
+
+	.oct-slot-spin-button:disabled {
+		cursor: not-allowed;
+		opacity: 0.62;
+	}
+
+	.oct-slot-empty {
+		margin: 0;
+		color: var(--muted);
+		font-size: 0.9rem;
+		text-align: center;
+	}
+
+	.oct-slot-result {
+		grid-column: 1 / -1;
+		display: grid;
+		grid-template-columns: minmax(0, 0.72fr) minmax(320px, 1fr);
+		gap: clamp(18px, 4vw, 34px);
+		align-items: center;
+		min-width: 0;
+		padding-top: clamp(18px, 3vw, 28px);
+		border-top: 1px solid rgba(255, 248, 232, 0.16);
+	}
+
+	.oct-slot-result-copy {
+		min-width: 0;
+	}
+
+	.oct-slot-duration {
+		display: inline-flex;
+		margin-bottom: 10px;
+		padding: 4px 9px;
+		color: #130f0a;
+		background: var(--alpine);
+		border-radius: 999px;
+		font-size: 0.72rem;
+		font-weight: 800;
+		letter-spacing: 0.04em;
+	}
+
+	.oct-slot-result-copy h3 {
+		font-size: clamp(1.32rem, 3vw, 2rem);
+		line-height: 1.35;
+		overflow-wrap: anywhere;
+	}
+
+	.oct-slot-result-copy p {
+		margin-bottom: 18px;
+	}
+
+	.oct-slot-video {
+		aspect-ratio: 16 / 9;
+		width: 100%;
+		min-width: 0;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		overflow: hidden;
+	}
+
+	@keyframes oct-slot-reel-blur {
+		0%,
+		100% {
+			transform: translateY(0);
+			filter: blur(0);
+		}
+
+		50% {
+			transform: translateY(2px);
+			filter: blur(1px);
+		}
+	}
+
 	.timeline {
 		position: relative;
 		display: grid;
@@ -1401,6 +1832,19 @@
 			grid-template-columns: 1fr;
 		}
 
+		.oct-slot-shell,
+		.oct-slot-result {
+			grid-template-columns: 1fr;
+		}
+
+		.oct-slot-shell {
+			padding: 20px;
+		}
+
+		.oct-slot-shell::before {
+			inset: 10px;
+		}
+
 		.timeline::before {
 			left: 30px;
 		}
@@ -1483,9 +1927,38 @@
 		.button,
 		.inline-actions a,
 		.timeline-copy a,
-		.share-link-actions a {
+		.share-link-actions a,
+		.oct-slot-result-copy .button {
 			width: 100%;
 			box-sizing: border-box;
+		}
+
+		.oct-slot-machine {
+			padding: 14px;
+		}
+
+		.oct-slot-categories {
+			gap: 6px;
+		}
+
+		.oct-slot-categories button {
+			min-height: 48px;
+			padding-inline: 5px;
+			font-size: 0.76rem;
+		}
+
+		.oct-slot-categories button small {
+			font-size: 0.62rem;
+		}
+
+		.oct-slot-reel {
+			min-height: 112px;
+			padding-inline: 14px;
+		}
+
+		.oct-slot-reel strong {
+			padding-inline: 12px;
+			font-size: 1rem;
 		}
 
 		.timeline-feature-card {
@@ -1520,6 +1993,10 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		.timeline-feature-badges .featured-badge {
+			animation: none;
+		}
+
+		.oct-slot-reel.spinning strong {
 			animation: none;
 		}
 	}
