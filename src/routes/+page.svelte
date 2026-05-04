@@ -7,6 +7,7 @@
 	import Meta from '$lib/components/Meta.svelte';
 	import type { Flyer as FlyerType } from '$lib/concerts/types';
 	import Flyer from '$lib/components/Flyer.svelte';
+	import FifthAnniversaryAlpsLink from '$lib/components/FifthAnniversaryAlpsLink.svelte';
 	import { onMount } from 'svelte';
 
 	let { data }: { data: PageServerData } = $props();
@@ -123,6 +124,7 @@
 <Meta title="" canonical="/" />
 
 <div class="slideshow" bind:this={slideshowEl}>
+	<FifthAnniversaryAlpsLink variant="floating" />
 	<Splide
 		hasTrack={false}
 		options={{
@@ -161,12 +163,14 @@
 
 <style>
 	.slideshow {
+		position: relative;
 		--slideshow-height: calc(100dvh - var(--header-height) - var(--window-padding) - 26px);
 		--image-height: calc(var(--slideshow-height) - 0.9rem - 10px);
 		height: var(--slideshow-height);
 		--slideshow-width: calc(min(100dvw, 1280px) - var(--aside-width) - var(--window-padding));
 		width: var(--slideshow-width);
 	}
+
 	@media (max-width: 950px) {
 		.slideshow {
 			--slideshow-height: calc(

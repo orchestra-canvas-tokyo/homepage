@@ -174,4 +174,36 @@ describe('Twitter Card設定', () => {
 		expect(twitterImageAlt).not.toBeNull();
 		expect(twitterImageAlt?.getAttribute('content')).toBe(expectedAlt);
 	});
+
+	it('ページ固有の説明文とOGP画像を設定できる', () => {
+		// Arrange: ページ固有メタ情報のテスト
+		const props = {
+			title: '特設ページ',
+			canonical: '/special/example',
+			description: 'ページ固有の説明文です。',
+			image: '/images/example.png',
+			imageAlt: 'ページ固有画像',
+			twitterCardType: 'summary_large_image' as const
+		};
+
+		// Act: コンポーネントをレンダリング
+		render(Meta, { props });
+
+		// Assert: Twitter CardとOGPにページ固有値が設定されることを確認
+		expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(
+			props.description
+		);
+		expect(document.querySelector('meta[name="twitter:card"]')?.getAttribute('content')).toBe(
+			'summary_large_image'
+		);
+		expect(document.querySelector('meta[name="twitter:image"]')?.getAttribute('content')).toBe(
+			'https://www.orch-canvas.tokyo/images/example.png'
+		);
+		expect(document.querySelector('meta[property="og:image"]')?.getAttribute('content')).toBe(
+			'https://www.orch-canvas.tokyo/images/example.png'
+		);
+		expect(document.querySelector('meta[property="og:image:alt"]')?.getAttribute('content')).toBe(
+			props.imageAlt
+		);
+	});
 });
