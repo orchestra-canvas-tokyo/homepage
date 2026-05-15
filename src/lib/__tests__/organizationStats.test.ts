@@ -7,6 +7,7 @@ import {
 	formatYouTubeSubscriberCount,
 	formatYouTubeTotalViewCount,
 	hasOrganizationStatsDisplayChange,
+	hasOrganizationStatsValueChange,
 	shouldPersistOrganizationStats
 } from '../organizationStats';
 
@@ -59,7 +60,24 @@ describe('formatters', () => {
 		).toBe(true);
 	});
 
-	it('persists the first verified subscriber count even when the display bucket is unchanged', () => {
+	it('detects raw value changes independently of display bucket changes', () => {
+		expect(
+			hasOrganizationStatsValueChange(
+				{
+					totalAttendance: 7867,
+					youtubeSubscriberCount: 15000,
+					youtubeTotalViewCount: 6607890
+				},
+				{
+					totalAttendance: 7999,
+					youtubeSubscriberCount: 15999,
+					youtubeTotalViewCount: 6699999
+				}
+			)
+		).toBe(true);
+	});
+
+	it('persists the first verified subscriber count and raw value changes', () => {
 		expect(
 			shouldPersistOrganizationStats(
 				{
@@ -90,7 +108,7 @@ describe('formatters', () => {
 					youtubeTotalViewCount: 6699999
 				}
 			)
-		).toBe(false);
+		).toBe(true);
 	});
 });
 

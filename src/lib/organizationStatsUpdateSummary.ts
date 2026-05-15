@@ -2,7 +2,6 @@ import {
 	formatAttendanceCount,
 	formatYouTubeSubscriberCount,
 	formatYouTubeTotalViewCount,
-	hasOrganizationStatsDisplayChange,
 	shouldPersistOrganizationStats,
 	type OrganizationStats,
 	type PersistedOrganizationStats
@@ -16,7 +15,7 @@ import {
 
 export type OrganizationStatsFieldKey = keyof OrganizationStats;
 
-export type OrganizationStatsPersistReason = 'display_change' | 'subscriber_verification';
+export type OrganizationStatsPersistReason = 'stats_change' | 'subscriber_verification';
 
 export type OrganizationStatsFieldSummary = {
 	key: OrganizationStatsFieldKey;
@@ -117,7 +116,6 @@ const slackSummaryIcons = {
 	danger: '🔴'
 } satisfies Record<OrganizationStatsSlackColor, string>;
 
-const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 const JST_OFFSET_MILLISECONDS = 9 * 60 * 60 * 1000;
 
 const formatRawInteger = (value: number): string => value.toLocaleString('ja-JP');
@@ -132,25 +130,24 @@ const formatPersistDecision = (
 	summary: Extract<OrganizationStatsUpdateSummary, { status: 'updated' | 'no_change' }>
 ): string => {
 	if (!summary.shouldPersist) {
-		return '公開用JSON: 変更なし';
+		return '保存データ: 変更なし';
 	}
 
 	const reasons = summary.persistReasons.map((reason) => {
-		if (reason === 'display_change') {
-			return '表示値差分あり';
+		if (reason === 'stats_change') {
+			return '統計値差分あり';
 		}
 
 		return '登録者数検証フラグを確定';
 	});
 
-	return `公開用JSON: 更新対象あり（${reasons.join(' / ')}）`;
+	return `保存データ: 更新対象あり（${reasons.join(' / ')}）`;
 };
 
 const formatJstDate = (date: Date): string =>
 	new Date(date.getTime() + JST_OFFSET_MILLISECONDS).toISOString().slice(0, 10);
 
-const getDefaultSummaryDate = (generatedAt: Date): string =>
-	formatJstDate(new Date(generatedAt.getTime() - DAY_IN_MILLISECONDS));
+const getDefaultSummaryDate = (generatedAt: Date): string => formatJstDate(generatedAt);
 
 const escapeSlackText = (value: string): string =>
 	value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
@@ -183,14 +180,16 @@ const getOrderedSlackFields = (
 		return field;
 	});
 
-const formatSlackMetricField = (
-	field: OrganizationStatsFieldSummary,
-	highlightChangedValues: boolean
-): string => {
-	const delta = field.changed ? ` (${formatSignedInteger(field.delta)})` : '';
-	const statusIcon = highlightChangedValues && field.changed ? '🟡' : '🟢';
+const formatSlackStatisticField = (field: OrganizationStatsFieldSummary): string =>
+	`- ${slackMetricLabels[field.key]} ${formatRawInteger(field.nextValue)}${slackMetricUnits[field.key]} (${formatSignedInteger(field.delta)})`;
 
-	return `- ${statusIcon} ${slackMetricLabels[field.key]} ${formatRawInteger(field.nextValue)}${slackMetricUnits[field.key]}${delta}`;
+const formatSlackDisplayField = (field: OrganizationStatsFieldSummary): string => {
+	const statusIcon = field.displayChanged ? '🟡' : '🟢';
+	const displayValue = field.displayChanged
+		? `${field.previousDisplayValue} → ${field.nextDisplayValue}`
+		: `${field.nextDisplayValue}（変更なし）`;
+
+	return `- ${statusIcon} ${slackMetricLabels[field.key]} ${displayValue}`;
 };
 
 const formatFailedStepsDetail = (failedSteps: string[]): string =>
@@ -274,7 +273,7 @@ const getSlackSummaryLabel = (
 	}
 
 	if (summary.status === 'updated') {
-		return `${summary.fields.filter((field) => field.changed).length}件更新`;
+		return `${summary.fields.filter((field) => field.displayChanged).length}件更新`;
 	}
 
 	return '更新なし';
@@ -295,12 +294,14 @@ const createSlackSummaryParts = (
 		options.mainBranchUpdate ? formatMainBranchUpdate(options.mainBranchUpdate) : undefined,
 		options.productionPromotion ? formatProductionPromotion(options.productionPromotion) : undefined
 	].filter((line): line is string => line !== undefined);
-	const metricRows =
+	const statisticRows =
 		summary.status === 'error'
 			? []
-			: getOrderedSlackFields(summary).map((field) =>
-					formatSlackMetricField(field, summary.shouldPersist)
-				);
+			: getOrderedSlackFields(summary).map((field) => formatSlackStatisticField(field));
+	const displayRows =
+		summary.status === 'error'
+			? []
+			: getOrderedSlackFields(summary).map((field) => formatSlackDisplayField(field));
 	const persistDecision = summary.status === 'error' ? undefined : formatPersistDecision(summary);
 
 	if (summary.status === 'error') {
@@ -317,7 +318,8 @@ const createSlackSummaryParts = (
 		title,
 		generatedAtLine: `生成: ${generatedAt.toISOString()}`,
 		summaryText: summaryLines.join('\n'),
-		metricRows,
+		statisticRows,
+		displayRows,
 		persistDecision,
 		runLink: options.runUrl ? `<${options.runUrl}|実行ログ>` : undefined
 	};
@@ -355,8 +357,8 @@ export const summarizeOrganizationStatsUpdate = (
 
 	const persistReasons: OrganizationStatsPersistReason[] = [];
 
-	if (hasOrganizationStatsDisplayChange(current, next)) {
-		persistReasons.push('display_change');
+	if (fields.some((field) => field.changed)) {
+		persistReasons.push('stats_change');
 	}
 
 	if (!current.youtubeSubscriberCountVerified) {
@@ -364,7 +366,7 @@ export const summarizeOrganizationStatsUpdate = (
 	}
 
 	return {
-		status: fields.some((field) => field.changed) ? 'updated' : 'no_change',
+		status: fields.some((field) => field.displayChanged) ? 'updated' : 'no_change',
 		fields,
 		shouldPersist: shouldPersistOrganizationStats(current, next),
 		persistReasons
@@ -382,7 +384,7 @@ export const getOrganizationStatsSlackColor = (
 		return 'danger';
 	}
 
-	if (summary.status === 'updated' && summary.shouldPersist) {
+	if (summary.status === 'updated') {
 		return 'warning';
 	}
 
@@ -396,8 +398,12 @@ export const formatOrganizationStatsSlackSummary = (
 	const parts = createSlackSummaryParts(summary, options);
 	const lines = [parts.title, parts.generatedAtLine, '---', parts.summaryText.replaceAll('*', '')];
 
-	if (parts.metricRows.length > 0) {
-		lines.push(...parts.metricRows);
+	if (parts.statisticRows.length > 0) {
+		lines.push('統計データ（前回取得値との差分）', ...parts.statisticRows);
+	}
+
+	if (parts.displayRows.length > 0) {
+		lines.push('表示データ（HP表示値）', ...parts.displayRows);
 	}
 
 	if (parts.persistDecision) {
@@ -423,8 +429,14 @@ export const formatOrganizationStatsSlackPayload = (
 		createSectionBlock(parts.summaryText)
 	];
 
-	if (parts.metricRows.length > 0) {
-		blocks.push(createSectionBlock(parts.metricRows.join('\n')));
+	if (parts.statisticRows.length > 0) {
+		blocks.push(
+			createSectionBlock(`*統計データ（前回取得値との差分）*\n${parts.statisticRows.join('\n')}`)
+		);
+	}
+
+	if (parts.displayRows.length > 0) {
+		blocks.push(createSectionBlock(`*表示データ（HP表示値）*\n${parts.displayRows.join('\n')}`));
 	}
 
 	if (parts.persistDecision) {

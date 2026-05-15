@@ -66,12 +66,20 @@ export const hasOrganizationStatsDisplayChange = (
 	);
 };
 
+export const hasOrganizationStatsValueChange = (
+	currentStats: OrganizationStats,
+	nextStats: OrganizationStats
+): boolean =>
+	currentStats.totalAttendance !== nextStats.totalAttendance ||
+	currentStats.youtubeSubscriberCount !== nextStats.youtubeSubscriberCount ||
+	currentStats.youtubeTotalViewCount !== nextStats.youtubeTotalViewCount;
+
 export const shouldPersistOrganizationStats = (
 	currentStats: PersistedOrganizationStats,
 	nextStats: OrganizationStats
 ): boolean =>
 	!currentStats.youtubeSubscriberCountVerified ||
-	hasOrganizationStatsDisplayChange(currentStats, nextStats);
+	hasOrganizationStatsValueChange(currentStats, nextStats);
 
 export const parseCsvText = (csvText: string): string[][] => {
 	const rows: string[][] = [];
