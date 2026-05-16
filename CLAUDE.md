@@ -96,6 +96,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## メンテナンス知見
 
+### PRレビュー対応の運用
+
+- 複数のレビュー指摘やUI変更がある場合は、親エージェントがスコープ・統合・最終検証を持ち、subagentには実装や読み取りレビューを具体的なファイル単位で委ねる。
+- subagentの結果は判断材料として扱い、最終的な差分確認、テスト実行、既存警告の切り分け、PRコメント作成は親エージェントが行う。
+- 特設ページ、導線、レスポンシブUIを変更した場合は、通常の`npm run check`、`npm run lint`、`npm run build`に加えて、可能ならPlaywright MCPまたはPlaywrightでmobile/desktop表示、主要操作、横スクロール有無を確認する。
+
 ### パッケージ更新
 
 - まず `npm update` で `package.json` の既存範囲内を更新する
