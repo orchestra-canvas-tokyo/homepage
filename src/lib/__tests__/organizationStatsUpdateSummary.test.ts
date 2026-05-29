@@ -11,7 +11,7 @@ import {
 describe('organization stats update summary', () => {
 	const generatedAt = new Date('2026-04-10T02:50:24.893Z');
 
-	it('marks raw numeric changes as updated even when display buckets stay the same', () => {
+	it('keeps the summary unchanged when only raw values change within display buckets', () => {
 		const summary = summarizeOrganizationStatsUpdate(
 			{
 				totalAttendance: 7867,
@@ -27,9 +27,9 @@ describe('organization stats update summary', () => {
 		);
 
 		expect(summary).toMatchObject({
-			status: 'updated',
-			shouldPersist: false,
-			persistReasons: []
+			status: 'no_change',
+			shouldPersist: true,
+			persistReasons: ['stats_change']
 		});
 		expect(
 			summary.status === 'error' ? [] : summary.fields.filter((field) => field.changed)
@@ -79,20 +79,25 @@ describe('organization stats update summary', () => {
 			}
 		);
 
-		expect(payload.text).toContain('団体情報統計 更新サマリー | 2026-04-09 JST');
+		expect(payload.text).toContain('団体情報統計 更新サマリー | 2026-04-10 JST');
 		expect(payload.text).toContain('生成: 2026-04-10T02:50:24.893Z');
 		expect(payload.text).toContain('サマリー: 🟡 3件更新');
-		expect(payload.text).toContain('- 🟡 YT総再生回数 6,704,321回 (+96,431)');
-		expect(payload.text).toContain('- 🟡 YT登録者数 16,050人 (+1,050)');
-		expect(payload.text).toContain('- 🟡 累計来場者数 8,001名 (+134)');
-		expect(payload.text).toContain('公開用JSON: 更新対象あり（表示値差分あり）');
+		expect(payload.text).toContain('統計データ（前回取得値との差分）');
+		expect(payload.text).toContain('- YT総再生回数 6,704,321回 (+96,431)');
+		expect(payload.text).toContain('- YT登録者数 16,050人 (+1,050)');
+		expect(payload.text).toContain('- 累計来場者数 8,001名 (+134)');
+		expect(payload.text).toContain('表示データ（HP表示値）');
+		expect(payload.text).toContain('- 🟡 YT総再生回数 660万回 → 670万回');
+		expect(payload.text).toContain('- 🟡 YT登録者数 1.5万人 → 1.6万人');
+		expect(payload.text).toContain('- 🟡 累計来場者数 7,000名 → 8,000名');
+		expect(payload.text).toContain('保存データ: 更新対象あり（統計値差分あり）');
 		expect(payload.text).toContain('<https://example.com/runs/1|実行ログ>');
 		expect(payload.blocks.slice(0, 4)).toMatchObject([
 			{
 				type: 'section',
 				text: {
 					type: 'mrkdwn',
-					text: '*団体情報統計 更新サマリー | 2026-04-09 JST*'
+					text: '*団体情報統計 更新サマリー | 2026-04-10 JST*'
 				}
 			},
 			{
@@ -138,13 +143,16 @@ describe('organization stats update summary', () => {
 		);
 
 		expect(text).toContain('サマリー: 🟢 更新なし');
-		expect(text).toContain('- 🟢 YT総再生回数 6,607,890回');
-		expect(text).toContain('- 🟢 YT登録者数 15,000人');
-		expect(text).toContain('- 🟢 累計来場者数 7,867名');
-		expect(text).toContain('公開用JSON: 更新対象あり（登録者数検証フラグを確定）');
+		expect(text).toContain('- YT総再生回数 6,607,890回 (0)');
+		expect(text).toContain('- YT登録者数 15,000人 (0)');
+		expect(text).toContain('- 累計来場者数 7,867名 (0)');
+		expect(text).toContain('- 🟢 YT総再生回数 660万回（変更なし）');
+		expect(text).toContain('- 🟢 YT登録者数 1.5万人（変更なし）');
+		expect(text).toContain('- 🟢 累計来場者数 7,000名（変更なし）');
+		expect(text).toContain('保存データ: 更新対象あり（登録者数検証フラグを確定）');
 	});
 
-	it('keeps summary and metric markers green when raw values changed but JSON is not persisted', () => {
+	it('keeps summary green when raw values change without display changes', () => {
 		const payload = formatOrganizationStatsSlackPayload(
 			summarizeOrganizationStatsUpdate(
 				{
@@ -164,14 +172,17 @@ describe('organization stats update summary', () => {
 			}
 		);
 
-		expect(payload.text).toContain('サマリー: 🟢 3件更新');
-		expect(payload.text).toContain('- 🟢 YT総再生回数 6,699,999回 (+92,109)');
-		expect(payload.text).toContain('- 🟢 YT登録者数 15,999人 (+999)');
-		expect(payload.text).toContain('- 🟢 累計来場者数 7,999名 (+132)');
-		expect(payload.text).toContain('公開用JSON: 変更なし');
+		expect(payload.text).toContain('サマリー: 🟢 更新なし');
+		expect(payload.text).toContain('- YT総再生回数 6,699,999回 (+92,109)');
+		expect(payload.text).toContain('- YT登録者数 15,999人 (+999)');
+		expect(payload.text).toContain('- 累計来場者数 7,999名 (+132)');
+		expect(payload.text).toContain('- 🟢 YT総再生回数 660万回（変更なし）');
+		expect(payload.text).toContain('- 🟢 YT登録者数 1.5万人（変更なし）');
+		expect(payload.text).toContain('- 🟢 累計来場者数 7,000名（変更なし）');
+		expect(payload.text).toContain('保存データ: 更新対象あり（統計値差分あり）');
 	});
 
-	it('returns warning only when changed values require a persisted JSON update', () => {
+	it('returns warning only when display values change', () => {
 		const warningColor = getOrganizationStatsSlackColor(
 			summarizeOrganizationStatsUpdate(
 				{
@@ -317,7 +328,8 @@ describe('organization stats update summary', () => {
 
 		expect(payload.text).toContain('サマリー: 🔴 エラー');
 		expect(payload.text).toContain('Merge to production');
-		expect(payload.text).toContain('- 🟢 累計来場者数 7,868名 (+1)');
+		expect(payload.text).toContain('- 累計来場者数 7,868名 (+1)');
+		expect(payload.text).toContain('- 🟢 累計来場者数 7,000名（変更なし）');
 		expect(payload.text).toContain('- main: 直接コミット完了');
 		expect(payload.text).toContain(
 			'- production: スキップ（実行中に production が更新されました）'
