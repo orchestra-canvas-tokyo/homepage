@@ -15,12 +15,10 @@
 
 	const supporters: string[] = [
 		'内田　明美子　様',
-		'柿沼　威司　様',
 		'金森　凌大　様',
 		'上條　義昭　様',
 		'神山　和子　様',
 		'神山　　怜　様',
-		'鈴木　辰生　様',
 		'螺良　修一　様',
 		'半田　翔希　様',
 		'山田　千尋　様',
@@ -90,7 +88,7 @@
 				<span>{supporter}</span>
 			{/each}
 		</div>
-		<div class="fullwidth-supporters">（他匿名8名様）</div>
+		<div class="fullwidth-supporters">（他匿名10名様）</div>
 	</div>
 
 	<h2>ご寄付のお願い・ご返礼</h2>
