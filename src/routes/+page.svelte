@@ -64,19 +64,19 @@
 			)
 	);
 
+	const paginationColorsByDistance = [
+		'var(--primary-color)',
+		'var(--secondary-color)',
+		'var(--tertiary-color)'
+	];
+
 	const updatePaginationColor = (e: CustomEvent<MoveEventDetail> | undefined) => {
 		if (!e) return;
 		const paginationButtons = document.querySelectorAll('.splide__pagination button');
 		paginationButtons.forEach((pagination, index) => {
-			if (index === e.detail.index) {
-				(pagination as HTMLButtonElement).style.backgroundColor = 'var(--primary-color)';
-			} else if (Math.abs(index - e.detail.index) === 1) {
-				(pagination as HTMLButtonElement).style.backgroundColor = 'var(--secondary-color)';
-			} else if (Math.abs(index - e.detail.index) === 2) {
-				(pagination as HTMLButtonElement).style.backgroundColor = 'var(--tertiary-color)';
-			} else {
-				(pagination as HTMLButtonElement).style.backgroundColor = 'var(--other-color)';
-			}
+			const distanceFromActive = Math.abs(index - e.detail.index);
+			const color = paginationColorsByDistance[distanceFromActive] ?? 'var(--other-color)';
+			(pagination as HTMLButtonElement).style.setProperty('--pagination-color', color);
 		});
 	};
 
@@ -265,35 +265,55 @@
 	:global(.splide__pagination) {
 		margin-top: 10px;
 		padding: 0 10px;
-		gap: 10px;
+		flex-wrap: nowrap;
 	}
 	:global(.splide__pagination li) {
-		flex-basis: 60px;
-		flex-shrink: 1;
+		flex: 0 0 auto;
 	}
 	:global(.splide__pagination button) {
+		position: relative;
 		padding: 0;
 		border: 0;
 		margin: 0;
-		width: 100%;
-		height: 4px;
-		border-radius: 2px;
-		transition: 0.3s;
+		width: 24px;
+		height: 24px;
 		--primary-color: rgb(255, 255, 255);
 		--secondary-color: rgb(200, 200, 200);
 		--tertiary-color: rgb(145, 145, 145);
 		--other-color: rgb(90, 90, 90);
-		background-color: var(--other-color);
+		--pagination-color: var(--other-color);
+		background-color: transparent;
 		cursor: pointer;
+		transition: width 0.3s;
+	}
+	:global(.splide__pagination button)::before {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 8px;
+		height: 8px;
+		border-radius: 999px;
+		background-color: var(--pagination-color);
+		transform: translate(-50%, -50%);
+		transition:
+			width 0.3s,
+			background-color 0.3s;
+	}
+	:global(.splide__pagination button.is-active) {
+		width: 40px;
+	}
+	:global(.splide__pagination button.is-active)::before {
+		width: 32px;
 	}
 	:global(.splide__pagination li:first-child button) {
-		background-color: var(--primary-color);
+		--pagination-color: var(--primary-color);
 	}
 	:global(.splide__pagination li:nth-child(2) button) {
-		background-color: var(--secondary-color);
+		--pagination-color: var(--secondary-color);
 	}
 	:global(.splide__pagination li:nth-child(3) button) {
-		background-color: var(--tertiary-color);
+		--pagination-color: var(--tertiary-color);
 	}
 	@media (max-width: 950px) {
 		:global(.splide__pagination) {
