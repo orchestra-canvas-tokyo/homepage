@@ -64,19 +64,39 @@
 			)
 	);
 
-	const paginationColorsByDistance = [
-		'var(--primary-color)',
-		'var(--secondary-color)',
-		'var(--tertiary-color)'
+	const paginationStylesByDistance = [
+		{
+			color: 'var(--primary-color)',
+			markWidth: '32px',
+			targetWidth: '40px'
+		},
+		{
+			color: 'var(--secondary-color)',
+			markWidth: '24px',
+			targetWidth: '32px'
+		},
+		{
+			color: 'var(--tertiary-color)',
+			markWidth: '16px',
+			targetWidth: '24px'
+		}
 	];
+	const defaultPaginationStyle = {
+		color: 'var(--other-color)',
+		markWidth: '8px',
+		targetWidth: '24px'
+	};
 
-	const updatePaginationColor = (e: CustomEvent<MoveEventDetail> | undefined) => {
+	const updatePaginationStyle = (e: CustomEvent<MoveEventDetail> | undefined) => {
 		if (!e) return;
 		const paginationButtons = document.querySelectorAll('.splide__pagination button');
 		paginationButtons.forEach((pagination, index) => {
 			const distanceFromActive = Math.abs(index - e.detail.index);
-			const color = paginationColorsByDistance[distanceFromActive] ?? 'var(--other-color)';
-			(pagination as HTMLButtonElement).style.setProperty('--pagination-color', color);
+			const style = paginationStylesByDistance[distanceFromActive] ?? defaultPaginationStyle;
+			const paginationButton = pagination as HTMLButtonElement;
+			paginationButton.style.setProperty('--pagination-color', style.color);
+			paginationButton.style.setProperty('--pagination-mark-width', style.markWidth);
+			paginationButton.style.setProperty('--pagination-target-width', style.targetWidth);
 		});
 	};
 
@@ -131,7 +151,7 @@
 			focus: 'center',
 			trimSpace: false
 		}}
-		on:move={updatePaginationColor}
+		on:move={updatePaginationStyle}
 	>
 		<SplideTrack>
 			{#each slideshowItems as { title, flyers, slug, isNew }}
@@ -275,13 +295,15 @@
 		padding: 0;
 		border: 0;
 		margin: 0;
-		width: 24px;
+		width: var(--pagination-target-width);
 		height: 24px;
 		--primary-color: rgb(255, 255, 255);
 		--secondary-color: rgb(200, 200, 200);
 		--tertiary-color: rgb(145, 145, 145);
 		--other-color: rgb(90, 90, 90);
 		--pagination-color: var(--other-color);
+		--pagination-mark-width: 8px;
+		--pagination-target-width: 24px;
 		background-color: transparent;
 		cursor: pointer;
 		transition: width 0.3s;
@@ -291,7 +313,7 @@
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		width: 8px;
+		width: var(--pagination-mark-width);
 		height: 8px;
 		border-radius: 999px;
 		background-color: var(--pagination-color);
@@ -301,19 +323,22 @@
 			background-color 0.3s;
 	}
 	:global(.splide__pagination button.is-active) {
-		width: 40px;
-	}
-	:global(.splide__pagination button.is-active)::before {
-		width: 32px;
+		--pagination-mark-width: 32px;
+		--pagination-target-width: 40px;
 	}
 	:global(.splide__pagination li:first-child button) {
 		--pagination-color: var(--primary-color);
+		--pagination-mark-width: 32px;
+		--pagination-target-width: 40px;
 	}
 	:global(.splide__pagination li:nth-child(2) button) {
 		--pagination-color: var(--secondary-color);
+		--pagination-mark-width: 24px;
+		--pagination-target-width: 32px;
 	}
 	:global(.splide__pagination li:nth-child(3) button) {
 		--pagination-color: var(--tertiary-color);
+		--pagination-mark-width: 16px;
 	}
 	@media (max-width: 950px) {
 		:global(.splide__pagination) {
