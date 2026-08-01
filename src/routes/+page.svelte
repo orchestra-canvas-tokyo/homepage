@@ -86,6 +86,7 @@
 		markWidth: '8px',
 		targetWidth: '24px'
 	};
+	const carouselTransitionDuration = 400;
 
 	const updatePaginationStyle = (e: CustomEvent<MoveEventDetail> | undefined) => {
 		if (!e) return;
@@ -142,14 +143,19 @@
 
 <Meta title="" canonical="/" />
 
-<div class="slideshow" bind:this={slideshowEl}>
+<div
+	class="slideshow"
+	bind:this={slideshowEl}
+	style="--carousel-transition-duration: {carouselTransitionDuration}ms"
+>
 	<Splide
 		hasTrack={false}
 		options={{
 			rewind: true,
 			gap: '5rem',
 			focus: 'center',
-			trimSpace: false
+			trimSpace: false,
+			speed: carouselTransitionDuration
 		}}
 		on:move={updatePaginationStyle}
 	>
@@ -306,7 +312,7 @@
 		--pagination-target-width: 24px;
 		background-color: transparent;
 		cursor: pointer;
-		transition: width 0.3s;
+		transition: width var(--carousel-transition-duration);
 	}
 	:global(.splide__pagination button)::before {
 		content: '';
@@ -319,8 +325,8 @@
 		background-color: var(--pagination-color);
 		transform: translate(-50%, -50%);
 		transition:
-			width 0.3s,
-			background-color 0.3s;
+			width var(--carousel-transition-duration),
+			background-color var(--carousel-transition-duration);
 	}
 	:global(.splide__pagination button.is-active) {
 		--pagination-mark-width: 32px;
@@ -343,6 +349,12 @@
 	@media (max-width: 950px) {
 		:global(.splide__pagination) {
 			display: none;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		:global(.splide__pagination button),
+		:global(.splide__pagination button)::before {
+			transition-duration: 0ms;
 		}
 	}
 </style>
