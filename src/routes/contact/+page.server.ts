@@ -4,7 +4,7 @@ import { getConcertBySlug, isFinished } from '$lib/concerts/utils';
 export const load: PageServerLoad = async () => {
 	const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
 		{
-			concertSlug: 'regular-15',
+			concertSlug: 'regular-17',
 			status: 'onlyRecruitmentClosed'
 		}
 	];

@@ -127,10 +127,12 @@ const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
 const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
 	{
 		concertSlug: 'regular-99',
-		status: 'recruitmentClosed'
+		status: 'onlyRecruitmentClosed'
 	}
 ];
 ```
+
+置きチラシを含むすべての募集を終了する場合は、`status` に `allClosed` を指定します。
 
 詳細な仕様は同ファイル内に記載してあります。
 
