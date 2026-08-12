@@ -1,9 +1,7 @@
 export type OrganizationStatsMainBranchUpdateSkipReason = 'main_moved';
 
 export type OrganizationStatsProductionPromotionSkipReason =
-	| 'not_caught_up'
-	| 'main_moved'
-	| 'production_moved';
+	'not_caught_up' | 'main_moved' | 'production_moved';
 
 export type OrganizationStatsMainBranchUpdate =
 	| {

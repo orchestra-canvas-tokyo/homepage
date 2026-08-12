@@ -64,27 +64,48 @@
 			)
 	);
 
-	const updatePaginationColor = (e: CustomEvent<MoveEventDetail> | undefined) => {
+	const paginationStylesByDistance = [
+		{
+			color: 'var(--primary-color)',
+			markWidth: '32px',
+			targetWidth: '40px'
+		},
+		{
+			color: 'var(--secondary-color)',
+			markWidth: '24px',
+			targetWidth: '32px'
+		},
+		{
+			color: 'var(--tertiary-color)',
+			markWidth: '16px',
+			targetWidth: '24px'
+		}
+	];
+	const defaultPaginationStyle = {
+		color: 'var(--other-color)',
+		markWidth: '8px',
+		targetWidth: '24px'
+	};
+	const carouselTransitionDuration = 400;
+
+	const updatePaginationStyle = (e: CustomEvent<MoveEventDetail> | undefined) => {
 		if (!e) return;
 		const paginationButtons = document.querySelectorAll('.splide__pagination button');
 		paginationButtons.forEach((pagination, index) => {
-			if (index === e.detail.index) {
-				(pagination as HTMLButtonElement).style.backgroundColor = 'var(--primary-color)';
-			} else if (Math.abs(index - e.detail.index) === 1) {
-				(pagination as HTMLButtonElement).style.backgroundColor = 'var(--secondary-color)';
-			} else if (Math.abs(index - e.detail.index) === 2) {
-				(pagination as HTMLButtonElement).style.backgroundColor = 'var(--tertiary-color)';
-			} else {
-				(pagination as HTMLButtonElement).style.backgroundColor = 'var(--other-color)';
-			}
+			const distanceFromActive = Math.abs(index - e.detail.index);
+			const style = paginationStylesByDistance[distanceFromActive] ?? defaultPaginationStyle;
+			const paginationButton = pagination as HTMLButtonElement;
+			paginationButton.style.setProperty('--pagination-color', style.color);
+			paginationButton.style.setProperty('--pagination-mark-width', style.markWidth);
+			paginationButton.style.setProperty('--pagination-target-width', style.targetWidth);
 		});
 	};
 
 	// imgタグの属性として指定するサイズを計算する
 	const A4_ASPECT_RATIO = Math.SQRT1_2; // A4版のみを想定
 	let slideshowEl: HTMLDivElement | null = null;
-	let flyerHeight: number | undefined;
-	let flyerWidth: number | undefined;
+	let flyerHeight = $state<number>();
+	let flyerWidth = $state<number>();
 
 	const updateFlyerDimensions = () => {
 		if (!slideshowEl) return;
@@ -122,16 +143,21 @@
 
 <Meta title="" canonical="/" />
 
-<div class="slideshow" bind:this={slideshowEl}>
+<div
+	class="slideshow"
+	bind:this={slideshowEl}
+	style="--carousel-transition-duration: {carouselTransitionDuration}ms"
+>
 	<Splide
 		hasTrack={false}
 		options={{
 			rewind: true,
 			gap: '5rem',
 			focus: 'center',
-			trimSpace: false
+			trimSpace: false,
+			speed: carouselTransitionDuration
 		}}
-		on:move={updatePaginationColor}
+		on:move={updatePaginationStyle}
 	>
 		<SplideTrack>
 			{#each slideshowItems as { title, flyers, slug, isNew }}
@@ -265,39 +291,70 @@
 	:global(.splide__pagination) {
 		margin-top: 10px;
 		padding: 0 10px;
-		gap: 10px;
+		flex-wrap: nowrap;
 	}
 	:global(.splide__pagination li) {
-		flex-basis: 60px;
-		flex-shrink: 1;
+		flex: 0 0 auto;
 	}
 	:global(.splide__pagination button) {
+		position: relative;
 		padding: 0;
 		border: 0;
 		margin: 0;
-		width: 100%;
-		height: 4px;
-		border-radius: 2px;
-		transition: 0.3s;
+		width: var(--pagination-target-width);
+		height: 24px;
 		--primary-color: rgb(255, 255, 255);
 		--secondary-color: rgb(200, 200, 200);
 		--tertiary-color: rgb(145, 145, 145);
 		--other-color: rgb(90, 90, 90);
-		background-color: var(--other-color);
+		--pagination-color: var(--other-color);
+		--pagination-mark-width: 8px;
+		--pagination-target-width: 24px;
+		background-color: transparent;
 		cursor: pointer;
+		transition: width var(--carousel-transition-duration);
+	}
+	:global(.splide__pagination button)::before {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: var(--pagination-mark-width);
+		height: 8px;
+		border-radius: 999px;
+		background-color: var(--pagination-color);
+		transform: translate(-50%, -50%);
+		transition:
+			width var(--carousel-transition-duration),
+			background-color var(--carousel-transition-duration);
+	}
+	:global(.splide__pagination button.is-active) {
+		--pagination-mark-width: 32px;
+		--pagination-target-width: 40px;
 	}
 	:global(.splide__pagination li:first-child button) {
-		background-color: var(--primary-color);
+		--pagination-color: var(--primary-color);
+		--pagination-mark-width: 32px;
+		--pagination-target-width: 40px;
 	}
 	:global(.splide__pagination li:nth-child(2) button) {
-		background-color: var(--secondary-color);
+		--pagination-color: var(--secondary-color);
+		--pagination-mark-width: 24px;
+		--pagination-target-width: 32px;
 	}
 	:global(.splide__pagination li:nth-child(3) button) {
-		background-color: var(--tertiary-color);
+		--pagination-color: var(--tertiary-color);
+		--pagination-mark-width: 16px;
 	}
 	@media (max-width: 950px) {
 		:global(.splide__pagination) {
 			display: none;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		:global(.splide__pagination button),
+		:global(.splide__pagination button)::before {
+			transition-duration: 0ms;
 		}
 	}
 </style>
