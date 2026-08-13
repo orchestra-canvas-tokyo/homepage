@@ -148,7 +148,40 @@ npm install
 
 ## Contactの仕様
 
-iframeでお手製のconctactアプリケーションを埋め込んでいます。
+`/contact` はSvelteKitのフォームアクションとして、このリポジトリ内で実装しています。
+別アプリケーションのiframeやCloudflare KVには依存しません。
+
+送信時は次の順で処理します。
+
+1. Zodで入力値を検証
+2. Cloudflare Turnstileをサーバー側で検証（actionとhostnameも確認）
+3. Resend APIで確認メールを送信
+4. D1が設定されていれば送信結果を記録
+5. Slack Webhookが設定されていれば通知
+
+### ローカル設定
+
+`.env.example` を `.env.local` にコピーし、ローカルまたはテスト用の値を設定してください。
+サンプルのTurnstileキーはCloudflare公式のテストキーで、本番環境では使用できません。
+
+| 変数                   | 必須 | 内容                                                        |
+| ---------------------- | :--: | ----------------------------------------------------------- |
+| `DEPLOYMENT_ENV`       |  ○   | `production` のときだけ本番向け宛先・件名を使用             |
+| `TURNSTILE_SITE_KEY`   |  ○   | Turnstileの公開サイトキー                                   |
+| `TURNSTILE_SECRET_KEY` |  ○   | Turnstileの秘密キー                                         |
+| `TURNSTILE_HOSTNAMES`  |  ○   | 許可hostnameのカンマ区切り一覧                              |
+| `RESEND_API_KEY`       |  ○   | Resend APIキー                                              |
+| `SLACK_WEBHOOK_URL`    | 任意 | 未設定時はSlack通知を無効化                                 |
+| `DB`                   | 任意 | Cloudflare D1 binding。未設定時は問い合わせログを保存しない |
+
+本番で `TURNSTILE_HOSTNAMES` に `localhost`、`127.0.0.1` などを含めると、フォームは安全側に倒して送信を拒否します。
+TurnstileトークンやAPIキーはD1へ保存しません。
+
+### D1マイグレーション
+
+問い合わせログ用のSQLは `migrations/` に番号順で配置しています。
+`0000_legacy_contact_compatibility.sql` は旧contactアプリのスキーマとの互換性を確保し、`0001_create_contacts.sql` が既存レコードを保持したまま新しいスキーマへ変換します。
+ローカル検証と各環境への適用は分けて実施し、`--remote` を付けたコマンドは対象環境を確認してから手動で実行してください。
 
 ## FAQ
 

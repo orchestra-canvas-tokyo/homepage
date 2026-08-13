@@ -204,10 +204,6 @@
 		}
 	}
 
-	:is(picture):has(.flyer) {
-		line-height: 0;
-	}
-
 	.show-on-mobile {
 		display: none;
 	}

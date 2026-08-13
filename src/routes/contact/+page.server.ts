@@ -1,7 +1,15 @@
-import type { PageServerLoad } from './$types';
+import { fail } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
 import { getConcertBySlug, isFinished } from '$lib/concerts/utils';
+import {
+	flattenContactFormErrors,
+	pickContactFormValues,
+	validateContactRequest
+} from '$lib/contact/form';
+import { resolveContactRuntimeConfig } from '$lib/server/contact/config';
+import { submitContactForm } from '$lib/server/contact/submit';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ platform }) => {
 	const flyerInsertionData: Parameters<typeof getFlyerInsertionStatus> = [
 		{
 			concertSlug: 'regular-17',
@@ -10,9 +18,46 @@ export const load: PageServerLoad = async () => {
 	];
 	const flyerInsertionStatus = getFlyerInsertionStatus(...flyerInsertionData);
 
-	return {
-		flyerInsertionStatus
-	};
+	const config = resolveContactRuntimeConfig(platform?.env);
+
+	return { flyerInsertionStatus, turnstileSiteKey: config.turnstileSiteKey };
+};
+
+export const actions: Actions = {
+	default: async ({ request, platform }) => {
+		const values = Object.fromEntries(await request.formData());
+		const publicValues = pickContactFormValues(values);
+		const validation = validateContactRequest(values);
+
+		if (!validation.success) {
+			return fail(400, {
+				success: false,
+				message: '入力内容を確認してください。',
+				values: publicValues,
+				errors: flattenContactFormErrors(validation.error)
+			});
+		}
+
+		const config = resolveContactRuntimeConfig(platform?.env);
+		const context = platform?.context;
+		const result = await submitContactForm(validation.data, config, {
+			remoteIp: request.headers.get('CF-Connecting-IP'),
+			waitUntil: context ? context.waitUntil.bind(context) : undefined
+		});
+
+		if (!result.ok) {
+			const status =
+				result.reason === 'configuration' ? 503 : result.reason === 'invalid_captcha' ? 400 : 502;
+
+			return fail(status, {
+				success: false,
+				message: result.message,
+				values: publicValues
+			});
+		}
+
+		return { success: true, message: result.message };
+	}
 };
 
 /**

@@ -2,11 +2,21 @@
 
 declare module '@splidejs/svelte-splide/css/core';
 
-interface ImportMetaEnv {
-	readonly VITE_RECAPTCHA_SECRET: string;
-	readonly VITE_RESEND_API_KEY: string;
+interface TurnstileApi {
+	render: (
+		container: HTMLElement,
+		options: {
+			sitekey: string;
+			action: string;
+			callback: (token: string) => void;
+			'expired-callback': () => void;
+			'error-callback': () => void;
+		}
+	) => string;
+	reset: (widgetId: string) => void;
+	remove: (widgetId: string) => void;
 }
 
-interface ImportMeta {
-	readonly env: ImportMetaEnv;
+interface Window {
+	turnstile?: TurnstileApi;
 }
