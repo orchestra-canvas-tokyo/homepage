@@ -175,6 +175,8 @@ npm install
 | `SLACK_WEBHOOK_URL`    | 任意 | 未設定時はSlack通知を無効化                                 |
 | `DB`                   | 任意 | Cloudflare D1 binding。未設定時は問い合わせログを保存しない |
 
+Cloudflare Pagesでは、`TURNSTILE_SECRET_KEY`、`RESEND_API_KEY`、`SLACK_WEBHOOK_URL`を暗号化済みのSecretとして登録してください。公開情報である`TURNSTILE_SITE_KEY`と、`DEPLOYMENT_ENV`、`TURNSTILE_HOSTNAMES`は通常の環境変数として登録できます。
+
 本番で `TURNSTILE_HOSTNAMES` に `localhost`、`127.0.0.1` などを含めると、フォームは安全側に倒して送信を拒否します。
 TurnstileトークンやAPIキーはD1へ保存しません。
 

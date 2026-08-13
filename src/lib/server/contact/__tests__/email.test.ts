@@ -39,6 +39,8 @@ describe('contact email', () => {
 		expect(payload.html).toContain('font-size:16px');
 		expect(payload.html).toContain('class="detail-label"');
 		expect(payload.html).toContain('class="detail-value"');
+		expect(payload.html.match(/height="40"/g)).toHaveLength(2);
+		expect(payload.html).toContain('height="1"');
 		expect(payload.html).not.toContain('font-size:42px');
 	});
 

@@ -102,7 +102,13 @@ export const generateContactHtmlBody = (content: ContactMailContent): string => 
 								<p style="margin:0;font-family:${emailFontFamily};font-size:16px;line-height:1.8;letter-spacing:0.06em;color:#ffffff;">必要に応じてメールにてご返答いたします。<br />なお、メールアドレスが正しく入力されていない場合、返答いたしかねます。ご了承ください。</p>
 								<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;border-collapse:collapse;">
 									<tr>
-										<td style="padding:40px 0;border-bottom:1px solid #666666;font-size:0;line-height:0;">&nbsp;</td>
+										<td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td>
+									</tr>
+									<tr>
+										<td height="1" style="height:1px;background-color:#666666;font-size:0;line-height:0;">&nbsp;</td>
+									</tr>
+									<tr>
+										<td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td>
 									</tr>
 								</table>
 								<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;border-collapse:collapse;">
