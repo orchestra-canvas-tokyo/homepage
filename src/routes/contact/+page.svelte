@@ -31,6 +31,7 @@
 		turnstileWidgetId = window.turnstile.render(turnstileContainer, {
 			sitekey: data.turnstileSiteKey,
 			action: contactTurnstileAction,
+			appearance: 'interaction-only',
 			callback: (token) => {
 				turnstileVerified = token.length > 0;
 			},
@@ -175,44 +176,59 @@
 			};
 		}}
 	>
-		<div class="form-grid">
-			<div class="field">
-				<label for="name">お名前（任意）</label>
-				<input id="name" name="name" maxlength={maxNameLength} bind:value={values.name} />
-				{#if form?.errors?.name}<span class="field-error">{form.errors.name}</span>{/if}
-			</div>
+		<div class="form-container">
+			<label for="name">お名前</label>
+			<input
+				id="name"
+				name="name"
+				type="text"
+				maxlength={maxNameLength}
+				disabled={submitting}
+				bind:value={values.name}
+			/>
 
-			<div class="field">
-				<label for="email">メールアドレス（必須）</label>
-				<input id="email" name="email" type="email" required bind:value={values.email} />
-				{#if form?.errors?.email}<span class="field-error">{form.errors.email}</span>{/if}
-			</div>
+			<label for="email" class="required-label">メールアドレス</label>
+			<input
+				id="email"
+				name="email"
+				type="email"
+				required
+				disabled={submitting}
+				bind:value={values.email}
+			/>
 
-			<div class="field full-width">
-				<label for="categoryKey">お問い合わせの種類（必須）</label>
-				<select id="categoryKey" name="categoryKey" required bind:value={values.categoryKey}>
-					<option value="" disabled>選択してください</option>
-					{#each Object.entries(categories) as [key, label]}
-						<option value={key}>{label}</option>
-					{/each}
-				</select>
-				{#if form?.errors?.categoryKey}<span class="field-error">{form.errors.categoryKey}</span
-					>{/if}
-			</div>
+			<label for="categoryKey" class="required-label">種類</label>
+			<select
+				id="categoryKey"
+				name="categoryKey"
+				required
+				disabled={submitting}
+				bind:value={values.categoryKey}
+			>
+				<option value="" hidden></option>
+				{#each Object.entries(categories) as [key, label]}
+					<option value={key}>{label}</option>
+				{/each}
+			</select>
 
-			<div class="field full-width">
-				<label for="body">お問い合わせ内容（必須）</label>
-				<textarea
-					id="body"
-					name="body"
-					rows="9"
-					maxlength={maxBodyLength}
-					required
-					bind:value={values.body}></textarea>
-				<div class="field-meta">{values.body.length} / {maxBodyLength}文字</div>
-				{#if form?.errors?.body}<span class="field-error">{form.errors.body}</span>{/if}
-			</div>
+			<label for="body" class="required-label">本文</label>
+			<textarea
+				id="body"
+				name="body"
+				rows="6"
+				maxlength={maxBodyLength}
+				required
+				disabled={submitting}
+				bind:value={values.body}></textarea>
 		</div>
+
+		{#if form?.errors}
+			<div class="field-errors" role="alert">
+				{#each Object.entries(form.errors).filter(([field, error]) => field !== 'turnstileToken' && error) as [, error]}
+					<span class="field-error">{error}</span>
+				{/each}
+			</div>
+		{/if}
 
 		<div class="turnstile" bind:this={turnstileContainer}></div>
 		{#if form?.errors?.turnstileToken}
@@ -220,7 +236,7 @@
 		{/if}
 
 		<button type="submit" disabled={!data.turnstileSiteKey || !turnstileVerified || submitting}>
-			{submitting ? '送信中…' : '送信する'}
+			{submitting ? '送信中…' : '送信'}
 		</button>
 	</form>
 </article>
@@ -240,67 +256,58 @@
 		margin: 30px 0;
 	}
 
-	.notice,
+	.notice {
+		position: fixed;
+		right: 20px;
+		bottom: 20px;
+		z-index: 1;
+		padding: 8px;
+		border: 1px solid;
+		border-radius: 4px;
+		color: var(--main-color);
+		background-color: var(--background-color);
+	}
+
 	.configuration-error {
 		margin: 30px 0;
 		padding: 12px 16px;
 		border-radius: 4px;
-	}
-
-	.notice.success {
-		background: #edf8ef;
-		border: 1px solid #438653;
-	}
-
-	.notice.error,
-	.configuration-error {
 		background: #fff1f1;
 		border: 1px solid #b84747;
 	}
 
-	form {
-		margin-top: 40px;
-	}
-
-	.form-grid {
+	.form-container {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 24px;
+		grid-template-columns: auto 1fr;
+		gap: 20px;
 	}
 
-	.field {
-		display: flex;
-		flex-direction: column;
+	.required-label::after {
+		content: '必須';
+		margin-left: 8px;
+		padding: 2px 4px;
+		border-radius: 4px;
+		background-color: var(--main-color);
+		color: var(--background-color);
+		font-size: 0.75em;
 	}
 
-	.full-width {
-		grid-column: 1 / -1;
-	}
-
-	label {
-		font-weight: bold;
-	}
-
-	input,
+	input[type='text'],
+	input[type='email'],
 	select,
 	textarea {
-		box-sizing: border-box;
-		width: 100%;
-		border: 1px solid #777;
-		border-radius: 3px;
-		padding: 10px;
-		font: inherit;
-		background: white;
+		padding: 8px;
+		border-radius: 4px;
+		background-color: var(--main-color);
+		color: var(--background-color);
 	}
 
 	textarea {
-		resize: vertical;
+		font-family: var(--font-family);
 	}
 
-	.field-meta {
-		align-self: flex-end;
-		font-size: 0.85em;
-		color: #555;
+	.field-errors {
+		margin-top: 10px;
 	}
 
 	.field-error {
@@ -309,26 +316,28 @@
 		font-size: 0.9em;
 	}
 
-	.turnstile {
-		min-height: 65px;
-		margin: 30px 0 10px;
+	button {
+		display: block;
+		border: 1px solid;
+		padding: 15px 0;
+		margin-top: 30px;
+		width: 100%;
+		text-align: center;
+		color: var(--main-color);
+		background-color: var(--background-color);
+		text-decoration: none;
+		transition-duration: 0.3s;
 	}
 
-	button {
-		min-width: 160px;
-		border: 0;
-		border-radius: 3px;
-		padding: 12px 24px;
-		font: inherit;
-		font-weight: bold;
-		color: white;
-		background: #333;
-		cursor: pointer;
+	button:hover:not(:disabled) {
+		color: var(--background-color);
+		background-color: var(--main-color);
 	}
 
 	button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
+		color: var(--main-color);
+		border-color: var(--background-color);
+		background-color: var(--secondary-color);
 	}
 
 	@media (max-width: 950px) {
@@ -337,13 +346,17 @@
 		}
 	}
 
-	@media (max-width: 650px) {
-		.form-grid {
-			grid-template-columns: 1fr;
+	@media (max-width: 790px) {
+		.form-container {
+			grid-template-columns: inherit;
+			gap: 5px;
 		}
 
-		.field {
-			grid-column: 1;
+		input[type='text'],
+		input[type='email'],
+		select,
+		textarea {
+			margin-bottom: 20px;
 		}
 	}
 </style>

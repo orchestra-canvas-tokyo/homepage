@@ -27,11 +27,11 @@ describe('/contact page', () => {
 			props: { data: baseData, form: null } as never
 		});
 
-		expect(screen.getByLabelText('メールアドレス（必須）')).toBeRequired();
-		expect(screen.getByLabelText('お問い合わせの種類（必須）')).toBeRequired();
-		expect(screen.getByLabelText('お問い合わせ内容（必須）')).toBeRequired();
+		expect(screen.getByLabelText('メールアドレス')).toBeRequired();
+		expect(screen.getByLabelText('種類')).toBeRequired();
+		expect(screen.getByLabelText('本文')).toBeRequired();
 		expect(container.querySelector('iframe')).toBeNull();
-		await waitFor(() => expect(screen.getByRole('button', { name: '送信する' })).toBeEnabled());
+		await waitFor(() => expect(screen.getByRole('button', { name: '送信' })).toBeEnabled());
 	});
 
 	it('keeps the flyer insertion notice alongside the form', () => {
@@ -60,6 +60,6 @@ describe('/contact page', () => {
 		});
 
 		expect(screen.getByRole('alert')).toHaveTextContent('現在フォームを利用できません');
-		expect(screen.getByRole('button', { name: '送信する' })).toBeDisabled();
+		expect(screen.getByRole('button', { name: '送信' })).toBeDisabled();
 	});
 });

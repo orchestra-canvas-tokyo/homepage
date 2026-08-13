@@ -7,6 +7,7 @@ type TurnstileResponse = {
 	success?: boolean;
 	hostname?: string;
 	action?: string;
+	metadata?: { result_with_testing_key?: boolean };
 };
 
 export const verifyTurnstile = async (options: {
@@ -15,6 +16,7 @@ export const verifyTurnstile = async (options: {
 	expectedHostnames: string[];
 	remoteIp?: string | null;
 	idempotencyKey: string;
+	allowTestingResponse?: boolean;
 	fetch?: typeof fetch;
 }): Promise<boolean> => {
 	if (
@@ -45,11 +47,18 @@ export const verifyTurnstile = async (options: {
 
 	const result = (await response.json()) as TurnstileResponse;
 	const hostname = result.hostname?.toLowerCase();
+	const isDocumentedTestingResponse =
+		options.allowTestingResponse === true &&
+		result.success === true &&
+		result.metadata?.result_with_testing_key === true &&
+		hostname === 'example.com' &&
+		result.action === undefined;
 
 	return (
-		result.success === true &&
-		result.action === contactTurnstileAction &&
-		hostname !== undefined &&
-		options.expectedHostnames.includes(hostname)
+		isDocumentedTestingResponse ||
+		(result.success === true &&
+			result.action === contactTurnstileAction &&
+			hostname !== undefined &&
+			options.expectedHostnames.includes(hostname))
 	);
 };

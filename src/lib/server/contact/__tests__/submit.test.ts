@@ -34,6 +34,7 @@ const config: ContactRuntimeConfig = {
 	turnstileSiteKey: 'site-key',
 	turnstileSecretKey: 'secret',
 	turnstileHostnames: ['preview.example.com'],
+	allowTurnstileTestingResponse: false,
 	resendApiKey: 'api-key',
 	slackWebhookUrl: null,
 	configurationError: null
@@ -66,7 +67,8 @@ describe('submitContactForm', () => {
 				secret: 'secret',
 				expectedHostnames: ['preview.example.com'],
 				remoteIp: '198.51.100.10',
-				idempotencyKey: expect.any(String)
+				idempotencyKey: expect.any(String),
+				allowTestingResponse: false
 			})
 		);
 		const verificationOptions = mockedVerifyTurnstile.mock.calls[0]?.[0];

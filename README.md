@@ -163,6 +163,7 @@ npm install
 
 `.env.example` を `.env.local` にコピーし、ローカルまたはテスト用の値を設定してください。
 サンプルのTurnstileキーはCloudflare公式のテストキーで、本番環境では使用できません。
+公式テストキーのSiteverifyレスポンスは通常のaction・hostnameを返さないため、`DEPLOYMENT_ENV` が本番以外かつ公式always-pass sitekeyを使用している場合だけ、Cloudflareのテストレスポンスを明示的に許可します。
 
 | 変数                   | 必須 | 内容                                                        |
 | ---------------------- | :--: | ----------------------------------------------------------- |

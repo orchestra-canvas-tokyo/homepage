@@ -95,6 +95,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 新しい演奏会やお知らせ追加時は`src/lib/news.ts`も更新
 - ドキュメント用にTSDoc形式のコメントを積極的に使用
 - `/contact` はSvelteKit標準のsame-origin検証に加え、Turnstileのtoken・action・hostnameをサーバーで検証する
+- Cloudflare公式のalways-pass Turnstileレスポンスは、本番以外かつ公式テストsitekeyを設定した場合だけ許可する
 - 問い合わせのTurnstileトークンや秘密情報はログ・D1・action dataに含めない
 - `DEPLOYMENT_ENV=production` のときだけ問い合わせメールの内部宛先を有効にする。ローカルhostnameを含む本番設定は拒否する
 - D1とSlackの失敗はメール送信成功を取り消さない。Workersでは `platform.context.waitUntil` を利用する

@@ -75,7 +75,8 @@ export const submitContactForm = async (
 			secret: config.turnstileSecretKey,
 			expectedHostnames: config.turnstileHostnames,
 			remoteIp: options.remoteIp,
-			idempotencyKey: submissionId
+			idempotencyKey: submissionId,
+			allowTestingResponse: config.allowTurnstileTestingResponse
 		});
 	} catch (error) {
 		console.error('Turnstile verification failed:', error);

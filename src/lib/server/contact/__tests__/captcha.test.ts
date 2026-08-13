@@ -12,15 +12,16 @@ const validOptions = {
 
 describe('verifyTurnstile', () => {
 	it('requires success, contact action, and an allowed hostname', async () => {
-		const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
-			new Response(
-				JSON.stringify({
-					success: true,
-					action: 'contact',
-					hostname: 'www.orch-canvas.tokyo'
-				}),
-				{ status: 200 }
-			)
+		const fetchMock = vi.fn<typeof fetch>().mockImplementation(
+			async () =>
+				new Response(
+					JSON.stringify({
+						success: true,
+						action: 'contact',
+						hostname: 'www.orch-canvas.tokyo'
+					}),
+					{ status: 200 }
+				)
 		);
 
 		await expect(verifyTurnstile({ ...validOptions, fetch: fetchMock })).resolves.toBe(true);
@@ -45,6 +46,40 @@ describe('verifyTurnstile', () => {
 				new Response(JSON.stringify({ success: true, ...responseFields }), { status: 200 })
 			);
 		await expect(verifyTurnstile({ ...validOptions, fetch: fetchMock })).resolves.toBe(false);
+	});
+
+	it('accepts the documented dummy-key response only when testing is explicitly enabled', async () => {
+		const fetchMock = vi.fn<typeof fetch>().mockImplementation(
+			async () =>
+				new Response(
+					JSON.stringify({
+						success: true,
+						hostname: 'example.com',
+						metadata: { result_with_testing_key: true }
+					})
+				)
+		);
+
+		await expect(
+			verifyTurnstile({ ...validOptions, allowTestingResponse: true, fetch: fetchMock })
+		).resolves.toBe(true);
+		await expect(
+			verifyTurnstile({ ...validOptions, allowTestingResponse: false, fetch: fetchMock })
+		).resolves.toBe(false);
+	});
+
+	it.each([
+		{ hostname: 'attacker.example', metadata: { result_with_testing_key: true } },
+		{ hostname: 'example.com', metadata: undefined },
+		{ hostname: 'example.com', metadata: { result_with_testing_key: true }, action: 'other' }
+	])('rejects an invalid testing response: %o', async (responseFields) => {
+		const fetchMock = vi
+			.fn<typeof fetch>()
+			.mockResolvedValue(new Response(JSON.stringify({ success: true, ...responseFields })));
+
+		await expect(
+			verifyTurnstile({ ...validOptions, allowTestingResponse: true, fetch: fetchMock })
+		).resolves.toBe(false);
 	});
 
 	it('rejects oversized tokens before making a network request', async () => {

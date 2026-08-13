@@ -10,6 +10,21 @@ describe('resolveContactRuntimeConfig', () => {
 
 		expect(config.isProduction).toBe(false);
 		expect(config.turnstileHostnames).toEqual(['preview.example.com', 'example.com']);
+		expect(config.allowTurnstileTestingResponse).toBe(false);
+	});
+
+	it('allows documented testing responses only with the always-pass site key outside production', () => {
+		const preview = resolveContactRuntimeConfig({
+			DEPLOYMENT_ENV: 'preview',
+			TURNSTILE_SITE_KEY: '1x00000000000000000000AA'
+		});
+		const production = resolveContactRuntimeConfig({
+			DEPLOYMENT_ENV: 'production',
+			TURNSTILE_SITE_KEY: '1x00000000000000000000AA'
+		});
+
+		expect(preview.allowTurnstileTestingResponse).toBe(true);
+		expect(production.allowTurnstileTestingResponse).toBe(false);
 	});
 
 	it('rejects local Turnstile hostnames in production', () => {

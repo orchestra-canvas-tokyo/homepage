@@ -4,6 +4,8 @@ type ContactPlatformEnv = Partial<NonNullable<App.Platform['env']>> | undefined;
 type ContactDatabase = NonNullable<App.Platform['env']['DB']>;
 type ContactStringEnvKey = Exclude<keyof NonNullable<ContactPlatformEnv>, 'DB'>;
 
+const alwaysPassTurnstileSiteKey = '1x00000000000000000000AA';
+
 const readNonEmptyString = (value: unknown): string | null =>
 	typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 
@@ -25,6 +27,7 @@ export type ContactRuntimeConfig = {
 	turnstileSiteKey: string | null;
 	turnstileSecretKey: string | null;
 	turnstileHostnames: string[];
+	allowTurnstileTestingResponse: boolean;
 	resendApiKey: string | null;
 	slackWebhookUrl: string | null;
 	configurationError: string | null;
@@ -35,6 +38,7 @@ export const resolveContactRuntimeConfig = (
 ): ContactRuntimeConfig => {
 	const deploymentEnv = readEnv(platformEnv, 'DEPLOYMENT_ENV') ?? 'local';
 	const isProduction = deploymentEnv === 'production';
+	const turnstileSiteKey = readEnv(platformEnv, 'TURNSTILE_SITE_KEY');
 	const turnstileHostnames = parseHostnames(readEnv(platformEnv, 'TURNSTILE_HOSTNAMES'));
 	const hasUnsafeProductionHostname =
 		isProduction && turnstileHostnames.some((hostname) => localHostnames.has(hostname));
@@ -43,9 +47,10 @@ export const resolveContactRuntimeConfig = (
 		db: platformEnv?.DB ?? null,
 		deploymentEnv,
 		isProduction,
-		turnstileSiteKey: readEnv(platformEnv, 'TURNSTILE_SITE_KEY'),
+		turnstileSiteKey,
 		turnstileSecretKey: readEnv(platformEnv, 'TURNSTILE_SECRET_KEY'),
 		turnstileHostnames,
+		allowTurnstileTestingResponse: !isProduction && turnstileSiteKey === alwaysPassTurnstileSiteKey,
 		resendApiKey: readEnv(platformEnv, 'RESEND_API_KEY'),
 		slackWebhookUrl: readEnv(platformEnv, 'SLACK_WEBHOOK_URL'),
 		configurationError: hasUnsafeProductionHostname
