@@ -172,7 +172,7 @@ npm install
 | `TURNSTILE_SECRET_KEY` |  ○   | Turnstileの秘密キー                                         |
 | `TURNSTILE_HOSTNAMES`  |  ○   | 許可hostnameのカンマ区切り一覧                              |
 | `RESEND_API_KEY`       |  ○   | Resend APIキー                                              |
-| `SLACK_WEBHOOK_URL`    | 任意 | 未設定時はSlack通知を無効化                                 |
+| `SLACK_WEBHOOK_URL`    | 任意 | 本番のみ有効。未設定時と非本番環境ではSlack通知を無効化     |
 | `DB`                   | 任意 | Cloudflare D1 binding。未設定時は問い合わせログを保存しない |
 
 Cloudflare Pagesでは、`TURNSTILE_SECRET_KEY`、`RESEND_API_KEY`、`SLACK_WEBHOOK_URL`を暗号化済みのSecretとして登録してください。公開情報である`TURNSTILE_SITE_KEY`と、`DEPLOYMENT_ENV`、`TURNSTILE_HOSTNAMES`は通常の環境変数として登録できます。

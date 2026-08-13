@@ -52,7 +52,7 @@ export const resolveContactRuntimeConfig = (
 		turnstileHostnames,
 		allowTurnstileTestingResponse: !isProduction && turnstileSiteKey === alwaysPassTurnstileSiteKey,
 		resendApiKey: readEnv(platformEnv, 'RESEND_API_KEY'),
-		slackWebhookUrl: readEnv(platformEnv, 'SLACK_WEBHOOK_URL'),
+		slackWebhookUrl: isProduction ? readEnv(platformEnv, 'SLACK_WEBHOOK_URL') : null,
 		configurationError: hasUnsafeProductionHostname
 			? 'Production Turnstile hostnames must not include local development hosts.'
 			: null

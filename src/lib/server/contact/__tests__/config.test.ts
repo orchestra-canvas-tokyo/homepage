@@ -36,4 +36,18 @@ describe('resolveContactRuntimeConfig', () => {
 		expect(config.isProduction).toBe(true);
 		expect(config.configurationError).toMatch(/must not include local/);
 	});
+
+	it('disables Slack notifications outside production', () => {
+		const preview = resolveContactRuntimeConfig({
+			DEPLOYMENT_ENV: 'preview',
+			SLACK_WEBHOOK_URL: 'https://hooks.slack.test/services/example'
+		});
+		const production = resolveContactRuntimeConfig({
+			DEPLOYMENT_ENV: 'production',
+			SLACK_WEBHOOK_URL: 'https://hooks.slack.test/services/example'
+		});
+
+		expect(preview.slackWebhookUrl).toBeNull();
+		expect(production.slackWebhookUrl).toBe('https://hooks.slack.test/services/example');
+	});
 });
