@@ -99,6 +99,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 問い合わせのTurnstileトークンや秘密情報はログ・D1・action dataに含めない
 - `DEPLOYMENT_ENV=production` のときだけ問い合わせメールの内部宛先を有効にする。ローカルhostnameを含む本番設定は拒否する
 - D1とSlackの失敗はメール送信成功を取り消さない。Workersでは `platform.context.waitUntil` を利用する
+- 問い合わせフォームの実送信やメール送信テストは、ユーザーからその都度明示的な依頼がある場合だけ行う。通常の検証にはモック、生成HTML、ローカルテストを使う
+- 問い合わせのHTMLメールは旧問い合わせアプリの意匠（暗色背景、ヘッダーバナー、区切り線、種類・本文の明細）を維持し、テーブルレイアウトとインラインCSSでメールクライアント互換性を確保する
 
 ## メンテナンス知見
 

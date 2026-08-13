@@ -2,6 +2,9 @@ import { categories, type ContactCategoryKey, type ContactRequest } from '$lib/c
 
 const resendEndpoint = 'https://api.resend.com/emails';
 const requestTimeoutMs = 10_000;
+const emailBannerUrl = 'https://pub-0aeda23dde5e4ea894ce7d8b49189414.r2.dev/header-banner.png';
+const emailFontFamily =
+	"-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, sans-serif";
 
 const ccsByCategory = {
 	'concert, ticket': ['webadmin@orch-canvas.tokyo', 'info@orch-canvas.tokyo'],
@@ -52,20 +55,75 @@ ${content.body}`.trim();
 
 export const generateContactHtmlBody = (content: ContactMailContent): string => {
 	const recipientLine = content.name
-		? `<p style="margin:0 0 24px;">${escapeHtml(content.name)}さま</p>`
+		? `<p style="margin:0 0 24px;font-family:${emailFontFamily};font-size:16px;line-height:1.8;letter-spacing:0.06em;color:#ffffff;">${escapeHtml(content.name)}さま</p>`
 		: '';
+	const category = escapeHtml(categories[content.categoryKey]);
+	const body = escapeHtml(content.body).replaceAll('\n', '<br />');
 
 	return `<!doctype html>
-<html lang="ja">
-<body style="font-family:sans-serif;line-height:1.7;color:#222;">
-${recipientLine}
-<p>Orchestra Canvas Tokyoです。<br />ホームページより、お問い合わせを承りました。</p>
-<p>必要に応じてメールにてご返答いたします。<br />メールアドレスが正しく入力されていない場合、返答いたしかねます。ご了承ください。</p>
-<hr />
-<p><strong>分類：</strong>${escapeHtml(categories[content.categoryKey])}</p>
-<p><strong>本文：</strong><br />${escapeHtml(content.body).replaceAll('\n', '<br />')}</p>
-</body>
-</html>`;
+	<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="x-apple-disable-message-reformatting" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge" />
+		<meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no" />
+		<title>お問い合わせを承りました。</title>
+		<style>
+			@media only screen and (max-width: 600px) {
+				.email-container { width: 100% !important; }
+				.email-header { padding: 40px 20px 36px !important; }
+				.email-content { padding: 0 20px 48px !important; }
+				.email-heading { font-size: 24px !important; line-height: 1.5 !important; }
+				.detail-label,
+				.detail-value { display: block !important; width: 100% !important; }
+				.detail-label { padding: 0 0 4px !important; }
+				.detail-value { padding: 0 0 20px !important; }
+			}
+		</style>
+	</head>
+	<body style="width:100%;margin:0;padding:0;background-color:#0a0606;">
+		<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">ホームページより、お問い合わせを承りました。</div>
+		<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#0a0606" style="width:100%;border-collapse:collapse;background-color:#0a0606;">
+			<tr>
+				<td align="center" style="margin:0;padding:0;">
+					<!--[if mso]><table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0"><tr><td><![endif]-->
+					<table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" class="email-container" style="width:100%;max-width:600px;border-collapse:collapse;background-color:#0a0606;">
+						<tr>
+							<td align="center" class="email-header" style="padding:56px 24px 48px;">
+								<img src="${emailBannerUrl}" width="420" alt="Orchestra Canvas Tokyo" style="display:block;width:100%;max-width:420px;height:auto;border:0;outline:none;text-decoration:none;" />
+							</td>
+						</tr>
+						<tr>
+							<td class="email-content" style="padding:0 24px 64px;">
+								<h1 class="email-heading" style="margin:0 0 48px;font-family:${emailFontFamily};font-size:28px;font-weight:400;line-height:1.5;letter-spacing:0.08em;color:#ffffff;">お問い合わせを承りました。</h1>
+								${recipientLine}
+								<p style="margin:0 0 24px;font-family:${emailFontFamily};font-size:16px;line-height:1.8;letter-spacing:0.06em;color:#ffffff;">Orchestra Canvas Tokyoです。<br />ホームページより、お問い合わせを承りました。</p>
+								<p style="margin:0;font-family:${emailFontFamily};font-size:16px;line-height:1.8;letter-spacing:0.06em;color:#ffffff;">必要に応じてメールにてご返答いたします。<br />なお、メールアドレスが正しく入力されていない場合、返答いたしかねます。ご了承ください。</p>
+								<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;border-collapse:collapse;">
+									<tr>
+										<td style="padding:40px 0;border-bottom:1px solid #666666;font-size:0;line-height:0;">&nbsp;</td>
+									</tr>
+								</table>
+								<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;border-collapse:collapse;">
+									<tr>
+										<td width="96" valign="top" class="detail-label" style="width:96px;padding:0 20px 16px 0;font-family:${emailFontFamily};font-size:16px;font-weight:600;line-height:1.8;letter-spacing:0.06em;color:#ffffff;">種類</td>
+										<td valign="top" class="detail-value" style="padding:0 0 16px;font-family:${emailFontFamily};font-size:16px;line-height:1.8;letter-spacing:0.06em;color:#ffffff;word-break:break-word;">${category}</td>
+									</tr>
+									<tr>
+										<td width="96" valign="top" class="detail-label" style="width:96px;padding:0 20px 0 0;font-family:${emailFontFamily};font-size:16px;font-weight:600;line-height:1.8;letter-spacing:0.06em;color:#ffffff;">本文</td>
+										<td valign="top" class="detail-value" style="padding:0;font-family:${emailFontFamily};font-size:16px;line-height:1.8;letter-spacing:0.06em;color:#ffffff;word-break:break-word;">${body}</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+					<!--[if mso]></td></tr></table><![endif]-->
+				</td>
+			</tr>
+		</table>
+	</body>
+	</html>`;
 };
 
 export const buildContactEmailPayload = (

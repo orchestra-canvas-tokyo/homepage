@@ -27,6 +27,21 @@ describe('contact email', () => {
 		expect(payload.html).toContain('山田 &lt;太郎&gt;');
 	});
 
+	it('preserves the legacy dark email design with refined typography and responsive details', () => {
+		const payload = buildContactEmailPayload(sampleContent, false);
+
+		expect(payload.html).toContain('background-color:#0a0606');
+		expect(payload.html).toContain(
+			'https://pub-0aeda23dde5e4ea894ce7d8b49189414.r2.dev/header-banner.png'
+		);
+		expect(payload.html).toContain('width="420"');
+		expect(payload.html).toContain('font-size:28px');
+		expect(payload.html).toContain('font-size:16px');
+		expect(payload.html).toContain('class="detail-label"');
+		expect(payload.html).toContain('class="detail-value"');
+		expect(payload.html).not.toContain('font-size:42px');
+	});
+
 	it('calls Resend with idempotency and User-Agent headers', async () => {
 		const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}', { status: 200 }));
 		await sendContactEmail(sampleContent, {
