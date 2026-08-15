@@ -28,8 +28,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **マイグレーション生成**: `npx drizzle-kit generate`
 - **環境別適用**:
   - ローカル: `npx wrangler d1 migrations apply DB`
-  - プレビュー: `npx wrangler d1 migrations apply DB --remote --env preview`
-  - 本番: `npx wrangler d1 migrations apply DB --remote --env production`
+  - プレビュー: Pagesのpreview bindingが指すD1を確認してから適用する（現在のdatabase nameは`homepage`）
+  - 本番: production bindingはpreviewと別DB。明示的な本番作業依頼なしに適用しない
+- このリポジトリにはWrangler設定ファイルがないため、`--env preview`だけでは対象DBを確定できない。リモート操作前にPages project設定のbinding IDとD1 databaseを照合する
 
 ## アーキテクチャ概要
 
@@ -38,7 +39,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### 技術スタック
 
 - **フレームワーク**: SvelteKit with TypeScript
-- **デプロイ**: Cloudflare Pages（D1データベースとKVストレージ使用）
+- **デプロイ**: Cloudflare Pages（問い合わせログには任意でD1を使用）
 - **テスト**: Vitest with Testing Library
 - **スタイリング**: コンポーネントスコープCSS
 - **テンプレート生成**: Hygen（演奏会ページ作成用）
@@ -72,7 +73,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **演奏会管理**: Hygenテンプレートによる自動演奏会ページ生成
 - **複数演奏会タイプ**: 定期演奏会と室内楽演奏会の異なるデータ構造に対応
 - **レスポンシブデザイン**: モバイルファーストのアダプティブレイアウト
-- **お問い合わせシステム**: reCAPTCHA v3、Cloudflare KVによるセッション管理、Resendによるメール送信
+- **お問い合わせシステム**: SvelteKit form action、Turnstile、Resend。D1ログとSlack通知は任意で、KVには依存しない
 - **アクセス解析**: Cloudflare Web AnalyticsとGoogle Search Console連携
 
 ### データフロー
@@ -93,6 +94,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 新しいコンポーネントは`src/lib/components/__tests__/`でテスト
 - 新しい演奏会やお知らせ追加時は`src/lib/news.ts`も更新
 - ドキュメント用にTSDoc形式のコメントを積極的に使用
+- `/contact` はSvelteKit標準のsame-origin検証に加え、Turnstileのtoken・action・hostnameをサーバーで検証する
+- Cloudflare公式のalways-pass Turnstileレスポンスは、本番以外かつ公式テストsitekeyを設定した場合だけ許可する
+- 問い合わせのTurnstileトークンや秘密情報はログ・D1・action dataに含めない
+- `DEPLOYMENT_ENV=production` のときだけ問い合わせメールの内部宛先を有効にする。ローカルhostnameを含む本番設定は拒否する
+- D1とSlackの失敗はメール送信成功を取り消さない。Workersでは `platform.context.waitUntil` を利用する
+- 問い合わせフォームの実送信やメール送信テストは、ユーザーからその都度明示的な依頼がある場合だけ行う。通常の検証にはモック、生成HTML、ローカルテストを使う
+- 問い合わせのHTMLメールは旧問い合わせアプリの意匠（暗色背景、ヘッダーバナー、区切り線、種類・本文の明細）を維持し、テーブルレイアウトとインラインCSSでメールクライアント互換性を確保する
 
 ## メンテナンス知見
 
