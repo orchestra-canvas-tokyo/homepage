@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/svelte';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ContactPage from '../+page.svelte';
 
 const baseData = {
@@ -20,6 +20,10 @@ describe('/contact page', () => {
 			reset: vi.fn(),
 			remove: vi.fn()
 		};
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
 	});
 
 	it('renders a native required form rather than the old iframe', async () => {
@@ -61,5 +65,28 @@ describe('/contact page', () => {
 
 		expect(screen.getByRole('alert')).toHaveTextContent('現在フォームを利用できません');
 		expect(screen.getByRole('button', { name: '送信' })).toBeDisabled();
+	});
+
+	it('fades and removes successful feedback after five seconds', async () => {
+		vi.useFakeTimers();
+		render(ContactPage, {
+			props: {
+				data: baseData,
+				form: {
+					success: true,
+					message: 'お問い合わせを受け付けました。確認メールをお送りしました。'
+				}
+			} as never
+		});
+
+		const toast = screen.getByRole('status');
+		expect(toast).toHaveClass('notice', 'success');
+		expect(toast).toHaveTextContent('確認メールをお送りしました。');
+
+		await vi.advanceTimersByTimeAsync(4_999);
+		expect(screen.getByRole('status')).toBeInTheDocument();
+
+		await vi.advanceTimersByTimeAsync(1);
+		expect(screen.queryByRole('status')).not.toBeInTheDocument();
 	});
 });
