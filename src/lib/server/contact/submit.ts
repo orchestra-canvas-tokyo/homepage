@@ -147,5 +147,5 @@ export const submitContactForm = async (
 	}
 	await Promise.all(backgroundTasks);
 
-	return { ok: true, message: 'お問い合わせを受け付けました。確認メールをご確認ください。' };
+	return { ok: true, message: 'お問い合わせを受け付けました。確認メールをお送りしました。' };
 };

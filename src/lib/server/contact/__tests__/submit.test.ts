@@ -60,7 +60,10 @@ describe('submitContactForm', () => {
 			remoteIp: '198.51.100.10'
 		});
 
-		expect(result.ok).toBe(true);
+		expect(result).toMatchObject({
+			ok: true,
+			message: 'お問い合わせを受け付けました。確認メールをお送りしました。'
+		});
 		expect(mockedVerifyTurnstile).toHaveBeenCalledWith(
 			expect.objectContaining({
 				token: 'token',

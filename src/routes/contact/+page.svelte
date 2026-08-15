@@ -21,7 +21,12 @@
 	let turnstileWidgetId = $state<string | null>(null);
 	let turnstileVerified = $state(false);
 	let submitting = $state(false);
-	let feedback = $state<{ success: boolean; message: string } | null>(null);
+	let feedback = $state<{ success: boolean; message: string } | null>(
+		untrack(() => (form ? { success: form.success, message: form.message } : null))
+	);
+	let feedbackTimeout: number | undefined;
+
+	const feedbackLifetimeMs = 5_000;
 
 	const renderTurnstile = (): boolean => {
 		if (!data.turnstileSiteKey || !window.turnstile || !turnstileContainer || turnstileWidgetId) {
@@ -55,12 +60,33 @@
 		return result.data as ContactActionData;
 	};
 
+	const clearFeedbackTimeout = () => {
+		if (feedbackTimeout === undefined) return;
+		window.clearTimeout(feedbackTimeout);
+		feedbackTimeout = undefined;
+	};
+
+	const scheduleFeedbackDismissal = () => {
+		clearFeedbackTimeout();
+		if (!feedback?.success) return;
+
+		feedbackTimeout = window.setTimeout(() => {
+			feedback = null;
+			feedbackTimeout = undefined;
+		}, feedbackLifetimeMs);
+	};
+
+	const showFeedback = (actionData: ContactActionData) => {
+		feedback = { success: actionData.success, message: actionData.message };
+		scheduleFeedbackDismissal();
+	};
+
 	onMount(() => {
-		if (!data.turnstileSiteKey) return;
+		scheduleFeedbackDismissal();
 
 		let interval: number | undefined;
 		let timeout: number | undefined;
-		if (!renderTurnstile()) {
+		if (data.turnstileSiteKey && !renderTurnstile()) {
 			interval = window.setInterval(() => {
 				if (renderTurnstile() && interval !== undefined) window.clearInterval(interval);
 			}, 100);
@@ -70,6 +96,7 @@
 		}
 
 		return () => {
+			clearFeedbackTimeout();
 			if (interval !== undefined) window.clearInterval(interval);
 			if (timeout !== undefined) window.clearTimeout(timeout);
 			if (turnstileWidgetId) window.turnstile?.remove(turnstileWidgetId);
@@ -137,16 +164,6 @@
 		>
 			{feedback.message}
 		</div>
-	{:else if form}
-		<div
-			class:success={form.success}
-			class:error={!form.success}
-			class="notice"
-			role="status"
-			aria-live="polite"
-		>
-			{form.message}
-		</div>
 	{/if}
 
 	{#if !data.turnstileSiteKey}
@@ -159,6 +176,7 @@
 		method="POST"
 		use:enhance={() => {
 			submitting = true;
+			clearFeedbackTimeout();
 			feedback = null;
 
 			return async ({ result, update }) => {
@@ -167,7 +185,7 @@
 
 				try {
 					await update({ reset: successful, invalidateAll: false });
-					if (actionData) feedback = { success: actionData.success, message: actionData.message };
+					if (actionData) showFeedback(actionData);
 					if (successful) values = emptyContactFormValues();
 				} finally {
 					submitting = false;
@@ -266,6 +284,34 @@
 		border-radius: 4px;
 		color: var(--main-color);
 		background-color: var(--background-color);
+	}
+
+	.notice.success {
+		animation: contact-toast-lifecycle 5s ease forwards;
+	}
+
+	@keyframes contact-toast-lifecycle {
+		0% {
+			opacity: 0;
+			transform: translateY(8px);
+		}
+
+		5%,
+		90% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		100% {
+			opacity: 0;
+			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.notice.success {
+			animation-timing-function: step-end;
+		}
 	}
 
 	.configuration-error {
