@@ -15,10 +15,17 @@ const execFileAsync = promisify(execFile);
 const temporaryDirectories: string[] = [];
 
 const runGit = async (cwd: string, args: string[]): Promise<string> => {
+	const gitEnv = { ...process.env };
+	// Git hooks export repository-scoped variables that must not leak into these isolated test repos.
+	delete gitEnv.GIT_DIR;
+	delete gitEnv.GIT_WORK_TREE;
+	delete gitEnv.GIT_INDEX_FILE;
+	delete gitEnv.GIT_PREFIX;
+
 	const { stdout } = await execFileAsync('git', ['-c', 'commit.gpgsign=false', ...args], {
 		cwd,
 		env: {
-			...process.env,
+			...gitEnv,
 			GIT_AUTHOR_NAME: 'Test User',
 			GIT_AUTHOR_EMAIL: 'test@example.com',
 			GIT_COMMITTER_NAME: 'Test User',
