@@ -15,7 +15,9 @@ export type SeasonalEvent = {
 };
 
 export type SeasonalOverrideAction =
-	{ type: 'set'; eventId: SeasonalEventId } | { type: 'clear' } | { type: 'none' };
+	| { type: 'set'; eventId: SeasonalEventId }
+	| { type: 'clear' }
+	| { type: 'none' };
 
 const seasonalTimeZone = 'Asia/Tokyo';
 const clearOverrideValues = new Set(['0', 'off', 'false', 'clear']);
