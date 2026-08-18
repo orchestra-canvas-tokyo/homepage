@@ -237,8 +237,7 @@
 				maxlength={maxBodyLength}
 				required
 				disabled={submitting}
-				bind:value={values.body}
-			></textarea>
+				bind:value={values.body}></textarea>
 		</div>
 
 		{#if form?.errors}
