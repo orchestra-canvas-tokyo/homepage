@@ -13,13 +13,14 @@
 		organizationStats.youtubeTotalViewCount
 	);
 
+	// 五十音順、アルファベットは末尾にアルファベット順で
 	const supporters: string[] = [
 		'内田　明美子　様',
 		'金森　凌大　様',
-		'鈴木　辰生　様',
 		'上條　義昭　様',
 		'神山　和子　様',
 		'神山　　怜　様',
+		'鈴木　辰生　様',
 		'螺良　修一　様',
 		'半田　翔希　様',
 		'山田　千尋　様',
