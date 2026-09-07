@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
+      actions: write
       contents: write
       pull-requests: write
     env:
@@ -48,6 +49,7 @@ jobs:
           fi
           STATE="$(gh pr view "$PR_NUMBER" --json state --jq .state)"
           if [ "$STATE" = 'MERGED' ]; then
+            echo 'merged=true' >> "$GITHUB_OUTPUT"
             echo 'PR #272 already merged.' >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
@@ -91,6 +93,7 @@ jobs:
           npm run build
 
       - name: Merge production release PR
+        id: merge
         if: steps.pr.outputs.number != ''
         env:
           PR_NUMBER: ${{ steps.pr.outputs.number }}
@@ -103,3 +106,41 @@ jobs:
             exit 1
           fi
           echo "Merged production PR #${PR_NUMBER}; Cloudflare Pages will build the deployment." >> "$GITHUB_STEP_SUMMARY"
+          echo 'merged=true' >> "$GITHUB_OUTPUT"
+
+      - name: Remove completed scheduler
+        if: steps.pr.outputs.merged == 'true' || steps.merge.outputs.merged == 'true'
+        env:
+          CLEANUP_BRANCH: cleanup/scheduled-production-272
+          WORKFLOW_PATH: .github/workflows/scheduled_production_release.yaml
+        run: |
+          # These deletion-only PRs are prepared before release. Remove production
+          # first so a failure can still retry from the workflow on main.
+          for BASE in production main; do
+            CLEANUP_PR="$(gh pr list --state all --base "$BASE" --head "$CLEANUP_BRANCH" --json number --jq '.[0].number // empty')"
+            if [ -z "$CLEANUP_PR" ]; then
+              echo "Missing prepared cleanup PR for ${BASE}." >&2
+              exit 1
+            fi
+            STATE="$(gh pr view "$CLEANUP_PR" --json state --jq .state)"
+            if [ "$STATE" = 'MERGED' ]; then
+              continue
+            fi
+            if [ "$STATE" != 'OPEN' ]; then
+              echo "Cleanup PR #${CLEANUP_PR} is not open." >&2
+              exit 1
+            fi
+            CLEANUP_SHA="$(gh pr view "$CLEANUP_PR" --json headRefOid --jq .headRefOid)"
+            FILES="$(gh api "repos/${GH_REPO}/pulls/${CLEANUP_PR}/files" --paginate --slurp)"
+            if ! jq -e --arg path "$WORKFLOW_PATH" 'add | length == 1 and .[0].filename == $path and .[0].status == "removed"' <<< "$FILES" > /dev/null; then
+              echo "Cleanup PR #${CLEANUP_PR} must only delete the scheduler." >&2
+              exit 1
+            fi
+            gh pr merge "$CLEANUP_PR" --merge --match-head-commit "$CLEANUP_SHA"
+            if [ "$(gh pr view "$CLEANUP_PR" --json state --jq .state)" != 'MERGED' ]; then
+              echo "Cleanup PR #${CLEANUP_PR} has not merged." >&2
+              exit 1
+            fi
+          done
+          gh workflow disable scheduled_production_release.yaml
+          echo 'Scheduler removed from main and production and disabled. Run logs follow repository retention settings.' >> "$GITHUB_STEP_SUMMARY"
