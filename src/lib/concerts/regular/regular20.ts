@@ -8,7 +8,7 @@ export const concert: Concert = {
 	number: number,
 	slug: `${type}-${number}`,
 	title: `第${number}回${getConcertShortName(type)}演奏会`,
-	dateTime: { date: '2027-11-7', time: '昼公演' },
+	dateTime: { date: '2027-11-7', time: '13:00開場 14:00開演' },
 	place: {
 		name: '東京芸術劇場 コンサートホール'
 	},
@@ -16,7 +16,7 @@ export const concert: Concert = {
 		name: '松本 宗利音'
 	},
 	ticket: {
-		description: '未定'
+		description: '1,000円'
 	},
 	showLinkToProgramNote: false
 };
