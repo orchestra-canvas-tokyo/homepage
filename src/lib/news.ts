@@ -298,5 +298,10 @@ export const newsItems: {
 		url: '/concerts/participation-lfj-2026',
 		date: '2026/5/1',
 		content: 'LFJエリアコンサート＠丸の内への出演情報を公開しました。'
+	},
+	{
+		url: '/concerts/regular-20',
+		date: '2026/9/5',
+		content: '第20回定期演奏会の情報を公開しました。'
 	}
 ];

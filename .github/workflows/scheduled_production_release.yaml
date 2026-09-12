@@ -1,0 +1,146 @@
+name: Scheduled production release 2026-09-12
+
+on:
+  schedule:
+    # September 12, 09:00 JST; retry every 10 minutes during that JST day.
+    - cron: '*/10 0-14 12 9 *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: scheduled-production-release-20260912
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      PR_NUMBER: 272
+    steps:
+      - name: Check release window
+        id: window
+        run: |
+          NOW="$(date -u +%s)"
+          START="$(date -u -d '2026-09-12 00:00:00' +%s)"
+          END="$(date -u -d '2026-09-12 15:00:00' +%s)"
+          if (( NOW >= START && NOW < END )); then
+            echo 'due=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Find production release PR
+        if: steps.window.outputs.due == 'true'
+        id: pr
+        run: |
+          if [ "$(gh pr view 271 --json state --jq .state)" != 'MERGED' ]; then
+            echo 'PR #271 must be merged by its owner before this release.' >&2
+            exit 1
+          fi
+          STATE="$(gh pr view "$PR_NUMBER" --json state --jq .state)"
+          if [ "$STATE" = 'MERGED' ]; then
+            echo 'merged=true' >> "$GITHUB_OUTPUT"
+            echo 'PR #272 already merged.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [ "$STATE" != 'OPEN' ]; then
+            echo 'PR #272 is not open.' >&2
+            exit 1
+          fi
+          TARGET="$(gh pr view "$PR_NUMBER" --json baseRefName,headRefName --jq '.baseRefName + ":" + .headRefName')"
+          if [ "$TARGET" != 'production:main' ]; then
+            echo 'PR #272 no longer targets main -> production.' >&2
+            exit 1
+          fi
+          RELEASE_SHA="$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)"
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "sha=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Check out release
+        if: steps.pr.outputs.number != ''
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.sha }}
+          fetch-depth: 0
+
+      - name: Verify concert change is included
+        if: steps.pr.outputs.number != ''
+        run: |
+          CONCERT_MERGE_SHA="$(gh pr view 271 --json mergeCommit --jq .mergeCommit.oid)"
+          git merge-base --is-ancestor "$CONCERT_MERGE_SHA" HEAD
+
+      - name: Set up Node.js
+        if: steps.pr.outputs.number != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: './.node-version'
+
+      - name: Validate release
+        if: steps.pr.outputs.number != ''
+        run: |
+          npm ci
+          npm run precommit
+          npm run build
+
+      - name: Merge production release PR
+        id: merge
+        if: steps.pr.outputs.number != ''
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          RELEASE_SHA: ${{ steps.pr.outputs.sha }}
+        run: |
+          # Refuse an updated head; a later scheduled run validates it again.
+          gh pr merge "$PR_NUMBER" --merge --match-head-commit "$RELEASE_SHA"
+          if [ "$(gh pr view "$PR_NUMBER" --json state --jq .state)" != 'MERGED' ]; then
+            echo 'Production PR has not merged; check branch rules or merge queue.' >&2
+            exit 1
+          fi
+          echo "Merged production PR #${PR_NUMBER}; Cloudflare Pages will build the deployment." >> "$GITHUB_STEP_SUMMARY"
+          echo 'merged=true' >> "$GITHUB_OUTPUT"
+
+      - name: Remove completed scheduler
+        if: steps.pr.outputs.merged == 'true' || steps.merge.outputs.merged == 'true'
+        env:
+          CLEANUP_BRANCH: cleanup/scheduled-production-272
+          WORKFLOW_PATH: .github/workflows/scheduled_production_release.yaml
+        run: |
+          # These deletion-only PRs are prepared before release. Remove production
+          # first so a failure can still retry from the workflow on main.
+          for BASE in production main; do
+            CLEANUP_PR="$(gh pr list --state all --base "$BASE" --head "$CLEANUP_BRANCH" --json number --jq '.[0].number // empty')"
+            if [ -z "$CLEANUP_PR" ]; then
+              echo "Missing prepared cleanup PR for ${BASE}." >&2
+              exit 1
+            fi
+            STATE="$(gh pr view "$CLEANUP_PR" --json state --jq .state)"
+            if [ "$STATE" = 'MERGED' ]; then
+              continue
+            fi
+            if [ "$STATE" != 'OPEN' ]; then
+              echo "Cleanup PR #${CLEANUP_PR} is not open." >&2
+              exit 1
+            fi
+            CLEANUP_SHA="$(gh pr view "$CLEANUP_PR" --json headRefOid --jq .headRefOid)"
+            FILES="$(gh api "repos/${GH_REPO}/pulls/${CLEANUP_PR}/files" --paginate --slurp)"
+            if ! jq -e --arg path "$WORKFLOW_PATH" 'add | length == 1 and .[0].filename == $path and .[0].status == "removed"' <<< "$FILES" > /dev/null; then
+              echo "Cleanup PR #${CLEANUP_PR} must only delete the scheduler." >&2
+              exit 1
+            fi
+            gh pr merge "$CLEANUP_PR" --merge --match-head-commit "$CLEANUP_SHA"
+            if [ "$(gh pr view "$CLEANUP_PR" --json state --jq .state)" != 'MERGED' ]; then
+              echo "Cleanup PR #${CLEANUP_PR} has not merged." >&2
+              exit 1
+            fi
+          done
+          gh workflow disable scheduled_production_release.yaml
+          echo 'Scheduler removed from main and production and disabled. Run logs follow repository retention settings.' >> "$GITHUB_STEP_SUMMARY"
