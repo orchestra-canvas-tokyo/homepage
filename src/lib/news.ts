@@ -301,7 +301,7 @@ export const newsItems: {
 	},
 	{
 		url: '/concerts/regular-20',
-		date: '2026/9/5',
+		date: '2026/9/12',
 		content: '第20回定期演奏会の情報を公開しました。'
 	}
 ];
