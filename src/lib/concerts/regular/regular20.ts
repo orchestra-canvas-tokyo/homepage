@@ -16,7 +16,7 @@ export const concert: Concert = {
 		name: '松本 宗利音'
 	},
 	ticket: {
-		description: '1,000円'
+		description: '未定'
 	},
 	showLinkToProgramNote: false
 };
