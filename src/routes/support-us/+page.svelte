@@ -90,7 +90,7 @@
 				<span>{supporter}</span>
 			{/each}
 		</div>
-		<div class="fullwidth-supporters">（他匿名10名様）</div>
+		<div class="fullwidth-supporters">（他匿名11名様）</div>
 	</div>
 
 	<h2>ご寄付のお願い・ご返礼</h2>
